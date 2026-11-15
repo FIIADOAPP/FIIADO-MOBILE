@@ -25,6 +25,7 @@ data class FormularioCliente(
 fun NavGraphBuilder.pantallasDeClientes(
     navController: NavController,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
+    onMetodosCobro: () -> Unit,
 ) {
     composable<ListaClientes> { entrada ->
         val registrado by entrada.savedStateHandle
@@ -36,6 +37,7 @@ fun NavGraphBuilder.pantallasDeClientes(
             onNuevo = { navController.navigate(FormularioCliente()) },
             onCliente = { navController.navigate(FormularioCliente(it.toString())) },
             onRegistrar = onRegistrar,
+            onMetodosCobro = onMetodosCobro,
         )
     }
     composable<FormularioCliente> {
