@@ -29,3 +29,4 @@ rootProject.name = "fiado"
 include(":app")
 include(":core:domain")
 include(":core:data")
+include(":feature:clientes")
