@@ -1,6 +1,8 @@
 package com.fiiadoapp.fiado.feature.clientes
 
 import androidx.lifecycle.SavedStateHandle
+import com.fiiadoapp.fiado.core.testing.LibretaFalsa
+import com.fiiadoapp.fiado.core.testing.ReglaDispatcherPrincipal
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.ErrorCliente

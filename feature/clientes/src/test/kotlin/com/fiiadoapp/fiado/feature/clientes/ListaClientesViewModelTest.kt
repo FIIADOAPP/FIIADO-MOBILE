@@ -1,5 +1,7 @@
 package com.fiiadoapp.fiado.feature.clientes
 
+import com.fiiadoapp.fiado.core.testing.LibretaFalsa
+import com.fiiadoapp.fiado.core.testing.ReglaDispatcherPrincipal
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.Movimiento

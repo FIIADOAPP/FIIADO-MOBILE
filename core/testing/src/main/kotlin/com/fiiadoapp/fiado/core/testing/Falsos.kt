@@ -1,4 +1,4 @@
-package com.fiiadoapp.fiado.feature.clientes
+package com.fiiadoapp.fiado.core.testing
 
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.ClienteConSaldo
