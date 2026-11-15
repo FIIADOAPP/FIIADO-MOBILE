@@ -1,0 +1,21 @@
+# Gradle y compilación
+.gradle/
+build/
+.kotlin/
+local.properties
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Firma y secretos
+*.jks
+*.keystore
+keystore.properties
+.env
+.env.*
+!.env.example
+
+# Node (hook de commitlint)
+node_modules/
