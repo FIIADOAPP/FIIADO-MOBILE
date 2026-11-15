@@ -34,6 +34,8 @@ dependencies {
     implementation(project(":core:domain"))
 
     implementation(libs.androidx.room.runtime)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
     ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit4)
