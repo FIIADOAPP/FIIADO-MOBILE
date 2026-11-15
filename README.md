@@ -11,14 +11,18 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 
 ## Capturas
 
-Se agregan cuando existan las primeras pantallas (Fase 1).
+<p>
+  <img src="docs/capturas/clientes-lista.png" alt="Lista de clientes con su saldo" width="240">
+  <img src="docs/capturas/clientes-editar.png" alt="Edición de un cliente con la opción de archivar" width="240">
+  <img src="docs/capturas/clientes-nuevo-error.png" alt="Validación al crear un cliente sin nombre" width="240">
+</p>
 
 ## Estado
 
 | Módulo | Estado |
 |---|---|
 | Esqueleto (Compose, Hilt, módulos, lint) | Listo |
-| Clientes | Pendiente |
+| Clientes (lista con saldo, búsqueda, alta, edición, archivado) | Listo |
 | Movimientos (fiar, cobrar, anular) | Pendiente |
 | Historial y resumen | Pendiente |
 | Inicio de sesión | Pendiente |
@@ -56,6 +60,7 @@ Ejecuta ktlint, Android Lint y las pruebas. `./gradlew spotlessApply` corrige el
 
 | Módulo | Contenido |
 |---|---|
-| `app` | Interfaz con Jetpack Compose y Material 3, navegación e inyección con Hilt. |
-| `core:domain` | Modelo y reglas del negocio. Kotlin puro, sin dependencias de Android. |
-| `core:data` | Persistencia local y sincronización. Implementa los contratos del dominio. |
+| `app` | Punto de entrada: tema, navegación entre funcionalidades y configuración de Hilt. |
+| `core:domain` | Modelo, reglas del negocio y contratos de repositorio. Kotlin puro, sin dependencias de Android. |
+| `core:data` | Room como fuente de verdad. Implementa los contratos del dominio. |
+| `feature:clientes` | Pantallas y ViewModels de clientes. |

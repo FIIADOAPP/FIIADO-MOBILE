@@ -1,0 +1,32 @@
+<resources>
+    <string name="clientes_titulo">Clientes</string>
+    <string name="clientes_nuevo">Nuevo cliente</string>
+    <string name="clientes_buscar">Buscar por nombre</string>
+    <string name="clientes_limpiar_busqueda">Limpiar búsqueda</string>
+    <string name="clientes_vacio">Aún no tienes clientes. Toca «Nuevo cliente» para agregar el primero.</string>
+    <string name="clientes_sin_resultados">Ningún cliente coincide con «%1$s».</string>
+
+    <string name="saldo_debe">Debe %1$s</string>
+    <string name="saldo_a_favor">A favor %1$s</string>
+    <string name="saldo_al_dia">Al día</string>
+
+    <string name="cliente_nuevo_titulo">Nuevo cliente</string>
+    <string name="cliente_editar_titulo">Editar cliente</string>
+    <string name="cliente_nombre">Nombre</string>
+    <string name="cliente_telefono">Celular (opcional)</string>
+    <string name="cliente_telefono_ayuda">Para recordarle sus cobros por WhatsApp.</string>
+    <string name="cliente_error_nombre_vacio">Escribe el nombre del cliente.</string>
+    <string name="cliente_error_telefono">Escribe un celular peruano de 9 dígitos que empiece con 9.</string>
+    <string name="cliente_archivar">Archivar cliente</string>
+    <string name="cliente_archivar_ayuda">El cliente deja de aparecer en la lista. Su historial se conserva.</string>
+    <string name="cliente_archivar_con_saldo">Solo se archiva un cliente con saldo en cero. Ahora: %1$s.</string>
+
+    <string name="guardar">Guardar</string>
+    <string name="volver">Volver</string>
+
+    <plurals name="cliente_error_nombre_largo">
+        <item quantity="one">Máximo %1$d carácter.</item>
+        <item quantity="many">Máximo %1$d caracteres.</item>
+        <item quantity="other">Máximo %1$d caracteres.</item>
+    </plurals>
+</resources>
