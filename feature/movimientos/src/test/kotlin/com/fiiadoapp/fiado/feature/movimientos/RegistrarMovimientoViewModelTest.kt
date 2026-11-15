@@ -6,6 +6,7 @@ import com.fiiadoapp.fiado.core.testing.ReglaDispatcherPrincipal
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.ErrorMovimiento
+import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import com.fiiadoapp.fiado.domain.TipoMovimiento.FIADO
@@ -46,6 +47,7 @@ class RegistrarMovimientoViewModelTest {
             SavedStateHandle(mapOf("clienteId" to cliente.id.toString(), "tipo" to tipo.name)),
             libreta.repositorioClientes,
             libreta.repositorioMovimientos,
+            libreta.repositorioMetodosCobro,
             { idNuevo },
             reloj,
         )
@@ -91,6 +93,7 @@ class RegistrarMovimientoViewModelTest {
 
             val pago = registrado()
             assertEquals(PAGO, pago?.tipo)
+            assertEquals(MetodoCobro.EFECTIVO.id, pago?.metodoCobroId)
             assertEquals("pagó con yape", pago?.nota)
             assertEquals(hoyEnLima.minusDays(2), pago?.fecha)
         }
@@ -143,5 +146,60 @@ class RegistrarMovimientoViewModelTest {
 
             assertEquals(ErrorMovimiento.ClienteArchivado, viewModel.estado.value.error)
             assertNull(registrado())
+        }
+
+    private fun pagoPrevio(
+        metodo: MetodoCobro,
+        segundos: Long,
+    ) = Movimiento(Uuid.random(), rosa.id, PAGO, Dinero(100), null, hoyEnLima, ahora.plusSeconds(segundos), null, metodo.id)
+
+    @Test
+    fun `un pago ofrece los metodos activos y preselecciona el ultimo usado`() =
+        runTest {
+            val estado = viewModel(PAGO, rosa, pagoPrevio(MetodoCobro.PLIN, 0), pagoPrevio(MetodoCobro.YAPE, 60)).estado.value
+
+            assertEquals(MetodoCobro.INICIALES, estado.metodos)
+            assertEquals(MetodoCobro.YAPE.id, estado.metodoElegido)
+        }
+
+    @Test
+    fun `sin pagos previos preselecciona el primer metodo`() =
+        runTest {
+            assertEquals(MetodoCobro.EFECTIVO.id, viewModel(PAGO).estado.value.metodoElegido)
+        }
+
+    @Test
+    fun `si el ultimo metodo usado se archivo preselecciona el primero activo`() =
+        runTest {
+            libreta.metodos.value += MetodoCobro.YAPE.id to MetodoCobro.YAPE.copy(archivadoEn = ahora)
+
+            val estado = viewModel(PAGO, rosa, pagoPrevio(MetodoCobro.YAPE, 0)).estado.value
+
+            assertEquals(listOf(MetodoCobro.EFECTIVO, MetodoCobro.PLIN), estado.metodos)
+            assertEquals(MetodoCobro.EFECTIVO.id, estado.metodoElegido)
+        }
+
+    @Test
+    fun `el pago se guarda con el metodo elegido`() =
+        runTest {
+            val viewModel = viewModel(PAGO)
+            viewModel.cambiarMonto("15")
+            viewModel.elegirMetodo(MetodoCobro.PLIN.id)
+
+            viewModel.guardar()
+
+            assertEquals(MetodoCobro.PLIN.id, registrado()?.metodoCobroId)
+        }
+
+    @Test
+    fun `un fiado no ofrece metodos ni guarda uno`() =
+        runTest {
+            val viewModel = viewModel(FIADO)
+            viewModel.cambiarMonto("15")
+
+            viewModel.guardar()
+
+            assertEquals(emptyList(), viewModel.estado.value.metodos)
+            assertNull(registrado()?.metodoCobroId)
         }
 }

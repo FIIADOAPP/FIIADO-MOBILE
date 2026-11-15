@@ -3,6 +3,7 @@ package com.fiiadoapp.fiado.core.data
 import android.content.Context
 import com.fiiadoapp.fiado.domain.GeneradorDeIds
 import com.fiiadoapp.fiado.domain.RepositorioClientes
+import com.fiiadoapp.fiado.domain.RepositorioMetodosCobro
 import com.fiiadoapp.fiado.domain.RepositorioMovimientos
 import dagger.Module
 import dagger.Provides
@@ -25,6 +26,9 @@ object DatosModule {
 
     @Provides
     fun repositorioMovimientos(db: FiadoDatabase): RepositorioMovimientos = RepositorioMovimientosRoom(db.movimientoDao())
+
+    @Provides
+    fun repositorioMetodosCobro(db: FiadoDatabase): RepositorioMetodosCobro = RepositorioMetodosCobroRoom(db.metodoCobroDao())
 
     @Provides
     fun generadorDeIds(): GeneradorDeIds = GeneradorUuidV7()

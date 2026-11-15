@@ -3,6 +3,8 @@ package com.fiiadoapp.fiado.feature.movimientos
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +19,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -45,6 +48,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fiiadoapp.fiado.core.ui.SaldoTexto
 import com.fiiadoapp.fiado.domain.ErrorMovimiento
+import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import java.time.LocalDate
@@ -67,6 +71,7 @@ internal fun RegistrarMovimientoDialogo(
         onMonto = viewModel::cambiarMonto,
         onNota = viewModel::cambiarNota,
         onFecha = viewModel::cambiarFecha,
+        onMetodo = viewModel::elegirMetodo,
         onGuardar = viewModel::guardar,
         onCancelar = onCerrar,
     )
@@ -78,6 +83,7 @@ internal fun RegistrarMovimientoContenido(
     onMonto: (String) -> Unit,
     onNota: (String) -> Unit,
     onFecha: (LocalDate) -> Unit,
+    onMetodo: (Uuid) -> Unit,
     onGuardar: () -> Unit,
     onCancelar: () -> Unit,
 ) {
@@ -112,6 +118,9 @@ internal fun RegistrarMovimientoContenido(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { onGuardar() }),
             )
+            if (estado.tipo == TipoMovimiento.PAGO) {
+                SelectorDeMetodo(estado.metodos, estado.metodoElegido, onMetodo)
+            }
             val notaMuyLarga = estado.error == ErrorMovimiento.NotaMuyLarga
             val errorNota = pluralStringResource(R.plurals.registro_error_nota, Movimiento.LARGO_MAXIMO_NOTA, Movimiento.LARGO_MAXIMO_NOTA)
             OutlinedTextField(
@@ -128,18 +137,16 @@ internal fun RegistrarMovimientoContenido(
                 label = { Text(textoDeFecha(estado.fecha, estado.hoy)) },
                 leadingIcon = { Icon(Icons.Filled.DateRange, contentDescription = null) },
             )
-            if (estado.error == ErrorMovimiento.FechaFutura || estado.error == ErrorMovimiento.ClienteArchivado) {
+            val errorGeneral =
+                when (estado.error) {
+                    ErrorMovimiento.FechaFutura -> R.string.registro_error_fecha
+                    ErrorMovimiento.ClienteArchivado -> R.string.registro_error_archivado
+                    ErrorMovimiento.SinMetodoCobro, ErrorMovimiento.MetodoCobroArchivado -> R.string.registro_error_metodo
+                    else -> null
+                }
+            if (errorGeneral != null) {
                 Text(
-                    text =
-                        stringResource(
-                            if (estado.error ==
-                                ErrorMovimiento.FechaFutura
-                            ) {
-                                R.string.registro_error_fecha
-                            } else {
-                                R.string.registro_error_archivado
-                            },
-                        ),
+                    text = stringResource(errorGeneral),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -159,6 +166,28 @@ internal fun RegistrarMovimientoContenido(
                 },
                 onCancelar = { eligiendoFecha = false },
             )
+        }
+    }
+}
+
+/** Un toque para cambiarlo; el preseleccionado ya viene marcado. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SelectorDeMetodo(
+    metodos: List<MetodoCobro>,
+    elegido: Uuid?,
+    onMetodo: (Uuid) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(stringResource(R.string.registro_metodo), style = MaterialTheme.typography.labelLarge)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            metodos.forEach { metodo ->
+                FilterChip(
+                    selected = metodo.id == elegido,
+                    onClick = { onMetodo(metodo.id) },
+                    label = { Text(metodo.nombre) },
+                )
+            }
         }
     }
 }

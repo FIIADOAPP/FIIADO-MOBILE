@@ -3,8 +3,10 @@ package com.fiiadoapp.fiado.core.data
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.ClienteConSaldo
 import com.fiiadoapp.fiado.domain.Dinero
+import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
 import com.fiiadoapp.fiado.domain.RepositorioClientes
+import com.fiiadoapp.fiado.domain.RepositorioMetodosCobro
 import com.fiiadoapp.fiado.domain.RepositorioMovimientos
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -35,5 +37,15 @@ class RepositorioMovimientosRoom(
 
     override suspend fun obtener(id: Uuid): Movimiento? = dao.obtener(id.toString())?.aDominio()
 
+    override suspend fun ultimoMetodoCobroUsado(): Uuid? = dao.ultimoMetodoCobroUsado()?.let(Uuid::parse)
+
     override suspend fun guardar(movimiento: Movimiento) = dao.guardar(movimiento.aEntidad())
+}
+
+class RepositorioMetodosCobroRoom(
+    private val dao: MetodoCobroDao,
+) : RepositorioMetodosCobro {
+    override fun observarActivos(): Flow<List<MetodoCobro>> = dao.observarActivos().map { filas -> filas.map { it.aDominio() } }
+
+    override suspend fun guardar(metodo: MetodoCobro) = dao.guardar(metodo.aEntidad())
 }

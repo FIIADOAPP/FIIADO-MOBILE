@@ -17,6 +17,12 @@ android {
         unitTests.isIncludeAndroidResources = true
     }
 
+    // MigrationTestHelper lee los esquemas exportados; Room solo los publica para las pruebas instrumentadas.
+    sourceSets
+        .getByName("test")
+        .assets.directories
+        .add("$projectDir/schemas")
+
     lint {
         warningsAsErrors = true
         abortOnError = true
@@ -44,6 +50,7 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core.ktx)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.room.testing)
 
     androidTestImplementation(libs.androidx.test.core.ktx)
     androidTestImplementation(libs.androidx.test.runner)

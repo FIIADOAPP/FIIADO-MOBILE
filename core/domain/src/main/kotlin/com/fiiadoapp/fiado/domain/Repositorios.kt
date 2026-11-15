@@ -26,6 +26,17 @@ interface RepositorioMovimientos {
 
     suspend fun obtener(id: Uuid): Movimiento?
 
+    /** Método del pago vigente registrado más recientemente; preselecciona el siguiente cobro. */
+    suspend fun ultimoMetodoCobroUsado(): Uuid?
+
     /** Inserta el movimiento o reemplaza el que tenga el mismo `id`. */
     suspend fun guardar(movimiento: Movimiento)
+}
+
+interface RepositorioMetodosCobro {
+    /** Métodos no archivados, en orden de creación. */
+    fun observarActivos(): Flow<List<MetodoCobro>>
+
+    /** Inserta el método o reemplaza el que tenga el mismo `id`. */
+    suspend fun guardar(metodo: MetodoCobro)
 }

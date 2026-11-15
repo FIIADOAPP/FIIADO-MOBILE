@@ -2,9 +2,12 @@ package com.fiiadoapp.fiado.core.testing
 
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.ClienteConSaldo
+import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
 import com.fiiadoapp.fiado.domain.RepositorioClientes
+import com.fiiadoapp.fiado.domain.RepositorioMetodosCobro
 import com.fiiadoapp.fiado.domain.RepositorioMovimientos
+import com.fiiadoapp.fiado.domain.TipoMovimiento
 import com.fiiadoapp.fiado.domain.saldo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,6 +27,7 @@ import kotlin.uuid.Uuid
 class LibretaFalsa {
     val clientes = MutableStateFlow<Map<Uuid, Cliente>>(emptyMap())
     val movimientos = MutableStateFlow<Map<Uuid, Movimiento>>(emptyMap())
+    val metodos = MutableStateFlow(MetodoCobro.INICIALES.associateBy { it.id })
 
     val repositorioClientes =
         object : RepositorioClientes {
@@ -49,7 +53,23 @@ class LibretaFalsa {
 
             override suspend fun obtener(id: Uuid): Movimiento? = movimientos.value[id]
 
+            override suspend fun ultimoMetodoCobroUsado(): Uuid? =
+                movimientos.value.values
+                    .filter { it.tipo == TipoMovimiento.PAGO && it.estaVigente }
+                    .maxByOrNull { it.registradoEn }
+                    ?.metodoCobroId
+
             override suspend fun guardar(movimiento: Movimiento) = movimientos.update { it + (movimiento.id to movimiento) }
+        }
+
+    val repositorioMetodosCobro =
+        object : RepositorioMetodosCobro {
+            override fun observarActivos(): Flow<List<MetodoCobro>> =
+                metodos.map { todos ->
+                    todos.values.filter { !it.estaArchivado }.sortedWith(compareBy({ it.creadoEn }, { it.id.toString() }))
+                }
+
+            override suspend fun guardar(metodo: MetodoCobro) = metodos.update { it + (metodo.id to metodo) }
         }
 }
 

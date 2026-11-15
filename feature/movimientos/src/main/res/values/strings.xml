@@ -11,6 +11,8 @@
     <string name="registro_error_monto">Escribe un monto mayor que cero, por ejemplo 12.50.</string>
     <string name="registro_error_fecha">La fecha no puede ser futura.</string>
     <string name="registro_error_archivado">Este cliente está archivado.</string>
+    <string name="registro_metodo">Cobrado con</string>
+    <string name="registro_error_metodo">Elige con qué te pagó.</string>
 
     <plurals name="registro_error_nota">
         <item quantity="one">Máximo %1$d carácter.</item>
