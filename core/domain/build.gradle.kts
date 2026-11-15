@@ -7,6 +7,8 @@ kotlin {
 }
 
 dependencies {
+    api(libs.kotlinx.coroutines.core)
+
     testImplementation(libs.kotlin.test)
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
