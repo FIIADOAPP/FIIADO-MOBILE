@@ -21,6 +21,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - El proyecto compila y prueba con JDK 21, fijado también para el daemon de Gradle.
 - Paleta verde completa en el tema claro y el oscuro.
 
+### Corregido
+
+- Un pago o fiado registrado ya no puede perderse si el teléfono se apaga sin aviso: la base de datos usa el journal clásico en lugar de WAL (ADR-0003).
+
 ## [0.1.0] - 2026-11-15
 
 ### Agregado
