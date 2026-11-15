@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -8,6 +10,10 @@ android {
 
     defaultConfig {
         minSdk = 26
+    }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
     }
 
     lint {
@@ -20,6 +26,19 @@ kotlin {
     jvmToolchain(21)
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 dependencies {
     implementation(project(":core:domain"))
+
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+
+    testImplementation(libs.junit4)
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core.ktx)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
