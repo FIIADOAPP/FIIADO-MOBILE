@@ -28,10 +28,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -46,22 +52,35 @@ import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import kotlin.uuid.Uuid
 
+/** [movimientoRegistrado] es el id que devuelve el registro al cerrarse; se muestra una vez y se consume. */
 @Composable
 internal fun ListaClientesPantalla(
+    movimientoRegistrado: Uuid?,
+    onAvisoConsumido: () -> Unit,
     onNuevo: () -> Unit,
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     viewModel: ListaClientesViewModel = hiltViewModel(),
 ) {
     val busqueda by viewModel.busqueda.collectAsStateWithLifecycle()
-    val clientes by viewModel.clientes.collectAsStateWithLifecycle()
+    val clientes by viewModel.lista.collectAsStateWithLifecycle()
+    val aviso by viewModel.aviso.collectAsStateWithLifecycle()
+    LaunchedEffect(movimientoRegistrado) {
+        movimientoRegistrado?.let {
+            viewModel.avisarRegistro(it)
+            onAvisoConsumido()
+        }
+    }
     ListaClientesContenido(
         busqueda = busqueda,
         clientes = clientes,
+        aviso = aviso,
         onBuscar = viewModel::buscar,
         onNuevo = onNuevo,
         onCliente = onCliente,
         onRegistrar = onRegistrar,
+        onDeshacer = viewModel::deshacer,
+        onDescartarAviso = viewModel::descartarAviso,
     )
 }
 
@@ -70,13 +89,31 @@ internal fun ListaClientesPantalla(
 internal fun ListaClientesContenido(
     busqueda: String,
     clientes: List<ClienteConSaldo>?,
+    aviso: AvisoRegistro?,
     onBuscar: (String) -> Unit,
     onNuevo: () -> Unit,
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
+    onDeshacer: () -> Unit,
+    onDescartarAviso: () -> Unit,
 ) {
+    val avisos = remember { SnackbarHostState() }
+    if (aviso != null) {
+        val mensaje =
+            stringResource(
+                if (aviso.tipo == TipoMovimiento.FIADO) R.string.aviso_fiado else R.string.aviso_pago,
+                aviso.monto.formatear(),
+                aviso.nombreCliente,
+            )
+        val accion = stringResource(R.string.aviso_deshacer)
+        LaunchedEffect(aviso) {
+            val resultado = avisos.showSnackbar(mensaje, actionLabel = accion, duration = SnackbarDuration.Long)
+            if (resultado == SnackbarResult.ActionPerformed) onDeshacer() else onDescartarAviso()
+        }
+    }
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.clientes_titulo)) }) },
+        snackbarHost = { SnackbarHost(avisos) },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onNuevo,

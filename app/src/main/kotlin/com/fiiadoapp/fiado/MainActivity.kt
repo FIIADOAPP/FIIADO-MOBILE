@@ -28,7 +28,13 @@ class MainActivity : ComponentActivity() {
                     )
                     pantallasDeMovimientos(
                         onCerrar = { navController.popBackStack() },
-                        onRegistrado = { navController.popBackStack() },
+                        onRegistrado = { movimientoId ->
+                            navController.popBackStack()
+                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                ListaClientes.MOVIMIENTO_REGISTRADO,
+                                movimientoId.toString(),
+                            )
+                        },
                     )
                 }
             }
