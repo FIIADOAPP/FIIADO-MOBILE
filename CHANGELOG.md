@@ -15,6 +15,9 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - Identificadores UUID v7 generados en el teléfono.
 - Registro de fiados y pagos en dos toques desde la lista: monto con el teclado listo, nota opcional y fecha de hoy o de un día pasado.
 - Aviso tras cada registro con la opción de deshacerlo, que anula el movimiento.
+- ADR-0004 y métodos de cobro propios: la app empieza con Efectivo, Yape y Plin; se pueden crear, renombrar y archivar desde el menú de la lista.
+- Cada pago guarda su método de cobro, preseleccionado con el último usado; el resumen calcula lo cobrado por método.
+- Migración de la base de datos a la versión 2: los pagos registrados antes quedan como Efectivo.
 
 ### Cambiado
 
