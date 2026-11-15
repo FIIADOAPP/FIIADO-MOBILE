@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
@@ -182,10 +183,13 @@ private fun SelectorDeMetodo(
         Text(stringResource(R.string.registro_metodo), style = MaterialTheme.typography.labelLarge)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             metodos.forEach { metodo ->
+                val seleccionado = metodo.id == elegido
                 FilterChip(
-                    selected = metodo.id == elegido,
+                    selected = seleccionado,
                     onClick = { onMetodo(metodo.id) },
                     label = { Text(metodo.nombre) },
+                    // El check distingue el elegido sin depender solo del color.
+                    leadingIcon = if (seleccionado) ({ Icon(Icons.Filled.Check, contentDescription = null) }) else null,
                 )
             }
         }
