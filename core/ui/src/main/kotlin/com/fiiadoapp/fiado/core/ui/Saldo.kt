@@ -1,4 +1,4 @@
-package com.fiiadoapp.fiado.feature.clientes
+package com.fiiadoapp.fiado.core.ui
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -10,7 +10,7 @@ import com.fiiadoapp.fiado.domain.Dinero
 
 /** "Debe S/ 12.50", "A favor S/ 3.00" o "Al día". */
 @Composable
-internal fun textoDeSaldo(saldo: Dinero): String =
+fun textoDeSaldo(saldo: Dinero): String =
     when {
         saldo.esPositivo -> stringResource(R.string.saldo_debe, saldo.formatear())
         saldo.esNegativo -> stringResource(R.string.saldo_a_favor, (-saldo).formatear())
@@ -18,7 +18,7 @@ internal fun textoDeSaldo(saldo: Dinero): String =
     }
 
 @Composable
-internal fun SaldoTexto(
+fun SaldoTexto(
     saldo: Dinero,
     modifier: Modifier = Modifier,
 ) {
