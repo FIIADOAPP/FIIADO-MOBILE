@@ -1,5 +1,7 @@
 # Fiado
 
+[![CI](https://github.com/FIIADOAPP/FIIADO-MOBILE/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/FIIADOAPP/FIIADO-MOBILE/actions/workflows/ci.yml)
+
 Libreta de fiado para bodegas pequeñas del Perú. Reemplaza el cuaderno donde el bodeguero anota quién le debe y cuánto: suma sola, recuerda los cobros por WhatsApp y funciona completa sin internet.
 
 Es una app Android nativa con los datos en el teléfono (Room como fuente de verdad). El servidor, [FIIADO-API](https://github.com/FIIADOAPP/FIIADO-API), solo respalda y restaura.
