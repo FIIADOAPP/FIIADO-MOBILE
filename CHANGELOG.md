@@ -12,3 +12,4 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - Validación de mensajes de commit con commitlint y un hook de husky.
 - Proyecto Android con los módulos `app`, `core:domain` y `core:data`, Jetpack Compose, Material 3 y Hilt.
 - Formato con ktlint mediante Spotless y Android Lint con las advertencias tratadas como errores.
+- CI en GitHub Actions: commitlint, ktlint, Android Lint, pruebas y build en cada pull request.
