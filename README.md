@@ -57,6 +57,12 @@ Compila e instala la app en el dispositivo o emulador conectado.
 
 Ejecuta ktlint, Android Lint y las pruebas. `./gradlew spotlessApply` corrige el formato.
 
+```bash
+./gradlew connectedDebugAndroidTest
+```
+
+Ejecuta las pruebas instrumentadas en el dispositivo o emulador conectado. Verifican lo que Robolectric no puede emular, como el modo de journal real de SQLite. No corren en el CI.
+
 ## Estructura
 
 | Módulo | Contenido |

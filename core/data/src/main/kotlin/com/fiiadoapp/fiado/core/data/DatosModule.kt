@@ -1,7 +1,6 @@
 package com.fiiadoapp.fiado.core.data
 
 import android.content.Context
-import androidx.room.Room
 import com.fiiadoapp.fiado.domain.GeneradorDeIds
 import com.fiiadoapp.fiado.domain.RepositorioClientes
 import com.fiiadoapp.fiado.domain.RepositorioMovimientos
@@ -19,7 +18,7 @@ object DatosModule {
     @Singleton
     fun baseDeDatos(
         @ApplicationContext contexto: Context,
-    ): FiadoDatabase = Room.databaseBuilder(contexto, FiadoDatabase::class.java, "fiado.db").build()
+    ): FiadoDatabase = FiadoDatabase.construir(contexto)
 
     @Provides
     fun repositorioClientes(db: FiadoDatabase): RepositorioClientes = RepositorioClientesRoom(db.clienteDao())

@@ -24,3 +24,4 @@ Un ADR aceptado no se edita: si la decisión cambia, se escribe uno nuevo que lo
 |---|---|---|
 | [0001](0001-stack-y-dos-repositorios.md) | Stack de la app y dos repositorios | Aceptada |
 | [0002](0002-modelo-de-datos.md) | Modelo de datos de la libreta | Aceptada |
+| [0003](0003-durabilidad-de-escrituras.md) | Durabilidad de las escrituras locales | Aceptada |
