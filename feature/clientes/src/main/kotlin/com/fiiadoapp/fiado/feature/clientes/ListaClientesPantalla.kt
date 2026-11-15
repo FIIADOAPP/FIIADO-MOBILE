@@ -40,10 +40,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fiiadoapp.fiado.core.ui.SaldoTexto
 import com.fiiadoapp.fiado.domain.Cliente
@@ -65,6 +67,12 @@ internal fun ListaClientesPantalla(
     val busqueda by viewModel.busqueda.collectAsStateWithLifecycle()
     val clientes by viewModel.lista.collectAsStateWithLifecycle()
     val aviso by viewModel.aviso.collectAsStateWithLifecycle()
+    val foco = LocalFocusManager.current
+    // Al cerrarse el registro, Compose devuelve el foco al buscador y abre el teclado sobre la lista.
+    LifecycleResumeEffect(Unit) {
+        foco.clearFocus()
+        onPauseOrDispose {}
+    }
     LaunchedEffect(movimientoRegistrado) {
         movimientoRegistrado?.let {
             viewModel.avisarRegistro(it)
