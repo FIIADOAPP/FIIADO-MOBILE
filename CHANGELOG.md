@@ -10,6 +10,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 - ADR-0002 sobre el modelo de datos: identificadores UUID v7, dinero en céntimos, movimientos inmutables y saldo calculado.
 - Dominio de la libreta en Kotlin puro: `Dinero` con conversión desde texto, teléfono celular peruano, cliente con archivado solo en saldo cero, movimientos con registro y anulación, saldo y resumen por periodo.
+- Persistencia local con Room: clientes con su saldo calculado en SQL, búsqueda sin distinguir mayúsculas ni tildes, historial de movimientos y esquema exportado para futuras migraciones.
+
+### Cambiado
+
+- El proyecto compila y prueba con JDK 21, fijado también para el daemon de Gradle.
 
 ## [0.1.0] - 2026-11-15
 
