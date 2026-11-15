@@ -28,7 +28,7 @@ Se agregan cuando existan las primeras pantallas (Fase 1).
 
 ## Requisitos
 
-- JDK 17
+- JDK 21
 - Android SDK con la plataforma 37
 - Node.js 20 o superior, solo para el hook de mensajes de commit
 
