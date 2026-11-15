@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
     implementation(project(":feature:clientes"))
+    implementation(project(":feature:movimientos"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

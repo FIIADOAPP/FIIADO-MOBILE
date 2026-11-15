@@ -1,0 +1,20 @@
+<resources>
+    <string name="registro_titulo_fiar">Fiar a %1$s</string>
+    <string name="registro_titulo_cobrar">Cobrar a %1$s</string>
+    <string name="registro_monto">Monto</string>
+    <string name="registro_nota">Nota (opcional)</string>
+    <string name="registro_fecha_hoy">Hoy</string>
+    <string name="registro_fecha_ayer">Ayer</string>
+    <string name="registro_guardar">Guardar</string>
+    <string name="registro_cancelar">Cancelar</string>
+    <string name="registro_aceptar">Aceptar</string>
+    <string name="registro_error_monto">Escribe un monto mayor que cero, por ejemplo 12.50.</string>
+    <string name="registro_error_fecha">La fecha no puede ser futura.</string>
+    <string name="registro_error_archivado">Este cliente está archivado.</string>
+
+    <plurals name="registro_error_nota">
+        <item quantity="one">Máximo %1$d carácter.</item>
+        <item quantity="many">Máximo %1$d caracteres.</item>
+        <item quantity="other">Máximo %1$d caracteres.</item>
+    </plurals>
+</resources>

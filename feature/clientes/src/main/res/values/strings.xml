@@ -5,6 +5,8 @@
     <string name="clientes_limpiar_busqueda">Limpiar búsqueda</string>
     <string name="clientes_vacio">Aún no tienes clientes. Toca «Nuevo cliente» para agregar el primero.</string>
     <string name="clientes_sin_resultados">Ningún cliente coincide con «%1$s».</string>
+    <string name="clientes_fiar">Fiar</string>
+    <string name="clientes_cobrar">Cobrar</string>
 
 
     <string name="cliente_nuevo_titulo">Nuevo cliente</string>
