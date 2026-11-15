@@ -40,6 +40,9 @@ interface MovimientoDao {
     @Query("SELECT * FROM movimientos WHERE clienteId = :clienteId ORDER BY fecha DESC, registradoEn DESC, id DESC")
     fun observarDeCliente(clienteId: String): Flow<List<MovimientoEntity>>
 
+    @Query("SELECT * FROM movimientos WHERE id = :id")
+    suspend fun obtener(id: String): MovimientoEntity?
+
     @Query("SELECT * FROM movimientos")
     fun observarTodos(): Flow<List<MovimientoEntity>>
 

@@ -5,10 +5,12 @@
     <string name="clientes_limpiar_busqueda">Limpiar búsqueda</string>
     <string name="clientes_vacio">Aún no tienes clientes. Toca «Nuevo cliente» para agregar el primero.</string>
     <string name="clientes_sin_resultados">Ningún cliente coincide con «%1$s».</string>
+    <string name="clientes_fiar">Fiar</string>
+    <string name="clientes_cobrar">Cobrar</string>
+    <string name="aviso_fiado">Fiaste %1$s a %2$s</string>
+    <string name="aviso_pago">Cobraste %1$s a %2$s</string>
+    <string name="aviso_deshacer">Deshacer</string>
 
-    <string name="saldo_debe">Debe %1$s</string>
-    <string name="saldo_a_favor">A favor %1$s</string>
-    <string name="saldo_al_dia">Al día</string>
 
     <string name="cliente_nuevo_titulo">Nuevo cliente</string>
     <string name="cliente_editar_titulo">Editar cliente</string>

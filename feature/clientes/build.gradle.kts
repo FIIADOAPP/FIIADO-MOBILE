@@ -29,6 +29,7 @@ kotlin {
 
 dependencies {
     implementation(project(":core:domain"))
+    implementation(project(":core:ui"))
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -44,6 +45,7 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
+    testImplementation(project(":core:testing"))
     testImplementation(libs.junit4)
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotlinx.coroutines.test)

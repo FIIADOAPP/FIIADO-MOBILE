@@ -1,4 +1,4 @@
-package com.fiiadoapp.fiado.feature.clientes
+package com.fiiadoapp.fiado.core.testing
 
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.ClienteConSaldo
@@ -46,6 +46,8 @@ class LibretaFalsa {
                 movimientos.map { todos -> todos.values.filter { it.clienteId == clienteId } }
 
             override fun observarTodos(): Flow<List<Movimiento>> = movimientos.map { it.values.toList() }
+
+            override suspend fun obtener(id: Uuid): Movimiento? = movimientos.value[id]
 
             override suspend fun guardar(movimiento: Movimiento) = movimientos.update { it + (movimiento.id to movimiento) }
         }

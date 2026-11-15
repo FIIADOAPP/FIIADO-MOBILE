@@ -5,9 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -17,41 +20,75 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fiiadoapp.fiado.core.ui.SaldoTexto
+import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.ClienteConSaldo
+import com.fiiadoapp.fiado.domain.Dinero
+import com.fiiadoapp.fiado.domain.TipoMovimiento
 import kotlin.uuid.Uuid
 
+/** [movimientoRegistrado] es el id que devuelve el registro al cerrarse; se muestra una vez y se consume. */
 @Composable
 internal fun ListaClientesPantalla(
+    movimientoRegistrado: Uuid?,
+    onAvisoConsumido: () -> Unit,
     onNuevo: () -> Unit,
     onCliente: (Uuid) -> Unit,
+    onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     viewModel: ListaClientesViewModel = hiltViewModel(),
 ) {
     val busqueda by viewModel.busqueda.collectAsStateWithLifecycle()
-    val clientes by viewModel.clientes.collectAsStateWithLifecycle()
+    val clientes by viewModel.lista.collectAsStateWithLifecycle()
+    val aviso by viewModel.aviso.collectAsStateWithLifecycle()
+    val foco = LocalFocusManager.current
+    // Al cerrarse el registro, Compose devuelve el foco al buscador y abre el teclado sobre la lista.
+    LifecycleResumeEffect(Unit) {
+        foco.clearFocus()
+        onPauseOrDispose {}
+    }
+    LaunchedEffect(movimientoRegistrado) {
+        movimientoRegistrado?.let {
+            viewModel.avisarRegistro(it)
+            onAvisoConsumido()
+        }
+    }
     ListaClientesContenido(
         busqueda = busqueda,
         clientes = clientes,
+        aviso = aviso,
         onBuscar = viewModel::buscar,
         onNuevo = onNuevo,
         onCliente = onCliente,
+        onRegistrar = onRegistrar,
+        onDeshacer = viewModel::deshacer,
+        onDescartarAviso = viewModel::descartarAviso,
     )
 }
 
@@ -60,12 +97,31 @@ internal fun ListaClientesPantalla(
 internal fun ListaClientesContenido(
     busqueda: String,
     clientes: List<ClienteConSaldo>?,
+    aviso: AvisoRegistro?,
     onBuscar: (String) -> Unit,
     onNuevo: () -> Unit,
     onCliente: (Uuid) -> Unit,
+    onRegistrar: (Uuid, TipoMovimiento) -> Unit,
+    onDeshacer: () -> Unit,
+    onDescartarAviso: () -> Unit,
 ) {
+    val avisos = remember { SnackbarHostState() }
+    if (aviso != null) {
+        val mensaje =
+            stringResource(
+                if (aviso.tipo == TipoMovimiento.FIADO) R.string.aviso_fiado else R.string.aviso_pago,
+                aviso.monto.formatear(),
+                aviso.nombreCliente,
+            )
+        val accion = stringResource(R.string.aviso_deshacer)
+        LaunchedEffect(aviso) {
+            val resultado = avisos.showSnackbar(mensaje, actionLabel = accion, duration = SnackbarDuration.Long)
+            if (resultado == SnackbarResult.ActionPerformed) onDeshacer() else onDescartarAviso()
+        }
+    }
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.clientes_titulo)) }) },
+        snackbarHost = { SnackbarHost(avisos) },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onNuevo,
@@ -94,7 +150,7 @@ internal fun ListaClientesContenido(
                 clientes == null -> Centrado { CircularProgressIndicator() }
                 clientes.isEmpty() && busqueda.isBlank() -> Centrado { Mensaje(stringResource(R.string.clientes_vacio)) }
                 clientes.isEmpty() -> Centrado { Mensaje(stringResource(R.string.clientes_sin_resultados, busqueda.trim())) }
-                else -> ListaDeClientes(clientes, onCliente)
+                else -> ListaDeClientes(clientes, onCliente, onRegistrar)
             }
         }
     }
@@ -104,16 +160,45 @@ internal fun ListaClientesContenido(
 private fun ListaDeClientes(
     clientes: List<ClienteConSaldo>,
     onCliente: (Uuid) -> Unit,
+    onRegistrar: (Uuid, TipoMovimiento) -> Unit,
 ) {
     LazyColumn(contentPadding = PaddingValues(bottom = 88.dp)) {
         items(clientes, key = { it.cliente.id.toString() }) { (cliente, saldo) ->
-            ListItem(
-                headlineContent = { Text(cliente.nombre, style = MaterialTheme.typography.titleMedium) },
-                supportingContent = cliente.telefono?.let { telefono -> { Text(telefono.formatear()) } },
-                trailingContent = { SaldoTexto(saldo) },
-                modifier = Modifier.clickable { onCliente(cliente.id) },
-            )
+            FilaCliente(cliente, saldo, onCliente, onRegistrar)
             HorizontalDivider()
+        }
+    }
+}
+
+/** Fiar o cobrar empieza con un toque desde la fila. */
+@Composable
+private fun FilaCliente(
+    cliente: Cliente,
+    saldo: Dinero,
+    onCliente: (Uuid) -> Unit,
+    onRegistrar: (Uuid, TipoMovimiento) -> Unit,
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable {
+                    onCliente(
+                        cliente.id,
+                    )
+                }.padding(start = 16.dp, end = 8.dp, top = 12.dp, bottom = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(cliente.nombre, style = MaterialTheme.typography.titleMedium)
+            SaldoTexto(saldo)
+        }
+        FilledTonalButton(onClick = { onRegistrar(cliente.id, TipoMovimiento.FIADO) }) {
+            Text(stringResource(R.string.clientes_fiar))
+        }
+        Spacer(Modifier.width(8.dp))
+        OutlinedButton(onClick = { onRegistrar(cliente.id, TipoMovimiento.PAGO) }) {
+            Text(stringResource(R.string.clientes_cobrar))
         }
     }
 }

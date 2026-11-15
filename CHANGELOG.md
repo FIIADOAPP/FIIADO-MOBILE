@@ -13,6 +13,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - Persistencia local con Room: clientes con su saldo calculado en SQL, búsqueda sin distinguir mayúsculas ni tildes, historial de movimientos y esquema exportado para futuras migraciones.
 - Gestión de clientes: lista con el saldo de cada uno, búsqueda, alta, edición y archivado (solo con saldo cero), con validación del nombre y del celular.
 - Identificadores UUID v7 generados en el teléfono.
+- Registro de fiados y pagos en dos toques desde la lista: monto con el teclado listo, nota opcional y fecha de hoy o de un día pasado.
+- Aviso tras cada registro con la opción de deshacerlo, que anula el movimiento.
 
 ### Cambiado
 

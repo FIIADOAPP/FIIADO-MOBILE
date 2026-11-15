@@ -12,7 +12,8 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 ## Capturas
 
 <p>
-  <img src="docs/capturas/clientes-lista.png" alt="Lista de clientes con su saldo" width="240">
+  <img src="docs/capturas/movimientos-lista.png" alt="Lista de clientes con su saldo y los botones Fiar y Cobrar" width="240">
+  <img src="docs/capturas/movimientos-dialogo.png" alt="Registro de un fiado con el monto enfocado" width="240">
   <img src="docs/capturas/clientes-editar.png" alt="Edición de un cliente con la opción de archivar" width="240">
   <img src="docs/capturas/clientes-nuevo-error.png" alt="Validación al crear un cliente sin nombre" width="240">
 </p>
@@ -23,8 +24,8 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 |---|---|
 | Esqueleto (Compose, Hilt, módulos, lint) | Listo |
 | Clientes (lista con saldo, búsqueda, alta, edición, archivado) | Listo |
-| Movimientos (fiar, cobrar, anular) | Pendiente |
-| Historial y resumen | Pendiente |
+| Movimientos: fiar y cobrar en dos toques, deshacer al instante | Listo |
+| Historial con anulación y resumen | Pendiente |
 | Inicio de sesión | Pendiente |
 | Sincronización y restauración | Pendiente |
 | Recordatorio por WhatsApp | Pendiente |
@@ -63,4 +64,7 @@ Ejecuta ktlint, Android Lint y las pruebas. `./gradlew spotlessApply` corrige el
 | `app` | Punto de entrada: tema, navegación entre funcionalidades y configuración de Hilt. |
 | `core:domain` | Modelo, reglas del negocio y contratos de repositorio. Kotlin puro, sin dependencias de Android. |
 | `core:data` | Room como fuente de verdad. Implementa los contratos del dominio. |
+| `core:ui` | Componentes de interfaz compartidos entre funcionalidades. |
+| `core:testing` | Repositorios falsos en memoria para las pruebas de los ViewModels. |
 | `feature:clientes` | Pantallas y ViewModels de clientes. |
+| `feature:movimientos` | Registro de fiados y pagos. |
