@@ -21,5 +21,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "fiado"
+
+include(":app")
 include(":core:domain")
 include(":core:data")
