@@ -10,6 +10,8 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
+import kotlin.uuid.Uuid
 
 @RunWith(RobolectricTestRunner::class)
 class RepositorioMovimientosRoomTest : BaseDeDatosDePrueba() {
@@ -70,5 +72,16 @@ class RepositorioMovimientosRoomTest : BaseDeDatosDePrueba() {
     fun `no acepta un movimiento de un cliente inexistente`() =
         runTest {
             assertFailsWith<SQLiteConstraintException> { movimientos.guardar(movimiento(rosa, FIADO, 100)) }
+        }
+
+    @Test
+    fun `obtiene un movimiento por su id`() =
+        runTest {
+            clientes.guardar(rosa)
+            val fiado = movimiento(rosa, FIADO, 1250)
+            movimientos.guardar(fiado)
+
+            assertEquals(fiado, movimientos.obtener(fiado.id))
+            assertNull(movimientos.obtener(Uuid.random()))
         }
 }

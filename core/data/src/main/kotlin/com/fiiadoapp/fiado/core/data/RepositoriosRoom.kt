@@ -33,5 +33,7 @@ class RepositorioMovimientosRoom(
 
     override fun observarTodos(): Flow<List<Movimiento>> = dao.observarTodos().map { filas -> filas.map { it.aDominio() } }
 
+    override suspend fun obtener(id: Uuid): Movimiento? = dao.obtener(id.toString())?.aDominio()
+
     override suspend fun guardar(movimiento: Movimiento) = dao.guardar(movimiento.aEntidad())
 }

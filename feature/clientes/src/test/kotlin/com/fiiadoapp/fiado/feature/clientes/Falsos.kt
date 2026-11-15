@@ -47,6 +47,8 @@ class LibretaFalsa {
 
             override fun observarTodos(): Flow<List<Movimiento>> = movimientos.map { it.values.toList() }
 
+            override suspend fun obtener(id: Uuid): Movimiento? = movimientos.value[id]
+
             override suspend fun guardar(movimiento: Movimiento) = movimientos.update { it + (movimiento.id to movimiento) }
         }
 }

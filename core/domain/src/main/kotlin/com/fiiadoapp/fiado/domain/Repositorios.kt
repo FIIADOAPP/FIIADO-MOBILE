@@ -24,6 +24,8 @@ interface RepositorioMovimientos {
 
     fun observarTodos(): Flow<List<Movimiento>>
 
+    suspend fun obtener(id: Uuid): Movimiento?
+
     /** Inserta el movimiento o reemplaza el que tenga el mismo `id`. */
     suspend fun guardar(movimiento: Movimiento)
 }
