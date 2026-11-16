@@ -14,6 +14,20 @@
     <string name="registro_metodo">Cobrado con</string>
     <string name="registro_error_metodo">Elige con qué te pagó.</string>
 
+    <string name="historial_editar_cliente">Editar cliente</string>
+    <string name="historial_fiar">Fiar</string>
+    <string name="historial_cobrar">Cobrar</string>
+    <string name="historial_vacio">Aún no hay movimientos con este cliente.</string>
+    <string name="historial_ayuda">Toca un movimiento si necesitas anularlo.</string>
+    <string name="historial_fiado">Fiado</string>
+    <string name="historial_pago">Pago · %1$s</string>
+    <string name="historial_anulado">Anulado</string>
+    <string name="historial_este_fiado">este fiado</string>
+    <string name="historial_este_pago">este pago</string>
+    <string name="historial_anular_titulo">¿Anular %1$s de %2$s?</string>
+    <string name="historial_anular_explicacion">Seguirá en el historial, tachado, y dejará de contar en el saldo. No se puede deshacer.</string>
+    <string name="historial_anular">Anular</string>
+
     <string name="metodos_titulo">Métodos de cobro</string>
     <string name="metodos_ayuda">Al cobrar eliges uno de estos métodos. Toca uno para renombrarlo o archivarlo.</string>
     <string name="metodos_nuevo">Nuevo método</string>
