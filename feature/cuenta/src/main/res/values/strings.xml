@@ -1,0 +1,35 @@
+<resources>
+    <string name="cuenta_titulo">Cuenta</string>
+    <string name="cuenta_volver">Volver</string>
+    <string name="cuenta_sin_cuenta_explicacion">Tu libreta funciona sin cuenta y sin internet. Con una cuenta podrás respaldarla y recuperarla si cambias de teléfono.</string>
+    <string name="cuenta_crear">Crear cuenta</string>
+    <string name="cuenta_iniciar_sesion">Iniciar sesión</string>
+    <string name="cuenta_cerrar_sesion">Cerrar sesión</string>
+    <string name="cuenta_cerrar_sesion_titulo">¿Cerrar sesión?</string>
+    <string name="cuenta_cerrar_sesion_explicacion">Tu libreta se queda en este teléfono. Podrás volver a iniciar sesión cuando quieras.</string>
+    <string name="cuenta_cancelar">Cancelar</string>
+    <string name="cuenta_nombre_negocio">Nombre de tu negocio</string>
+    <string name="cuenta_correo">Correo</string>
+    <string name="cuenta_contrasena">Contraseña</string>
+    <string name="cuenta_contrasena_nueva">Contraseña (mínimo 8 caracteres)</string>
+    <string name="cuenta_sin_conexion">No hay conexión. Revisa tu internet e intenta de nuevo.</string>
+    <string name="cuenta_verificar_titulo">Verifica tu correo</string>
+    <string name="cuenta_verificar_explicacion">Te enviamos un código de 6 dígitos a %1$s.</string>
+    <string name="cuenta_codigo">Código</string>
+    <string name="cuenta_verificar">Verificar</string>
+    <string name="cuenta_reenviar">Enviar otro código</string>
+    <string name="cuenta_reenviar_otra_vez">Código enviado. Enviar otro</string>
+    <string name="cuenta_reenviar_en">Podrás pedir otro código en %1$d s</string>
+    <string name="cuenta_olvide_contrasena">¿Olvidaste tu contraseña?</string>
+    <string name="cuenta_ceder_titulo">Tu cuenta está abierta en otro teléfono</string>
+    <string name="cuenta_ceder_explicacion">Si la usas aquí, el otro teléfono dejará de respaldarse y lo que no haya sincronizado se perderá.</string>
+    <string name="cuenta_ceder">Usar este teléfono</string>
+    <string name="cuenta_recuperar_titulo">Recuperar contraseña</string>
+    <string name="cuenta_recuperar_explicacion">Escribe tu correo y te enviaremos un código para crear una contraseña nueva.</string>
+    <string name="cuenta_enviar_codigo">Enviar código</string>
+    <string name="cuenta_recuperar_codigo_enviado">Si %1$s tiene una cuenta, le llegará un código de 6 dígitos.</string>
+    <string name="cuenta_restablecer">Cambiar contraseña</string>
+    <string name="cuenta_sesion_terminada_titulo">Tu sesión se cerró</string>
+    <string name="cuenta_sesion_terminada_explicacion">Tu cuenta se abrió en otro teléfono o se cambió la contraseña. Tu libreta sigue en este teléfono.</string>
+    <string name="cuenta_entendido">Entendido</string>
+</resources>
