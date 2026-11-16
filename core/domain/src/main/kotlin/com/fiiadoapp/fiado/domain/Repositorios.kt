@@ -37,6 +37,9 @@ interface RepositorioMetodosCobro {
     /** Métodos no archivados, en orden de creación. */
     fun observarActivos(): Flow<List<MetodoCobro>>
 
+    /** Todos, archivados incluidos: los pagos pasados muestran el nombre de su método aunque se haya archivado. */
+    fun observarTodos(): Flow<List<MetodoCobro>>
+
     /** Inserta el método o reemplaza el que tenga el mismo `id`. */
     suspend fun guardar(metodo: MetodoCobro)
 }

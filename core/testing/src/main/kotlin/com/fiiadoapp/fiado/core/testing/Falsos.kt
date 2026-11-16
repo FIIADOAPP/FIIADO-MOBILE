@@ -69,6 +69,9 @@ class LibretaFalsa {
                     todos.values.filter { !it.estaArchivado }.sortedWith(compareBy({ it.creadoEn }, { it.id.toString() }))
                 }
 
+            override fun observarTodos(): Flow<List<MetodoCobro>> =
+                metodos.map { todos -> todos.values.sortedWith(compareBy({ it.creadoEn }, { it.id.toString() })) }
+
             override suspend fun guardar(metodo: MetodoCobro) = metodos.update { it + (metodo.id to metodo) }
         }
 }

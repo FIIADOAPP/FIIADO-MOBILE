@@ -47,5 +47,7 @@ class RepositorioMetodosCobroRoom(
 ) : RepositorioMetodosCobro {
     override fun observarActivos(): Flow<List<MetodoCobro>> = dao.observarActivos().map { filas -> filas.map { it.aDominio() } }
 
+    override fun observarTodos(): Flow<List<MetodoCobro>> = dao.observarTodos().map { filas -> filas.map { it.aDominio() } }
+
     override suspend fun guardar(metodo: MetodoCobro) = dao.guardar(metodo.aEntidad())
 }

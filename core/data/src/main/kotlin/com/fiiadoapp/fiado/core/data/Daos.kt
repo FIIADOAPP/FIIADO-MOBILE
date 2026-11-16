@@ -61,6 +61,9 @@ interface MetodoCobroDao {
     @Query("SELECT * FROM metodos_cobro WHERE archivadoEn IS NULL ORDER BY creadoEn, id")
     fun observarActivos(): Flow<List<MetodoCobroEntity>>
 
+    @Query("SELECT * FROM metodos_cobro ORDER BY creadoEn, id")
+    fun observarTodos(): Flow<List<MetodoCobroEntity>>
+
     @Upsert
     suspend fun guardar(metodo: MetodoCobroEntity)
 }

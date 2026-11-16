@@ -41,6 +41,14 @@ class RepositorioMetodosCobroRoomTest : BaseDeDatosDePrueba() {
         }
 
     @Test
+    fun `observar todos incluye los archivados`() =
+        runTest {
+            metodos.guardar(MetodoCobro.PLIN.copy(archivadoEn = ahora))
+
+            assertEquals(listOf("Efectivo", "Yape", "Plin"), metodos.observarTodos().first().map { it.nombre })
+        }
+
+    @Test
     fun `un pago guarda y lee su metodo`() =
         runTest {
             clientes.guardar(rosa)
