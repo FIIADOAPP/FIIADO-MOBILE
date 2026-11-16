@@ -21,11 +21,13 @@ data class FormularioCliente(
     val clienteId: String? = null,
 )
 
-/** [onRegistrar] abre el registro de un fiado o un pago para el cliente. */
+/** [onCliente] abre el historial del cliente; [onRegistrar], el registro de un fiado o un pago. */
 fun NavGraphBuilder.pantallasDeClientes(
     navController: NavController,
+    onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     onMetodosCobro: () -> Unit,
+    onResumen: () -> Unit,
 ) {
     composable<ListaClientes> { entrada ->
         val registrado by entrada.savedStateHandle
@@ -35,9 +37,10 @@ fun NavGraphBuilder.pantallasDeClientes(
             movimientoRegistrado = registrado?.let(Uuid::parse),
             onAvisoConsumido = { entrada.savedStateHandle[ListaClientes.MOVIMIENTO_REGISTRADO] = null },
             onNuevo = { navController.navigate(FormularioCliente()) },
-            onCliente = { navController.navigate(FormularioCliente(it.toString())) },
+            onCliente = onCliente,
             onRegistrar = onRegistrar,
             onMetodosCobro = onMetodosCobro,
+            onResumen = onResumen,
         )
     }
     composable<FormularioCliente> {

@@ -6,6 +6,7 @@ import com.fiiadoapp.fiado.domain.ClienteConSaldo
 import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.RepositorioClientes
 import com.fiiadoapp.fiado.domain.RepositorioMovimientos
+import com.fiiadoapp.fiado.domain.Resumen
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,10 +16,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.uuid.Uuid
 
@@ -46,6 +49,13 @@ class ListaClientesViewModel
         val lista: StateFlow<List<ClienteConSaldo>?> =
             _busqueda
                 .flatMapLatest { clientes.observarActivos(it) }
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+        /** Deuda pendiente de todos los clientes; `null` mientras se carga. */
+        val porCobrar: StateFlow<Dinero?> =
+            movimientos
+                .observarTodos()
+                .map { Resumen.calcular(it, LocalDate.now(reloj)).porCobrar }
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
         private val _aviso = MutableStateFlow<AvisoRegistro?>(null)

@@ -53,8 +53,6 @@ import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import kotlin.uuid.Uuid
 
 private const val MILISEGUNDOS_POR_DIA = 86_400_000L
@@ -195,17 +193,6 @@ private fun SelectorDeMetodo(
         }
     }
 }
-
-@Composable
-private fun textoDeFecha(
-    fecha: LocalDate,
-    hoy: LocalDate,
-): String =
-    when (fecha) {
-        hoy -> stringResource(R.string.registro_fecha_hoy)
-        hoy.minusDays(1) -> stringResource(R.string.registro_fecha_ayer)
-        else -> fecha.format(DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", Locale.forLanguageTag("es-PE")))
-    }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

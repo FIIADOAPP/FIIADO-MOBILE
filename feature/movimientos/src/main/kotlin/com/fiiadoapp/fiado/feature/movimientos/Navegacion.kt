@@ -17,15 +17,31 @@ data class RegistrarMovimiento(
 @Serializable
 data object MetodosCobro
 
+@Serializable
+data object ResumenGeneral
+
+@Serializable
+data class HistorialCliente(
+    val clienteId: String,
+)
+
 /** [onRegistrado] recibe el id del movimiento guardado; [onCerrar] cierra el registro o la pantalla de métodos. */
 fun NavGraphBuilder.pantallasDeMovimientos(
     onCerrar: () -> Unit,
     onRegistrado: (Uuid) -> Unit,
+    onEditarCliente: (Uuid) -> Unit,
+    onRegistrar: (Uuid, TipoMovimiento) -> Unit,
 ) {
     dialog<RegistrarMovimiento> {
         RegistrarMovimientoDialogo(onCerrar = onCerrar, onRegistrado = onRegistrado)
     }
     composable<MetodosCobro> {
         MetodosCobroPantalla(onVolver = onCerrar)
+    }
+    composable<ResumenGeneral> {
+        ResumenPantalla(onVolver = onCerrar)
+    }
+    composable<HistorialCliente> {
+        HistorialPantalla(onVolver = onCerrar, onEditar = onEditarCliente, onRegistrar = onRegistrar)
     }
 }
