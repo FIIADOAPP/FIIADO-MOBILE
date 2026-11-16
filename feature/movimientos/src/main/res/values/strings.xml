@@ -28,6 +28,14 @@
     <string name="historial_anular_explicacion">Seguirá en el historial, tachado, y dejará de contar en el saldo. No se puede deshacer.</string>
     <string name="historial_anular">Anular</string>
 
+    <string name="resumen_titulo">Resumen</string>
+    <string name="resumen_por_cobrar">Por cobrar</string>
+    <string name="resumen_por_cobrar_ayuda">Lo que te deben todos tus clientes. El saldo a favor de uno no descuenta lo que deben los demás.</string>
+    <string name="resumen_hoy">Hoy</string>
+    <string name="resumen_mes">Este mes (%1$s)</string>
+    <string name="resumen_fiado">Fiado</string>
+    <string name="resumen_cobrado">Cobrado</string>
+
     <string name="metodos_titulo">Métodos de cobro</string>
     <string name="metodos_ayuda">Al cobrar eliges uno de estos métodos. Toca uno para renombrarlo o archivarlo.</string>
     <string name="metodos_nuevo">Nuevo método</string>

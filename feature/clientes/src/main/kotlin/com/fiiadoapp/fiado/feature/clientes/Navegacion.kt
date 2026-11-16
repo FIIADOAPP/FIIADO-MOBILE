@@ -27,6 +27,7 @@ fun NavGraphBuilder.pantallasDeClientes(
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     onMetodosCobro: () -> Unit,
+    onResumen: () -> Unit,
 ) {
     composable<ListaClientes> { entrada ->
         val registrado by entrada.savedStateHandle
@@ -39,6 +40,7 @@ fun NavGraphBuilder.pantallasDeClientes(
             onCliente = onCliente,
             onRegistrar = onRegistrar,
             onMetodosCobro = onMetodosCobro,
+            onResumen = onResumen,
         )
     }
     composable<FormularioCliente> {

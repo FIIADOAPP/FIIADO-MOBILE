@@ -34,6 +34,7 @@ class ListaClientesViewModelTest {
     private fun TestScope.viewModelObservado() =
         ListaClientesViewModel(libreta.repositorioClientes, libreta.repositorioMovimientos, reloj).also {
             it.lista.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
+            it.porCobrar.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
         }
 
     @Test
@@ -131,5 +132,15 @@ class ListaClientesViewModelTest {
                     .getValue(fiado.id)
                     .anuladoEn,
             )
+        }
+
+    @Test
+    fun `calcula lo pendiente por cobrar de todos los clientes`() =
+        runTest {
+            val fiado = fiadoDeRosa()
+            libreta.clientes.value = mapOf(rosa.id to rosa)
+            libreta.movimientos.value = mapOf(fiado.id to fiado)
+
+            assertEquals(Dinero(1250), viewModelObservado().porCobrar.value)
         }
 }

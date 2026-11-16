@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -47,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -68,11 +71,13 @@ internal fun ListaClientesPantalla(
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     onMetodosCobro: () -> Unit,
+    onResumen: () -> Unit,
     viewModel: ListaClientesViewModel = hiltViewModel(),
 ) {
     val busqueda by viewModel.busqueda.collectAsStateWithLifecycle()
     val clientes by viewModel.lista.collectAsStateWithLifecycle()
     val aviso by viewModel.aviso.collectAsStateWithLifecycle()
+    val porCobrar by viewModel.porCobrar.collectAsStateWithLifecycle()
     val foco = LocalFocusManager.current
     // Al cerrarse el registro, Compose devuelve el foco al buscador y abre el teclado sobre la lista.
     LifecycleResumeEffect(Unit) {
@@ -88,12 +93,14 @@ internal fun ListaClientesPantalla(
     ListaClientesContenido(
         busqueda = busqueda,
         clientes = clientes,
+        porCobrar = porCobrar,
         aviso = aviso,
         onBuscar = viewModel::buscar,
         onNuevo = onNuevo,
         onCliente = onCliente,
         onRegistrar = onRegistrar,
         onMetodosCobro = onMetodosCobro,
+        onResumen = onResumen,
         onDeshacer = viewModel::deshacer,
         onDescartarAviso = viewModel::descartarAviso,
     )
@@ -104,12 +111,14 @@ internal fun ListaClientesPantalla(
 internal fun ListaClientesContenido(
     busqueda: String,
     clientes: List<ClienteConSaldo>?,
+    porCobrar: Dinero?,
     aviso: AvisoRegistro?,
     onBuscar: (String) -> Unit,
     onNuevo: () -> Unit,
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     onMetodosCobro: () -> Unit,
+    onResumen: () -> Unit,
     onDeshacer: () -> Unit,
     onDescartarAviso: () -> Unit,
 ) {
@@ -144,6 +153,7 @@ internal fun ListaClientesContenido(
         },
     ) { relleno ->
         Column(Modifier.padding(relleno).fillMaxSize()) {
+            if (porCobrar != null) TarjetaPorCobrar(porCobrar, onResumen)
             OutlinedTextField(
                 value = busqueda,
                 onValueChange = onBuscar,
@@ -212,6 +222,24 @@ private fun FilaCliente(
         Spacer(Modifier.width(8.dp))
         OutlinedButton(onClick = { onRegistrar(cliente.id, TipoMovimiento.PAGO) }) {
             Text(stringResource(R.string.clientes_cobrar))
+        }
+    }
+}
+
+/** Lo pendiente de todos los clientes; un toque lleva al resumen de hoy y del mes. */
+@Composable
+private fun TarjetaPorCobrar(
+    porCobrar: Dinero,
+    onResumen: () -> Unit,
+) {
+    Card(onClick = onResumen, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.clientes_por_cobrar), style = MaterialTheme.typography.labelLarge)
+                Text(porCobrar.formatear(), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            }
+            Text(stringResource(R.string.clientes_ver_resumen), color = MaterialTheme.colorScheme.primary)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
         }
     }
 }

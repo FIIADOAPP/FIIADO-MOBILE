@@ -13,6 +13,7 @@ import com.fiiadoapp.fiado.feature.clientes.pantallasDeClientes
 import com.fiiadoapp.fiado.feature.movimientos.HistorialCliente
 import com.fiiadoapp.fiado.feature.movimientos.MetodosCobro
 import com.fiiadoapp.fiado.feature.movimientos.RegistrarMovimiento
+import com.fiiadoapp.fiado.feature.movimientos.ResumenGeneral
 import com.fiiadoapp.fiado.feature.movimientos.pantallasDeMovimientos
 import com.fiiadoapp.fiado.ui.theme.FiadoTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
                         onCliente = { navController.navigate(HistorialCliente(it.toString())) },
                         onRegistrar = registrar,
                         onMetodosCobro = { navController.navigate(MetodosCobro) },
+                        onResumen = { navController.navigate(ResumenGeneral) },
                     )
                     pantallasDeMovimientos(
                         onCerrar = { navController.popBackStack() },
