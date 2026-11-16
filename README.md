@@ -14,6 +14,8 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 <p>
   <img src="docs/capturas/movimientos-lista.png" alt="Lista de clientes con su saldo y los botones Fiar y Cobrar" width="240">
   <img src="docs/capturas/movimientos-dialogo.png" alt="Registro de un fiado con el monto enfocado" width="240">
+  <img src="docs/capturas/cobro-metodos.png" alt="Cobro con el método preseleccionado" width="240">
+  <img src="docs/capturas/metodos-lista.png" alt="Métodos de cobro propios" width="240">
   <img src="docs/capturas/clientes-editar.png" alt="Edición de un cliente con la opción de archivar" width="240">
   <img src="docs/capturas/clientes-nuevo-error.png" alt="Validación al crear un cliente sin nombre" width="240">
 </p>
@@ -25,6 +27,7 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Esqueleto (Compose, Hilt, módulos, lint) | Listo |
 | Clientes (lista con saldo, búsqueda, alta, edición, archivado) | Listo |
 | Movimientos: fiar y cobrar en dos toques, deshacer al instante | Listo |
+| Métodos de cobro propios, con el método obligatorio en cada pago | Listo |
 | Historial con anulación y resumen | Pendiente |
 | Inicio de sesión | Pendiente |
 | Sincronización y restauración | Pendiente |
@@ -73,4 +76,4 @@ Ejecuta las pruebas instrumentadas en el dispositivo o emulador conectado. Verif
 | `core:ui` | Componentes de interfaz compartidos entre funcionalidades. |
 | `core:testing` | Repositorios falsos en memoria para las pruebas de los ViewModels. |
 | `feature:clientes` | Pantallas y ViewModels de clientes. |
-| `feature:movimientos` | Registro de fiados y pagos. |
+| `feature:movimientos` | Registro de fiados y pagos, y gestión de los métodos de cobro. |

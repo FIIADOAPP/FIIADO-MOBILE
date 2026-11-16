@@ -48,4 +48,19 @@ interface MovimientoDao {
 
     @Upsert
     suspend fun guardar(movimiento: MovimientoEntity)
+
+    @Query(
+        "SELECT metodoCobroId FROM movimientos WHERE tipo = 'PAGO' AND anuladoEn IS NULL " +
+            "ORDER BY registradoEn DESC, id DESC LIMIT 1",
+    )
+    suspend fun ultimoMetodoCobroUsado(): String?
+}
+
+@Dao
+interface MetodoCobroDao {
+    @Query("SELECT * FROM metodos_cobro WHERE archivadoEn IS NULL ORDER BY creadoEn, id")
+    fun observarActivos(): Flow<List<MetodoCobroEntity>>
+
+    @Upsert
+    suspend fun guardar(metodo: MetodoCobroEntity)
 }

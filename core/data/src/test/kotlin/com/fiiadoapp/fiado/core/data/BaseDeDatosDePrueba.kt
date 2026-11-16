@@ -4,6 +4,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
+import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
 import com.fiiadoapp.fiado.domain.Telefono
 import com.fiiadoapp.fiado.domain.TipoMovimiento
@@ -17,10 +18,12 @@ abstract class BaseDeDatosDePrueba {
         Room
             .inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), FiadoDatabase::class.java)
             .allowMainThreadQueries()
+            .addCallback(SembrarMetodosIniciales)
             .build()
 
     protected val clientes = RepositorioClientesRoom(db.clienteDao())
     protected val movimientos = RepositorioMovimientosRoom(db.movimientoDao())
+    protected val metodos = RepositorioMetodosCobroRoom(db.metodoCobroDao())
 
     protected val ahora: Instant = Instant.parse("2026-11-15T15:30:00.123Z")
     protected val hoy: LocalDate = LocalDate.of(2026, 11, 15)
@@ -41,5 +44,16 @@ abstract class BaseDeDatosDePrueba {
         fecha: LocalDate = hoy,
         registradoEn: Instant = ahora,
         nota: String? = null,
-    ) = Movimiento(Uuid.random(), cliente.id, tipo, Dinero(centimos), nota, fecha, registradoEn, anuladoEn = null)
+        metodo: MetodoCobro = MetodoCobro.EFECTIVO,
+    ) = Movimiento(
+        Uuid.random(),
+        cliente.id,
+        tipo,
+        Dinero(centimos),
+        nota,
+        fecha,
+        registradoEn,
+        anuladoEn = null,
+        metodoCobroId = metodo.id.takeIf { tipo == TipoMovimiento.PAGO },
+    )
 }

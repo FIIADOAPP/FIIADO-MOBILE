@@ -11,6 +11,25 @@
     <string name="registro_error_monto">Escribe un monto mayor que cero, por ejemplo 12.50.</string>
     <string name="registro_error_fecha">La fecha no puede ser futura.</string>
     <string name="registro_error_archivado">Este cliente está archivado.</string>
+    <string name="registro_metodo">Cobrado con</string>
+    <string name="registro_error_metodo">Elige con qué te pagó.</string>
+
+    <string name="metodos_titulo">Métodos de cobro</string>
+    <string name="metodos_ayuda">Al cobrar eliges uno de estos métodos. Toca uno para renombrarlo o archivarlo.</string>
+    <string name="metodos_nuevo">Nuevo método</string>
+    <string name="metodos_editar">Editar método</string>
+    <string name="metodos_nombre">Nombre</string>
+    <string name="metodos_archivar">Archivar</string>
+    <string name="metodos_volver">Volver</string>
+    <string name="metodos_error_vacio">Escribe el nombre del método.</string>
+    <string name="metodos_error_repetido">Ya tienes un método con ese nombre.</string>
+    <string name="metodos_error_ultimo">Necesitas al menos un método para cobrar.</string>
+
+    <plurals name="metodos_error_largo">
+        <item quantity="one">Máximo %1$d carácter.</item>
+        <item quantity="many">Máximo %1$d caracteres.</item>
+        <item quantity="other">Máximo %1$d caracteres.</item>
+    </plurals>
 
     <plurals name="registro_error_nota">
         <item quantity="one">Máximo %1$d carácter.</item>

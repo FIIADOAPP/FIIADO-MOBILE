@@ -2,6 +2,7 @@ package com.fiiadoapp.fiado.core.data
 
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
+import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
 import com.fiiadoapp.fiado.domain.Telefono
 import com.fiiadoapp.fiado.domain.TipoMovimiento
@@ -55,6 +56,7 @@ internal fun Movimiento.aEntidad() =
         fecha = fecha.toEpochDay(),
         registradoEn = registradoEn.toEpochMilli(),
         anuladoEn = anuladoEn?.toEpochMilli(),
+        metodoCobroId = metodoCobroId?.toString(),
     )
 
 internal fun MovimientoEntity.aDominio() =
@@ -67,4 +69,23 @@ internal fun MovimientoEntity.aDominio() =
         fecha = LocalDate.ofEpochDay(fecha),
         registradoEn = Instant.ofEpochMilli(registradoEn),
         anuladoEn = anuladoEn?.let(Instant::ofEpochMilli),
+        metodoCobroId = metodoCobroId?.let(Uuid::parse),
+    )
+
+internal fun MetodoCobro.aEntidad() =
+    MetodoCobroEntity(
+        id = id.toString(),
+        nombre = nombre,
+        creadoEn = creadoEn.toEpochMilli(),
+        actualizadoEn = actualizadoEn.toEpochMilli(),
+        archivadoEn = archivadoEn?.toEpochMilli(),
+    )
+
+internal fun MetodoCobroEntity.aDominio() =
+    MetodoCobro(
+        id = Uuid.parse(id),
+        nombre = nombre,
+        creadoEn = Instant.ofEpochMilli(creadoEn),
+        actualizadoEn = Instant.ofEpochMilli(actualizadoEn),
+        archivadoEn = archivadoEn?.let(Instant::ofEpochMilli),
     )

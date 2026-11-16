@@ -1,6 +1,7 @@
 package com.fiiadoapp.fiado.feature.movimientos
 
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import kotlinx.serialization.Serializable
@@ -13,12 +14,18 @@ data class RegistrarMovimiento(
     val tipo: String,
 )
 
-/** [onRegistrado] recibe el id del movimiento guardado; [onCerrar] se llama al cancelar. */
+@Serializable
+data object MetodosCobro
+
+/** [onRegistrado] recibe el id del movimiento guardado; [onCerrar] cierra el registro o la pantalla de métodos. */
 fun NavGraphBuilder.pantallasDeMovimientos(
     onCerrar: () -> Unit,
     onRegistrado: (Uuid) -> Unit,
 ) {
     dialog<RegistrarMovimiento> {
         RegistrarMovimientoDialogo(onCerrar = onCerrar, onRegistrado = onRegistrado)
+    }
+    composable<MetodosCobro> {
+        MetodosCobroPantalla(onVolver = onCerrar)
     }
 }

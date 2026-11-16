@@ -17,7 +17,18 @@ class ResumenTest {
         tipo: TipoMovimiento,
         centimos: Long,
         fecha: LocalDate = hoy,
-    ) = Movimiento(Uuid.random(), cliente, tipo, Dinero(centimos), null, fecha, ahora, anuladoEn = null)
+        metodo: MetodoCobro = MetodoCobro.EFECTIVO,
+    ) = Movimiento(
+        Uuid.random(),
+        cliente,
+        tipo,
+        Dinero(centimos),
+        null,
+        fecha,
+        ahora,
+        anuladoEn = null,
+        metodoCobroId = metodo.id.takeIf { tipo == TipoMovimiento.PAGO },
+    )
 
     private fun fiado(
         cliente: Uuid,
@@ -29,7 +40,8 @@ class ResumenTest {
         cliente: Uuid,
         centimos: Long,
         fecha: LocalDate = hoy,
-    ) = movimiento(cliente, TipoMovimiento.PAGO, centimos, fecha)
+        metodo: MetodoCobro = MetodoCobro.EFECTIVO,
+    ) = movimiento(cliente, TipoMovimiento.PAGO, centimos, fecha, metodo)
 
     @Test
     fun `el saldo es fiados menos pagos`() {
@@ -84,6 +96,27 @@ class ResumenTest {
     fun `los anulados no cuentan en ningun total`() {
         val resumen = Resumen.calcular(listOf(fiado(rosa, 1000).anular(ahora), pago(rosa, 200).anular(ahora)), hoy)
 
-        assertEquals(Resumen(Dinero.CERO, Dinero.CERO, Dinero.CERO, Dinero.CERO, Dinero.CERO), resumen)
+        assertEquals(Resumen(Dinero.CERO, Dinero.CERO, Dinero.CERO, Dinero.CERO, Dinero.CERO, emptyMap(), emptyMap()), resumen)
+    }
+
+    @Test
+    fun `desglosa lo cobrado por metodo hoy y en el mes`() {
+        val movimientos =
+            listOf(
+                pago(rosa, 1000, metodo = MetodoCobro.YAPE),
+                pago(pedro, 500, metodo = MetodoCobro.YAPE),
+                pago(rosa, 300),
+                pago(pedro, 2000, fecha = LocalDate.of(2026, 11, 2), metodo = MetodoCobro.PLIN),
+                pago(rosa, 700, metodo = MetodoCobro.YAPE).anular(ahora),
+                fiado(rosa, 9000),
+            )
+
+        val resumen = Resumen.calcular(movimientos, hoy)
+
+        assertEquals(mapOf(MetodoCobro.YAPE.id to Dinero(1500), MetodoCobro.EFECTIVO.id to Dinero(300)), resumen.cobradoHoyPorMetodo)
+        assertEquals(
+            mapOf(MetodoCobro.YAPE.id to Dinero(1500), MetodoCobro.EFECTIVO.id to Dinero(300), MetodoCobro.PLIN.id to Dinero(2000)),
+            resumen.cobradoMesPorMetodo,
+        )
     }
 }

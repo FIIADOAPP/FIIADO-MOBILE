@@ -19,11 +19,23 @@ data class ClienteEntity(
     val archivadoEn: Long?,
 )
 
+@Entity(tableName = "metodos_cobro")
+data class MetodoCobroEntity(
+    @PrimaryKey val id: String,
+    val nombre: String,
+    val creadoEn: Long,
+    val actualizadoEn: Long,
+    val archivadoEn: Long?,
+)
+
 /** `fecha` en días desde la época (`LocalDate.toEpochDay`); los instantes en milisegundos UTC. */
 @Entity(
     tableName = "movimientos",
-    foreignKeys = [ForeignKey(entity = ClienteEntity::class, parentColumns = ["id"], childColumns = ["clienteId"])],
-    indices = [Index("clienteId"), Index("fecha")],
+    foreignKeys = [
+        ForeignKey(entity = ClienteEntity::class, parentColumns = ["id"], childColumns = ["clienteId"]),
+        ForeignKey(entity = MetodoCobroEntity::class, parentColumns = ["id"], childColumns = ["metodoCobroId"]),
+    ],
+    indices = [Index("clienteId"), Index("fecha"), Index("metodoCobroId")],
 )
 data class MovimientoEntity(
     @PrimaryKey val id: String,
@@ -34,6 +46,8 @@ data class MovimientoEntity(
     val fecha: Long,
     val registradoEn: Long,
     val anuladoEn: Long?,
+    /** Obligatorio en un pago y nulo en un fiado (ADR-0004). */
+    val metodoCobroId: String?,
 )
 
 data class ClienteConSaldoFila(

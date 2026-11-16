@@ -22,7 +22,8 @@ class MovimientoTest {
         nota: String? = null,
         fecha: LocalDate = hoy,
         para: Cliente = cliente,
-    ) = Movimiento.registrar(Uuid.random(), para, tipo, monto, nota, fecha, hoy, ahora)
+        metodo: MetodoCobro? = MetodoCobro.EFECTIVO,
+    ) = Movimiento.registrar(Uuid.random(), para, tipo, monto, metodo, nota, fecha, hoy, ahora)
 
     private fun registrado(
         tipo: TipoMovimiento = TipoMovimiento.FIADO,
@@ -45,6 +46,36 @@ class MovimientoTest {
     fun `un fiado suma deuda y un pago la resta`() {
         assertEquals(Dinero(1250), registrado(TipoMovimiento.FIADO).efectoEnSaldo)
         assertEquals(Dinero(-1250), registrado(TipoMovimiento.PAGO).efectoEnSaldo)
+    }
+
+    @Test
+    fun `un pago guarda su metodo y un fiado no`() {
+        assertEquals(
+            MetodoCobro.YAPE.id,
+            assertIs<Resultado.Exito<Movimiento>>(registrar(TipoMovimiento.PAGO, metodo = MetodoCobro.YAPE)).valor.metodoCobroId,
+        )
+        assertNull(assertIs<Resultado.Exito<Movimiento>>(registrar(TipoMovimiento.FIADO, metodo = MetodoCobro.YAPE)).valor.metodoCobroId)
+    }
+
+    @Test
+    fun `un pago sin metodo no se registra`() {
+        assertEquals(Resultado.Fallo(ErrorMovimiento.SinMetodoCobro), registrar(TipoMovimiento.PAGO, metodo = null))
+    }
+
+    @Test
+    fun `un pago con un metodo archivado no se registra`() {
+        val archivado = MetodoCobro.PLIN.copy(archivadoEn = ahora)
+
+        assertEquals(Resultado.Fallo(ErrorMovimiento.MetodoCobroArchivado), registrar(TipoMovimiento.PAGO, metodo = archivado))
+    }
+
+    @Test
+    fun `no se puede construir un pago sin metodo ni un fiado con metodo`() {
+        val fiado = registrado(TipoMovimiento.FIADO)
+        val pago = registrado(TipoMovimiento.PAGO)
+
+        assertThrows<IllegalArgumentException> { fiado.copy(metodoCobroId = MetodoCobro.EFECTIVO.id) }
+        assertThrows<IllegalArgumentException> { pago.copy(metodoCobroId = null) }
     }
 
     @Test

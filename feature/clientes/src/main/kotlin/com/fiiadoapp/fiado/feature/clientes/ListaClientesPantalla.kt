@@ -16,8 +16,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilledTonalButton
@@ -37,7 +40,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -62,6 +67,7 @@ internal fun ListaClientesPantalla(
     onNuevo: () -> Unit,
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
+    onMetodosCobro: () -> Unit,
     viewModel: ListaClientesViewModel = hiltViewModel(),
 ) {
     val busqueda by viewModel.busqueda.collectAsStateWithLifecycle()
@@ -87,6 +93,7 @@ internal fun ListaClientesPantalla(
         onNuevo = onNuevo,
         onCliente = onCliente,
         onRegistrar = onRegistrar,
+        onMetodosCobro = onMetodosCobro,
         onDeshacer = viewModel::deshacer,
         onDescartarAviso = viewModel::descartarAviso,
     )
@@ -102,6 +109,7 @@ internal fun ListaClientesContenido(
     onNuevo: () -> Unit,
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
+    onMetodosCobro: () -> Unit,
     onDeshacer: () -> Unit,
     onDescartarAviso: () -> Unit,
 ) {
@@ -120,7 +128,12 @@ internal fun ListaClientesContenido(
         }
     }
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.clientes_titulo)) }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.clientes_titulo)) },
+                actions = { MenuDeOpciones(onMetodosCobro) },
+            )
+        },
         snackbarHost = { SnackbarHost(avisos) },
         floatingActionButton = {
             ExtendedFloatingActionButton(
@@ -200,6 +213,23 @@ private fun FilaCliente(
         OutlinedButton(onClick = { onRegistrar(cliente.id, TipoMovimiento.PAGO) }) {
             Text(stringResource(R.string.clientes_cobrar))
         }
+    }
+}
+
+@Composable
+private fun MenuDeOpciones(onMetodosCobro: () -> Unit) {
+    var abierto by remember { mutableStateOf(false) }
+    IconButton(onClick = { abierto = true }) {
+        Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.clientes_mas_opciones))
+    }
+    DropdownMenu(expanded = abierto, onDismissRequest = { abierto = false }) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.clientes_metodos_cobro)) },
+            onClick = {
+                abierto = false
+                onMetodosCobro()
+            },
+        )
     }
 }
 
