@@ -33,6 +33,9 @@ interface RepositorioCuenta {
 
     suspend fun descartarAvisoSesionTerminada()
 
+    /** Pregunta a la API si la sesión sigue abierta; si se cerró desde fuera, la borra y avisa. */
+    suspend fun comprobarSesion(): Resultado<CuentaAbierta, ErrorCuenta>
+
     suspend fun registrar(
         correo: String,
         contrasena: String,
