@@ -6,6 +6,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+## [0.2.0] - 2026-11-16
+
 ### Agregado
 
 - ADR-0002 sobre el modelo de datos: identificadores UUID v7, dinero en céntimos, movimientos inmutables y saldo calculado.
@@ -40,5 +42,6 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - Formato con ktlint mediante Spotless y Android Lint con las advertencias tratadas como errores.
 - CI en GitHub Actions: commitlint, ktlint, Android Lint, pruebas y build en cada pull request.
 
-[Sin publicar]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.1.0...develop
+[Sin publicar]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.2.0...develop
+[0.2.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/releases/tag/v0.1.0
