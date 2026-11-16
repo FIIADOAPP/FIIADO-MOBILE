@@ -1,0 +1,61 @@
+<resources>
+    <string name="registro_titulo_fiar">Fiar a %1$s</string>
+    <string name="registro_titulo_cobrar">Cobrar a %1$s</string>
+    <string name="registro_monto">Monto</string>
+    <string name="registro_nota">Nota (opcional)</string>
+    <string name="registro_fecha_hoy">Hoy</string>
+    <string name="registro_fecha_ayer">Ayer</string>
+    <string name="registro_guardar">Guardar</string>
+    <string name="registro_cancelar">Cancelar</string>
+    <string name="registro_aceptar">Aceptar</string>
+    <string name="registro_error_monto">Escribe un monto mayor que cero, por ejemplo 12.50.</string>
+    <string name="registro_error_fecha">La fecha no puede ser futura.</string>
+    <string name="registro_error_archivado">Este cliente está archivado.</string>
+    <string name="registro_metodo">Cobrado con</string>
+    <string name="registro_error_metodo">Elige con qué te pagó.</string>
+
+    <string name="historial_editar_cliente">Editar cliente</string>
+    <string name="historial_fiar">Fiar</string>
+    <string name="historial_cobrar">Cobrar</string>
+    <string name="historial_vacio">Aún no hay movimientos con este cliente.</string>
+    <string name="historial_ayuda">Toca un movimiento si necesitas anularlo.</string>
+    <string name="historial_fiado">Fiado</string>
+    <string name="historial_pago">Pago · %1$s</string>
+    <string name="historial_anulado">Anulado</string>
+    <string name="historial_este_fiado">este fiado</string>
+    <string name="historial_este_pago">este pago</string>
+    <string name="historial_anular_titulo">¿Anular %1$s de %2$s?</string>
+    <string name="historial_anular_explicacion">Seguirá en el historial, tachado, y dejará de contar en el saldo. No se puede deshacer.</string>
+    <string name="historial_anular">Anular</string>
+
+    <string name="resumen_titulo">Resumen</string>
+    <string name="resumen_por_cobrar">Por cobrar</string>
+    <string name="resumen_por_cobrar_ayuda">Lo que te deben todos tus clientes. El saldo a favor de uno no descuenta lo que deben los demás.</string>
+    <string name="resumen_hoy">Hoy</string>
+    <string name="resumen_mes">Este mes (%1$s)</string>
+    <string name="resumen_fiado">Fiado</string>
+    <string name="resumen_cobrado">Cobrado</string>
+
+    <string name="metodos_titulo">Métodos de cobro</string>
+    <string name="metodos_ayuda">Al cobrar eliges uno de estos métodos. Toca uno para renombrarlo o archivarlo.</string>
+    <string name="metodos_nuevo">Nuevo método</string>
+    <string name="metodos_editar">Editar método</string>
+    <string name="metodos_nombre">Nombre</string>
+    <string name="metodos_archivar">Archivar</string>
+    <string name="metodos_volver">Volver</string>
+    <string name="metodos_error_vacio">Escribe el nombre del método.</string>
+    <string name="metodos_error_repetido">Ya tienes un método con ese nombre.</string>
+    <string name="metodos_error_ultimo">Necesitas al menos un método para cobrar.</string>
+
+    <plurals name="metodos_error_largo">
+        <item quantity="one">Máximo %1$d carácter.</item>
+        <item quantity="many">Máximo %1$d caracteres.</item>
+        <item quantity="other">Máximo %1$d caracteres.</item>
+    </plurals>
+
+    <plurals name="registro_error_nota">
+        <item quantity="one">Máximo %1$d carácter.</item>
+        <item quantity="many">Máximo %1$d caracteres.</item>
+        <item quantity="other">Máximo %1$d caracteres.</item>
+    </plurals>
+</resources>

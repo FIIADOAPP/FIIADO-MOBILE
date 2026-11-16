@@ -12,6 +12,7 @@ Libreta de fiado para bodegas pequeñas del Perú. La usa una sola persona, el d
 | Movimientos | Inmutables. No se editan; se anulan, y el anulado queda visible en el historial. |
 | Clientes | Se archivan, no se borran. |
 | Pago mayor a la deuda | Se permite y queda como saldo a favor del cliente. La app registra lo que pasó; no lo impide. |
+| Métodos de cobro | Lista propia (crear, renombrar, archivar); empieza con Efectivo, Yape y Plin. Cada pago lleva un método, preseleccionado con el último usado. |
 | Resumen | "Hoy" y "Este mes": lo fiado y lo cobrado en el periodo, en hora de Lima. "Total": deuda pendiente actual. |
 | Montos | Céntimos como enteros (`Long`), nunca decimales. |
 | Bloqueo | `BiometricPrompt` con huella o, si no hay, el bloqueo del propio teléfono. Sin PIN propio de la app. Protege la pantalla, no cifra los datos. |
@@ -58,8 +59,10 @@ Cada entrega indica su repositorio: **M** (mobile) o **A** (API).
 | `feat/dominio-libreta` | M | `Dinero`, `Cliente`, `Movimiento`, reglas de saldo y resumen, con pruebas unitarias. |
 | `feat/persistencia-room` | M | Entidades, DAOs y repositorios, probados con Robolectric. |
 | `feat/clientes` | M | Lista, búsqueda, crear, editar, archivar y saldo por cliente. |
-| `feat/registro-de-movimientos` | M | Fiar o cobrar en dos toques, y anular. |
-| `feat/historial-y-resumen` | M | Historial por cliente y resumen de hoy, el mes y el total. |
+| `feat/registro-de-movimientos` | M | Fiar o cobrar en dos toques, y deshacer al instante. |
+| `fix/durabilidad-sqlite` | M | ADR-0003: journal clásico para que una escritura confirmada sobreviva a un apagado. |
+| `feat/metodos-de-cobro` | M | ADR-0004: métodos de cobro propios (Efectivo, Yape y Plin de inicio) y método obligatorio en cada pago. |
+| `feat/historial-y-resumen` | M | Historial por cliente con anulación y método de cada pago; resumen de hoy, el mes y el total, con lo cobrado por método. |
 
 ### Fase 2: Cuenta → API `v0.2.0`, app `v0.3.0`
 

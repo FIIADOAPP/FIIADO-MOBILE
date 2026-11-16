@@ -12,6 +12,10 @@ pluginManagement {
     }
 }
 
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -25,3 +29,7 @@ rootProject.name = "fiado"
 include(":app")
 include(":core:domain")
 include(":core:data")
+include(":core:ui")
+include(":core:testing")
+include(":feature:clientes")
+include(":feature:movimientos")
