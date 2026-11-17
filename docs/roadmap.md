@@ -16,7 +16,7 @@ Libreta de fiado para bodegas pequeñas del Perú. La usa una sola persona, el d
 | Resumen | "Hoy" y "Este mes": lo fiado y lo cobrado en el periodo, en hora de Lima. "Total": deuda pendiente actual. |
 | Montos | Céntimos como enteros (`Long`), nunca decimales. |
 | Bloqueo | `BiometricPrompt` con huella o, si no hay, el bloqueo del propio teléfono. Sin PIN propio de la app. Protege la pantalla, no cifra los datos. |
-| Inicio de sesión | Correo y contraseña. Requiere internet solo la primera vez. |
+| Cuenta | Opcional: la app funciona completa sin cuenta y la cuenta activa el respaldo. Se crea con correo, contraseña y nombre del negocio; el correo se verifica con un código y la contraseña se recupera con otro código, ambos enviados por correo (SMTP). |
 | WhatsApp | Enlace `wa.me` con el número normalizado a +51 y el mensaje con el monto ya escrito. |
 | Firma del APK | Keystore en GitHub Secrets; el APK firmado se genera en CI. Nunca se sube al repositorio. |
 
@@ -68,9 +68,11 @@ Cada entrega indica su repositorio: **M** (mobile) o **A** (API).
 
 | Rama | Repo | Entrega |
 |---|---|---|
-| `docs/adr-autenticacion` | A | Token de acceso y token de refresco con rotación, contraseñas con argon2, dispositivo activo. |
-| `feat/identidad` | A | Registro, login y refresco, con arquitectura hexagonal y pruebas de integración contra Postgres. |
-| `feat/sesion` | M | Pantalla de login, almacenamiento seguro del token y sesión que se mantiene sin conexión. |
+| `docs/adr-autenticacion` | A | ADR-0002: tokens de acceso y de refresco con rotación, argon2id, códigos por correo, dispositivo activo. |
+| `feat/registro-y-verificacion` | A | Registro con nombre del negocio, envío de códigos por SMTP (Mailpit en local y en el CI) y verificación del correo. |
+| `feat/sesiones` | A | Inicio de sesión, refresco con rotación y detección de reutilización, cesión del dispositivo activo y cierre de sesión. |
+| `feat/recuperar-contrasena` | A | Pedir y usar un código para restablecer la contraseña, cerrando todas las sesiones. |
+| `feat/cuenta` | M | Crear cuenta, verificar el correo, iniciar sesión (con aviso al ceder el dispositivo) y recuperar la contraseña desde el menú; tokens guardados de forma segura; la sesión se mantiene sin conexión. |
 
 ### Fase 3: Sincronización → API `v0.3.0`, app `v0.4.0`
 
