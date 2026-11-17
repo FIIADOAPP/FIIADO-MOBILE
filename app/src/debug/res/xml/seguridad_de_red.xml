@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Solo debug (ADR-0005): permite HTTP sin cifrar para hablar con la API en tu PC, desde el
+    emulador (10.0.2.2) o desde un teléfono en el mismo wifi, cuya IP cambia según la red.
+    La build release no incluye este archivo y exige HTTPS.
+-->
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
+    <base-config
+        cleartextTrafficPermitted="true"
+        tools:ignore="InsecureBaseConfiguration" />
+</network-security-config>

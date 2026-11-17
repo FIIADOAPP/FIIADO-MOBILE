@@ -27,6 +27,7 @@ fun NavGraphBuilder.pantallasDeClientes(
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     onMetodosCobro: () -> Unit,
+    onCuenta: () -> Unit,
     onResumen: () -> Unit,
 ) {
     composable<ListaClientes> { entrada ->
@@ -40,6 +41,7 @@ fun NavGraphBuilder.pantallasDeClientes(
             onCliente = onCliente,
             onRegistrar = onRegistrar,
             onMetodosCobro = onMetodosCobro,
+            onCuenta = onCuenta,
             onResumen = onResumen,
         )
     }

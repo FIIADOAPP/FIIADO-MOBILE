@@ -10,6 +10,9 @@ import com.fiiadoapp.fiado.domain.TipoMovimiento
 import com.fiiadoapp.fiado.feature.clientes.FormularioCliente
 import com.fiiadoapp.fiado.feature.clientes.ListaClientes
 import com.fiiadoapp.fiado.feature.clientes.pantallasDeClientes
+import com.fiiadoapp.fiado.feature.cuenta.AvisoSesionTerminada
+import com.fiiadoapp.fiado.feature.cuenta.Cuenta
+import com.fiiadoapp.fiado.feature.cuenta.pantallasDeCuenta
 import com.fiiadoapp.fiado.feature.movimientos.HistorialCliente
 import com.fiiadoapp.fiado.feature.movimientos.MetodosCobro
 import com.fiiadoapp.fiado.feature.movimientos.RegistrarMovimiento
@@ -37,6 +40,7 @@ class MainActivity : ComponentActivity() {
                         onRegistrar = registrar,
                         onMetodosCobro = { navController.navigate(MetodosCobro) },
                         onResumen = { navController.navigate(ResumenGeneral) },
+                        onCuenta = { navController.navigate(Cuenta) },
                     )
                     pantallasDeMovimientos(
                         onCerrar = { navController.popBackStack() },
@@ -50,7 +54,9 @@ class MainActivity : ComponentActivity() {
                             )
                         },
                     )
+                    pantallasDeCuenta(navController)
                 }
+                AvisoSesionTerminada()
             }
         }
     }
