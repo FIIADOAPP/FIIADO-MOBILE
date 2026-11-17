@@ -31,7 +31,8 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Métodos de cobro propios, con el método obligatorio en cada pago | Listo |
 | Historial por cliente con anulación, y resumen de hoy y del mes con lo cobrado por método | Listo |
 | Cuenta opcional: crear, verificar el correo, iniciar sesión cediendo el dispositivo y recuperar la contraseña | Listo |
-| Sincronización y restauración | Pendiente |
+| Sincronización: cola de cambios pendientes, guardada junto con cada cambio | Listo |
+| Sincronización: envío al servidor y restauración | Pendiente |
 | Recordatorio por WhatsApp | Pendiente |
 | Bloqueo con huella | Pendiente |
 
