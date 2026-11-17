@@ -6,6 +6,15 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+## [0.3.0] - 2026-11-16
+
+La cuenta requiere FIIADO-API `v0.2.0` o superior.
+
+### Agregado
+
+- ADR-0005 y cuenta opcional desde el menú: crear cuenta con el nombre del negocio, verificar el correo con un código, iniciar sesión (con aviso y confirmación si la cuenta está abierta en otro teléfono) y recuperar la contraseña.
+- La sesión se guarda cifrada con una clave del Android Keystore, se renueva sola y se mantiene sin conexión; si se cierra desde fuera, la app avisa y la libreta queda intacta.
+
 ## [0.2.0] - 2026-11-16
 
 ### Agregado
@@ -20,8 +29,6 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - ADR-0004 y métodos de cobro propios: la app empieza con Efectivo, Yape y Plin; se pueden crear, renombrar y archivar desde el menú de la lista.
 - Cada pago guarda su método de cobro, preseleccionado con el último usado; el resumen calcula lo cobrado por método.
 - Migración de la base de datos a la versión 2: los pagos registrados antes quedan como Efectivo.
-- ADR-0005 y cuenta opcional desde el menú: crear cuenta con el nombre del negocio, verificar el correo con un código, iniciar sesión (con aviso y confirmación si la cuenta está abierta en otro teléfono) y recuperar la contraseña.
-- La sesión se guarda cifrada con una clave del Android Keystore, se renueva sola y se mantiene sin conexión; si se cierra desde fuera, la app avisa y la libreta queda intacta.
 - Historial por cliente: fiados y pagos del más reciente al más antiguo, con el método de cada pago; un toque anula un movimiento previa confirmación y queda tachado.
 - Resumen de hoy y del mes con lo fiado, lo cobrado y lo cobrado por cada método, y la tarjeta "Por cobrar" en la lista de clientes.
 
@@ -44,6 +51,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - Formato con ktlint mediante Spotless y Android Lint con las advertencias tratadas como errores.
 - CI en GitHub Actions: commitlint, ktlint, Android Lint, pruebas y build en cada pull request.
 
-[Sin publicar]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.2.0...develop
+[Sin publicar]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.3.0...develop
+[0.3.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/releases/tag/v0.1.0
