@@ -44,6 +44,26 @@ class MigracionesTest {
         db.close()
     }
 
+    @Test
+    fun `la version 3 agrega la cola vacia y conserva la libreta`() {
+        ayudante.createDatabase(base, 2).use { db ->
+            db.execSQL("INSERT INTO clientes VALUES ('c1', 'Rosa', 'rosa', NULL, 0, 0, NULL)")
+            db.execSQL("INSERT INTO movimientos VALUES ('m1', 'c1', 'FIADO', 1250, NULL, 20407, 0, NULL, NULL)")
+        }
+
+        val db = ayudante.runMigrationsAndValidate(base, 3, true, MIGRACION_2_3)
+
+        db.query("SELECT COUNT(*) FROM operaciones_pendientes").use { c ->
+            c.moveToFirst()
+            assertEquals(0, c.getInt(0))
+        }
+        db.query("SELECT COUNT(*) FROM movimientos").use { c ->
+            c.moveToFirst()
+            assertEquals(1, c.getInt(0))
+        }
+        db.close()
+    }
+
     /** Ruta absoluta: con un nombre relativo, el ayudante abre y valida rutas distintas. */
     private val base =
         InstrumentationRegistry

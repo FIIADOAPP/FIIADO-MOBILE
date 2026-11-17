@@ -22,13 +22,22 @@ object DatosModule {
     ): FiadoDatabase = FiadoDatabase.construir(contexto)
 
     @Provides
-    fun repositorioClientes(db: FiadoDatabase): RepositorioClientes = RepositorioClientesRoom(db.clienteDao())
+    fun repositorioClientes(
+        db: FiadoDatabase,
+        ids: GeneradorDeIds,
+    ): RepositorioClientes = RepositorioClientesRoom(db, ids)
 
     @Provides
-    fun repositorioMovimientos(db: FiadoDatabase): RepositorioMovimientos = RepositorioMovimientosRoom(db.movimientoDao())
+    fun repositorioMovimientos(
+        db: FiadoDatabase,
+        ids: GeneradorDeIds,
+    ): RepositorioMovimientos = RepositorioMovimientosRoom(db, ids)
 
     @Provides
-    fun repositorioMetodosCobro(db: FiadoDatabase): RepositorioMetodosCobro = RepositorioMetodosCobroRoom(db.metodoCobroDao())
+    fun repositorioMetodosCobro(
+        db: FiadoDatabase,
+        ids: GeneradorDeIds,
+    ): RepositorioMetodosCobro = RepositorioMetodosCobroRoom(db, ids)
 
     @Provides
     fun generadorDeIds(): GeneradorDeIds = GeneradorUuidV7()
