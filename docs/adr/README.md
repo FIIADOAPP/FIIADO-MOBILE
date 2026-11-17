@@ -26,3 +26,4 @@ Un ADR aceptado no se edita: si la decisión cambia, se escribe uno nuevo que lo
 | [0002](0002-modelo-de-datos.md) | Modelo de datos de la libreta | Aceptada |
 | [0003](0003-durabilidad-de-escrituras.md) | Durabilidad de las escrituras locales | Aceptada |
 | [0004](0004-metodos-de-cobro.md) | Métodos de cobro | Aceptada |
+| [0005](0005-sesion-en-la-app.md) | Cuenta y sesión en la app | Aceptada |

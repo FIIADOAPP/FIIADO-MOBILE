@@ -45,6 +45,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":feature:clientes"))
     implementation(project(":feature:movimientos"))
+    implementation(project(":feature:cuenta"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

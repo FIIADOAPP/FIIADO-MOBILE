@@ -11,6 +11,7 @@
     <string name="clientes_ver_resumen">Ver resumen</string>
     <string name="clientes_mas_opciones">Más opciones</string>
     <string name="clientes_metodos_cobro">Métodos de cobro</string>
+    <string name="clientes_cuenta">Cuenta</string>
     <string name="aviso_fiado">Fiaste %1$s a %2$s</string>
     <string name="aviso_pago">Cobraste %1$s a %2$s</string>
     <string name="aviso_deshacer">Deshacer</string>

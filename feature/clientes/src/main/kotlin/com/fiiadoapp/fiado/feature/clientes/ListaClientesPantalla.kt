@@ -71,6 +71,7 @@ internal fun ListaClientesPantalla(
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     onMetodosCobro: () -> Unit,
+    onCuenta: () -> Unit,
     onResumen: () -> Unit,
     viewModel: ListaClientesViewModel = hiltViewModel(),
 ) {
@@ -100,6 +101,7 @@ internal fun ListaClientesPantalla(
         onCliente = onCliente,
         onRegistrar = onRegistrar,
         onMetodosCobro = onMetodosCobro,
+        onCuenta = onCuenta,
         onResumen = onResumen,
         onDeshacer = viewModel::deshacer,
         onDescartarAviso = viewModel::descartarAviso,
@@ -118,6 +120,7 @@ internal fun ListaClientesContenido(
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     onMetodosCobro: () -> Unit,
+    onCuenta: () -> Unit,
     onResumen: () -> Unit,
     onDeshacer: () -> Unit,
     onDescartarAviso: () -> Unit,
@@ -140,7 +143,7 @@ internal fun ListaClientesContenido(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.clientes_titulo)) },
-                actions = { MenuDeOpciones(onMetodosCobro) },
+                actions = { MenuDeOpciones(onMetodosCobro, onCuenta) },
             )
         },
         snackbarHost = { SnackbarHost(avisos) },
@@ -245,7 +248,10 @@ private fun TarjetaPorCobrar(
 }
 
 @Composable
-private fun MenuDeOpciones(onMetodosCobro: () -> Unit) {
+private fun MenuDeOpciones(
+    onMetodosCobro: () -> Unit,
+    onCuenta: () -> Unit,
+) {
     var abierto by remember { mutableStateOf(false) }
     IconButton(onClick = { abierto = true }) {
         Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.clientes_mas_opciones))
@@ -256,6 +262,13 @@ private fun MenuDeOpciones(onMetodosCobro: () -> Unit) {
             onClick = {
                 abierto = false
                 onMetodosCobro()
+            },
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.clientes_cuenta)) },
+            onClick = {
+                abierto = false
+                onCuenta()
             },
         )
     }
