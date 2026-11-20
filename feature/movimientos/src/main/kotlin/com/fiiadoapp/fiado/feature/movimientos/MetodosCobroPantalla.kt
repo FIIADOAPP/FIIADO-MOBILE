@@ -153,6 +153,7 @@ private fun DialogoMetodo(
         title = { Text(stringResource(if (edicion.metodo == null) R.string.metodos_nuevo else R.string.metodos_editar)) },
         text = {
             OutlinedTextField(
+                shape = MaterialTheme.shapes.small,
                 value = edicion.nombre,
                 onValueChange = onNombre,
                 modifier = Modifier.fillMaxWidth(),

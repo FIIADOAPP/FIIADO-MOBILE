@@ -17,6 +17,7 @@
     <string name="historial_editar_cliente">Editar cliente</string>
     <string name="historial_fiar">Fiar</string>
     <string name="historial_cobrar">Cobrar</string>
+    <string name="historial_movimientos">Movimientos</string>
     <string name="historial_vacio">Aún no hay movimientos con este cliente.</string>
     <string name="historial_ayuda">Toca un movimiento si necesitas anularlo.</string>
     <string name="historial_fiado">Fiado</string>

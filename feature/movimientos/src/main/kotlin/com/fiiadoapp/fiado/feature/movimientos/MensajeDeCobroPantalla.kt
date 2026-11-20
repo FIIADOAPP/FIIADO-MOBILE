@@ -90,6 +90,7 @@ internal fun MensajeDeCobroContenido(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             OutlinedTextField(
+                shape = MaterialTheme.shapes.small,
                 value = estado.texto,
                 onValueChange = onCambiar,
                 modifier = Modifier.fillMaxWidth(),

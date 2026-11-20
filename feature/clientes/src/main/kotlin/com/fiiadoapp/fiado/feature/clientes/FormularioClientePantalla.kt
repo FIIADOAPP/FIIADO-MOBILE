@@ -114,6 +114,7 @@ internal fun FormularioClienteContenido(
                     }
                 }
             OutlinedTextField(
+                shape = MaterialTheme.shapes.small,
                 value = estado.nombre,
                 onValueChange = onNombre,
                 modifier = Modifier.fillMaxWidth(),
@@ -124,6 +125,7 @@ internal fun FormularioClienteContenido(
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
             )
             OutlinedTextField(
+                shape = MaterialTheme.shapes.small,
                 value = estado.telefono,
                 onValueChange = onTelefono,
                 modifier = Modifier.fillMaxWidth(),

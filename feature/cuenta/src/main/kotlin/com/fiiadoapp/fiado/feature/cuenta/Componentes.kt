@@ -74,6 +74,7 @@ internal fun Campo(
     secreto: Boolean = false,
 ) {
     OutlinedTextField(
+        shape = MaterialTheme.shapes.small,
         value = valor,
         onValueChange = onCambio,
         modifier = Modifier.fillMaxWidth(),
