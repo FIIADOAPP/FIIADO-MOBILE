@@ -6,6 +6,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+### Agregado
+
+- Recordatorio de cobro por WhatsApp desde el historial de un cliente que debe: abre WhatsApp con el mensaje escrito. Si el cliente no tiene celular, ofrece agregarlo.
+- Mensaje de cobro editable desde el menú, con `{cliente}`, `{saldo}` y `{negocio}`, vista previa y opción de restablecer. Por defecto saluda con el nombre del negocio; sin cuenta, esa frase se omite. Se guarda solo en el teléfono.
+
 ## [0.4.0] - 2026-11-20
 
 El respaldo y la restauración requieren FIIADO-API `v0.3.0` o superior.

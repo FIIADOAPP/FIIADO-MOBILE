@@ -21,6 +21,8 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
   <img src="docs/capturas/cuenta-ceder.png" alt="Aviso al iniciar sesión con la cuenta abierta en otro teléfono" width="240">
   <img src="docs/capturas/respaldo-pendientes.png" alt="Cuenta con dos cambios por respaldar sin conexión" width="240">
   <img src="docs/capturas/respaldo-cerrar-sesion.png" alt="Aviso al cerrar sesión con cambios sin respaldar" width="240">
+  <img src="docs/capturas/recordatorio-historial.png" alt="Historial de un cliente con el botón Recordar por WhatsApp" width="240">
+  <img src="docs/capturas/mensaje-de-cobro.png" alt="Plantilla del mensaje de cobro con su vista previa" width="240">
 </p>
 
 ## Estado
@@ -37,7 +39,7 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Sincronización: envío de la cola en segundo plano al haber red | Listo |
 | Sincronización: restauración reanudable al iniciar sesión, unida con la libreta local | Listo |
 | Sincronización: estado del respaldo y avisos al cerrar sesión o ceder el teléfono | Listo |
-| Recordatorio por WhatsApp | Pendiente |
+| Recordatorio por WhatsApp con un mensaje de cobro editable | Listo |
 | Bloqueo con huella | Pendiente |
 
 ## Requisitos
