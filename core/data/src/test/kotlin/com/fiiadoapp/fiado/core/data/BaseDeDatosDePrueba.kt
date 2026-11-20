@@ -21,9 +21,9 @@ abstract class BaseDeDatosDePrueba {
             .addCallback(SembrarMetodosIniciales)
             .build()
 
-    protected val clientes = RepositorioClientesRoom(db.clienteDao())
-    protected val movimientos = RepositorioMovimientosRoom(db.movimientoDao())
-    protected val metodos = RepositorioMetodosCobroRoom(db.metodoCobroDao())
+    protected val clientes = RepositorioClientesRoom(db, GeneradorUuidV7())
+    protected val movimientos = RepositorioMovimientosRoom(db, GeneradorUuidV7())
+    protected val metodos = RepositorioMetodosCobroRoom(db, GeneradorUuidV7())
 
     protected val ahora: Instant = Instant.parse("2026-11-15T15:30:00.123Z")
     protected val hoy: LocalDate = LocalDate.of(2026, 11, 15)

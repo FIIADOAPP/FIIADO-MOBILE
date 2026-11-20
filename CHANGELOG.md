@@ -6,6 +6,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+### Agregado
+
+- Cola de cambios pendientes de subir: cada cliente, método de cobro o movimiento que se guarda deja, en la misma transacción, una operación con su foto en el formato de FIIADO-API. La base de datos pasa a la versión 3.
+
 ## [0.3.0] - 2026-11-16
 
 La cuenta requiere FIIADO-API `v0.2.0` o superior.

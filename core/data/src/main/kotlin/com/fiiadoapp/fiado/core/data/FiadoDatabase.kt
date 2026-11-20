@@ -5,14 +5,21 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.fiiadoapp.fiado.core.data.sincronizacion.ColaDao
+import com.fiiadoapp.fiado.core.data.sincronizacion.OperacionPendienteEntity
 
-@Database(entities = [ClienteEntity::class, MovimientoEntity::class, MetodoCobroEntity::class], version = 2)
+@Database(
+    entities = [ClienteEntity::class, MovimientoEntity::class, MetodoCobroEntity::class, OperacionPendienteEntity::class],
+    version = 3,
+)
 abstract class FiadoDatabase : RoomDatabase() {
     abstract fun clienteDao(): ClienteDao
 
     abstract fun movimientoDao(): MovimientoDao
 
     abstract fun metodoCobroDao(): MetodoCobroDao
+
+    abstract fun colaDao(): ColaDao
 
     companion object {
         /** Journal clásico en lugar de WAL, para que una escritura confirmada sobreviva a un apagado (ADR-0003). */
@@ -23,13 +30,13 @@ abstract class FiadoDatabase : RoomDatabase() {
             Room
                 .databaseBuilder(contexto, FiadoDatabase::class.java, nombre)
                 .setJournalMode(JournalMode.TRUNCATE)
-                .addMigrations(MIGRACION_1_2)
+                .addMigrations(MIGRACION_1_2, MIGRACION_2_3)
                 .addCallback(SembrarMetodosIniciales)
                 .build()
     }
 }
 
-/** En una instalación nueva Room crea la versión 2 directamente; la migración no corre y los iniciales se siembran aquí. */
+/** En una instalación nueva Room crea la última versión directamente; las migraciones no corren y los iniciales se siembran aquí. */
 internal object SembrarMetodosIniciales : RoomDatabase.Callback() {
     override fun onCreate(db: SupportSQLiteDatabase) = insertarMetodosIniciales(db)
 }

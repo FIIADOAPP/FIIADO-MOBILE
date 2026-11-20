@@ -37,6 +37,21 @@ internal val MIGRACION_1_2 =
         }
     }
 
+/**
+ * Versión 3 (ADR-0003 de la API): cola de operaciones pendientes. Lo registrado antes queda fuera
+ * de la cola; se sube al vincular el teléfono con la cuenta, cuando se restaura.
+ */
+internal val MIGRACION_2_3 =
+    object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `operaciones_pendientes` (`orden` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`id` TEXT NOT NULL, `entidad` TEXT NOT NULL, `datos` TEXT NOT NULL)",
+            )
+            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_operaciones_pendientes_id` ON `operaciones_pendientes` (`id`)")
+        }
+    }
+
 /** Idempotente: los iniciales tienen identificadores fijos. */
 internal fun insertarMetodosIniciales(db: SupportSQLiteDatabase) {
     MetodoCobro.INICIALES.forEach {
