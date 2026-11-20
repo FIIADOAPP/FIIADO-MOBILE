@@ -37,6 +37,38 @@ internal val MIGRACION_1_2 =
         }
     }
 
+/**
+ * Versión 3 (ADR-0003 de la API): cola de operaciones pendientes. Lo registrado antes queda fuera
+ * de la cola; se sube al vincular el teléfono con la cuenta, cuando se restaura.
+ */
+internal val MIGRACION_2_3 =
+    object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `operaciones_pendientes` (`orden` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`id` TEXT NOT NULL, `entidad` TEXT NOT NULL, `datos` TEXT NOT NULL)",
+            )
+            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_operaciones_pendientes_id` ON `operaciones_pendientes` (`id`)")
+        }
+    }
+
+/**
+ * Versión 4 (ADR-0003 de la API): vínculo del teléfono con una cuenta y registros traídos en la
+ * restauración en curso. Una sesión abierta en la versión anterior se vincula al sincronizar.
+ */
+internal val MIGRACION_3_4 =
+    object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `vinculo` (`id` INTEGER NOT NULL, `correo` TEXT NOT NULL, `cursor` TEXT, " +
+                    "`restaurada` INTEGER NOT NULL, `primera` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+            )
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `ids_restaurados` (`entidad` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`entidad`, `id`))",
+            )
+        }
+    }
+
 /** Idempotente: los iniciales tienen identificadores fijos. */
 internal fun insertarMetodosIniciales(db: SupportSQLiteDatabase) {
     MetodoCobro.INICIALES.forEach {

@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.fiiadoapp.fiado.core.data.BuildConfig
+import com.fiiadoapp.fiado.core.data.sincronizacion.Vinculacion
 import com.fiiadoapp.fiado.domain.RepositorioCuenta
 import dagger.Module
 import dagger.Provides
@@ -30,16 +31,28 @@ object CuentaModule {
         @ApplicationContext contexto: Context,
     ): AlmacenSesion = AlmacenSesion(contexto.sesionDataStore, CifradorKeystore())
 
+    /** Uno solo para toda la app: dos clientes podrían renovar a la vez con el mismo token y cerrar la sesión. */
     @Provides
     @Singleton
-    fun repositorioCuenta(almacen: AlmacenSesion): RepositorioCuenta = crearRepositorioCuenta(BuildConfig.API_URL, almacen)
+    fun retrofitConSesion(almacen: AlmacenSesion): Retrofit = crearRetrofitConSesion(BuildConfig.API_URL, almacen)
+
+    @Provides
+    @Singleton
+    fun repositorioCuenta(
+        retrofit: Retrofit,
+        almacen: AlmacenSesion,
+        vinculacion: Vinculacion,
+    ): RepositorioCuenta = RepositorioCuentaRemoto(retrofit.create(ApiCuentas::class.java), almacen, vinculacion)
 }
 
-/** Arma el cliente HTTP con la renovación de sesión. Las pruebas usan esta misma función contra MockWebServer. */
-fun crearRepositorioCuenta(
+/**
+ * Cliente HTTP de la API: agrega el token a las llamadas marcadas y renueva la sesión.
+ * Las pruebas usan esta misma función contra MockWebServer.
+ */
+fun crearRetrofitConSesion(
     urlBase: String,
     almacen: AlmacenSesion,
-): RepositorioCuentaRemoto {
+): Retrofit {
     val base =
         OkHttpClient
             .Builder()
@@ -53,7 +66,7 @@ fun crearRepositorioCuenta(
             .addInterceptor(TokenDeAcceso(almacen))
             .authenticator(RenovacionDeSesion(almacen, refresco))
             .build()
-    return RepositorioCuentaRemoto(retrofit(urlBase, conSesion).create(ApiCuentas::class.java), almacen)
+    return retrofit(urlBase, conSesion)
 }
 
 private fun retrofit(

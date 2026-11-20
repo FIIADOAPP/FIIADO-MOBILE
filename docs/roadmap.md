@@ -82,9 +82,9 @@ Cada entrega indica su repositorio: **M** (mobile) o **A** (API).
 | `feat/sincronizacion` | A | Endpoints para subir cambios, restaurar y ceder el dispositivo, con pruebas de integración. |
 | `feat/cola-de-pendientes` | M | La entidad y su operación pendiente se escriben en la misma transacción de Room (con migración). |
 | `feat/sincronizador` | M | WorkManager con restricción de red y reintentos con espera creciente. |
-| `feat/restaurar-en-dispositivo-nuevo` | M | Descarga completa al iniciar sesión en un teléfono nuevo, reanudable si se corta. |
+| `feat/restaurar-al-iniciar-sesion` | M | Al iniciar sesión, descarga la libreta del servidor de forma reanudable, la une con la local sin borrar nada y sube lo que falta. El teléfono queda ligado a esa cuenta. |
 | `test/sincronizacion-casos-dificiles` | M, A | Sin conexión, corte a la mitad (enviado pero sin confirmación), reenvío duplicado, restauración interrumpida y sesión reemplazada. |
-| `feat/estado-de-sincronizacion` | M | Indicador de pendientes y aviso al cerrar sesión o al ceder el dispositivo con cambios sin enviar. |
+| `feat/estado-de-sincronizacion` | M | Indicador de pendientes y aviso al cerrar sesión o al ceder el dispositivo con cambios sin enviar, que se conservan en el teléfono. |
 
 ### Fase 4: Cobro y seguridad → app `v0.5.0`
 

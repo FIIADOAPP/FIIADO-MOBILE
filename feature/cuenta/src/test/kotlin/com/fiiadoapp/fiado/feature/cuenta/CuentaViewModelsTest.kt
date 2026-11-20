@@ -3,8 +3,10 @@ package com.fiiadoapp.fiado.feature.cuenta
 import androidx.lifecycle.SavedStateHandle
 import com.fiiadoapp.fiado.core.testing.CuentaFalsa
 import com.fiiadoapp.fiado.core.testing.ReglaDispatcherPrincipal
+import com.fiiadoapp.fiado.core.testing.RespaldoFalso
 import com.fiiadoapp.fiado.domain.CuentaAbierta
 import com.fiiadoapp.fiado.domain.ErrorCuenta
+import com.fiiadoapp.fiado.domain.EstadoRespaldo
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.plus
@@ -24,6 +26,8 @@ class CuentaViewModelsTest {
     val dispatcher = ReglaDispatcherPrincipal()
 
     private val cuenta = CuentaFalsa()
+    private val respaldo = RespaldoFalso()
+    private val alDia = EstadoRespaldo(pendientes = 0, detenido = false)
     private val rosa = CuentaAbierta("rosa@bodega.pe", "Bodega Doña Rosa")
     private val ceder = ErrorCuenta.DeLaApi("sesion_activa_en_otro_dispositivo", "Tu cuenta está abierta en otro teléfono.")
 
@@ -32,7 +36,7 @@ class CuentaViewModelsTest {
     @Test
     fun `sin cuenta la pantalla ofrece crearla o iniciar sesion`() =
         runTest {
-            val viewModel = CuentaViewModel(cuenta)
+            val viewModel = CuentaViewModel(cuenta, respaldo)
             viewModel.estado.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
 
             assertEquals(EstadoCuenta.SinCuenta, viewModel.estado.value)
@@ -43,18 +47,32 @@ class CuentaViewModelsTest {
     fun `con cuenta la muestra y comprueba con la api que la sesion siga abierta`() =
         runTest {
             cuenta.cuenta.value = rosa
-            val viewModel = CuentaViewModel(cuenta)
+            val viewModel = CuentaViewModel(cuenta, respaldo)
             viewModel.estado.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
 
-            assertEquals(EstadoCuenta.Abierta(rosa), viewModel.estado.value)
+            assertEquals(EstadoCuenta.Abierta(rosa, alDia), viewModel.estado.value)
             assertTrue("comprobarSesion" in cuenta.llamadas)
+        }
+
+    @Test
+    fun `con cuenta muestra los cambios por respaldar y si el envio se detuvo`() =
+        runTest {
+            cuenta.cuenta.value = rosa
+            val viewModel = CuentaViewModel(cuenta, respaldo)
+            viewModel.estado.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
+
+            respaldo.estado.value = EstadoRespaldo(pendientes = 3, detenido = false)
+            assertEquals(EstadoCuenta.Abierta(rosa, EstadoRespaldo(3, false)), viewModel.estado.value)
+
+            respaldo.estado.value = EstadoRespaldo(pendientes = 3, detenido = true)
+            assertEquals(EstadoCuenta.Abierta(rosa, EstadoRespaldo(3, true)), viewModel.estado.value)
         }
 
     @Test
     fun `cerrar sesion vuelve al modo sin cuenta`() =
         runTest {
             cuenta.cuenta.value = rosa
-            val viewModel = CuentaViewModel(cuenta)
+            val viewModel = CuentaViewModel(cuenta, respaldo)
             viewModel.estado.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
 
             viewModel.cerrarSesion()

@@ -1,6 +1,7 @@
 package com.fiiadoapp.fiado.core.data
 
 import android.content.Context
+import com.fiiadoapp.fiado.core.data.sincronizacion.ProgramadorDeEnvio
 import com.fiiadoapp.fiado.domain.GeneradorDeIds
 import com.fiiadoapp.fiado.domain.RepositorioClientes
 import com.fiiadoapp.fiado.domain.RepositorioMetodosCobro
@@ -22,13 +23,25 @@ object DatosModule {
     ): FiadoDatabase = FiadoDatabase.construir(contexto)
 
     @Provides
-    fun repositorioClientes(db: FiadoDatabase): RepositorioClientes = RepositorioClientesRoom(db.clienteDao())
+    fun repositorioClientes(
+        db: FiadoDatabase,
+        ids: GeneradorDeIds,
+        programador: ProgramadorDeEnvio,
+    ): RepositorioClientes = RepositorioClientesRoom(db, ids, programador)
 
     @Provides
-    fun repositorioMovimientos(db: FiadoDatabase): RepositorioMovimientos = RepositorioMovimientosRoom(db.movimientoDao())
+    fun repositorioMovimientos(
+        db: FiadoDatabase,
+        ids: GeneradorDeIds,
+        programador: ProgramadorDeEnvio,
+    ): RepositorioMovimientos = RepositorioMovimientosRoom(db, ids, programador)
 
     @Provides
-    fun repositorioMetodosCobro(db: FiadoDatabase): RepositorioMetodosCobro = RepositorioMetodosCobroRoom(db.metodoCobroDao())
+    fun repositorioMetodosCobro(
+        db: FiadoDatabase,
+        ids: GeneradorDeIds,
+        programador: ProgramadorDeEnvio,
+    ): RepositorioMetodosCobro = RepositorioMetodosCobroRoom(db, ids, programador)
 
     @Provides
     fun generadorDeIds(): GeneradorDeIds = GeneradorUuidV7()

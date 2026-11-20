@@ -19,6 +19,8 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
   <img src="docs/capturas/resumen.png" alt="Resumen de hoy y del mes con lo cobrado por método" width="240">
   <img src="docs/capturas/metodos-lista.png" alt="Métodos de cobro propios" width="240">
   <img src="docs/capturas/cuenta-ceder.png" alt="Aviso al iniciar sesión con la cuenta abierta en otro teléfono" width="240">
+  <img src="docs/capturas/respaldo-pendientes.png" alt="Cuenta con dos cambios por respaldar sin conexión" width="240">
+  <img src="docs/capturas/respaldo-cerrar-sesion.png" alt="Aviso al cerrar sesión con cambios sin respaldar" width="240">
 </p>
 
 ## Estado
@@ -31,7 +33,10 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Métodos de cobro propios, con el método obligatorio en cada pago | Listo |
 | Historial por cliente con anulación, y resumen de hoy y del mes con lo cobrado por método | Listo |
 | Cuenta opcional: crear, verificar el correo, iniciar sesión cediendo el dispositivo y recuperar la contraseña | Listo |
-| Sincronización y restauración | Pendiente |
+| Sincronización: cola de cambios pendientes, guardada junto con cada cambio | Listo |
+| Sincronización: envío de la cola en segundo plano al haber red | Listo |
+| Sincronización: restauración reanudable al iniciar sesión, unida con la libreta local | Listo |
+| Sincronización: estado del respaldo y avisos al cerrar sesión o ceder el teléfono | Listo |
 | Recordatorio por WhatsApp | Pendiente |
 | Bloqueo con huella | Pendiente |
 
@@ -40,7 +45,7 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 - JDK 21
 - Android SDK con la plataforma 37
 - Node.js 20 o superior, solo para el hook de mensajes de commit
-- Para la cuenta: [FIIADO-API](https://github.com/FIIADOAPP/FIIADO-API) `v0.2.0` o superior
+- Para la cuenta y el respaldo: [FIIADO-API](https://github.com/FIIADOAPP/FIIADO-API) `v0.3.0` o superior
 
 ## Cómo ejecutarlo
 
