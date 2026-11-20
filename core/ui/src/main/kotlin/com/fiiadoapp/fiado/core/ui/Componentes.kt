@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -101,7 +102,17 @@ fun Tarjeta(
     val interior: @Composable ColumnScope.() -> Unit = {
         Column(Modifier.fillMaxWidth().padding(relleno), verticalArrangement = Arrangement.spacedBy(8.dp), content = contenido)
     }
-    if (onClick == null) Card(modifier, content = interior) else Card(onClick = onClick, modifier = modifier, content = interior)
+    // Texto blanco explícito: el fondo de tarjeta coincide con surfaceVariant y Material le daría el gris secundario.
+    val colores =
+        CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        )
+    if (onClick == null) {
+        Card(modifier, colors = colores, content = interior)
+    } else {
+        Card(onClick = onClick, modifier = modifier, colors = colores, content = interior)
+    }
 }
 
 /** Anillo de progreso con un texto al centro, como un indicador circular de avance. */
@@ -151,5 +162,29 @@ fun BarraDeProgreso(
                 .clip(CircleShape)
                 .background(color),
         )
+    }
+}
+
+/** Círculo con las iniciales de un nombre: "Doña Rosa" → "DR". */
+@Composable
+fun Avatar(
+    nombre: String,
+    modifier: Modifier = Modifier,
+    tamano: Dp = 44.dp,
+) {
+    val iniciales =
+        nombre
+            .split(' ')
+            .filter { it.isNotBlank() }
+            .take(2)
+            .joinToString("") { it.first().uppercase() }
+    Box(
+        modifier
+            .size(tamano)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primaryContainer),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(iniciales, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
     }
 }

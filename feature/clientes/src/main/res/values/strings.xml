@@ -32,4 +32,9 @@
         <item quantity="many">Máximo %1$d caracteres.</item>
         <item quantity="other">Máximo %1$d caracteres.</item>
     </plurals>
+    <plurals name="clientes_cantidad">
+        <item quantity="one">%1$d cliente</item>
+        <item quantity="many">%1$d clientes</item>
+        <item quantity="other">%1$d clientes</item>
+    </plurals>
 </resources>

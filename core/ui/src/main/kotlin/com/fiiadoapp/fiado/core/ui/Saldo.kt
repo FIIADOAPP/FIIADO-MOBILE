@@ -5,6 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.fiiadoapp.fiado.domain.Dinero
 
@@ -21,11 +22,12 @@ fun textoDeSaldo(saldo: Dinero): String =
 fun SaldoTexto(
     saldo: Dinero,
     modifier: Modifier = Modifier,
+    estilo: TextStyle = MaterialTheme.typography.titleMedium,
 ) {
     Text(
         text = textoDeSaldo(saldo),
         modifier = modifier,
-        style = MaterialTheme.typography.titleMedium,
+        style = estilo,
         fontWeight = if (saldo.esPositivo) FontWeight.SemiBold else FontWeight.Medium,
         color =
             when {
