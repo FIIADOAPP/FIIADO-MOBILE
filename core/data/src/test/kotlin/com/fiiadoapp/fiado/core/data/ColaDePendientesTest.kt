@@ -38,6 +38,7 @@ class ColaDePendientesTest : BaseDeDatosDePrueba() {
             assertEquals(listOf("cliente", "metodo_cobro", "movimiento", "movimiento"), operaciones.map { it.entidad })
             assertEquals(4, operaciones.map { it.id }.distinct().size)
             assertTrue(operaciones.zipWithNext().all { (a, b) -> a.orden < b.orden })
+            assertEquals(4, enviosProgramados)
         }
 
     @Test
@@ -90,6 +91,7 @@ class ColaDePendientesTest : BaseDeDatosDePrueba() {
 
             assertEquals(emptyList(), cola())
             assertNull(movimientos.obtener(huerfano.id))
+            assertEquals(0, enviosProgramados)
         }
 
     @Test

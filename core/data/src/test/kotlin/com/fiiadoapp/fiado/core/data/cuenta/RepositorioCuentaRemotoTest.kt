@@ -1,6 +1,5 @@
 package com.fiiadoapp.fiado.core.data.cuenta
 
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.fiiadoapp.fiado.domain.CuentaAbierta
 import com.fiiadoapp.fiado.domain.ErrorCuenta
 import com.fiiadoapp.fiado.domain.Resultado
@@ -22,7 +21,6 @@ import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.io.File
-import java.util.Base64
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
@@ -39,25 +37,15 @@ class RepositorioCuentaRemotoTest {
     private lateinit var almacen: AlmacenSesion
     private lateinit var repositorio: RepositorioCuentaRemoto
 
-    /** Invierte los bytes: suficiente para comprobar que nada se guarda en claro. */
-    private class CifradorDePrueba : Cifrador {
-        override fun cifrar(datos: ByteArray) = datos.reversedArray()
-
-        override fun descifrar(datos: ByteArray) = datos.reversedArray()
-    }
-
     @Before
     fun preparar() {
         servidor.start()
-        val dataStore = PreferenceDataStoreFactory.create(scope = alcance) { File(carpeta.root, "sesion.preferences_pb") }
-        almacen =
-            AlmacenSesion(
-                dataStore,
-                CifradorDePrueba(),
-                aTexto = { Base64.getEncoder().encodeToString(it) },
-                aBytes = { Base64.getDecoder().decode(it) },
+        almacen = almacenDePrueba(carpeta.root, alcance)
+        repositorio =
+            RepositorioCuentaRemoto(
+                crearRetrofitConSesion(servidor.url("/").toString(), almacen).create(ApiCuentas::class.java),
+                almacen,
             )
-        repositorio = crearRepositorioCuenta(servidor.url("/").toString(), almacen)
     }
 
     @After

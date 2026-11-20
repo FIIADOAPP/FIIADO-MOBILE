@@ -9,6 +9,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ### Agregado
 
 - Cola de cambios pendientes de subir: cada cliente, método de cobro o movimiento que se guarda deja, en la misma transacción, una operación con su foto en el formato de FIIADO-API. La base de datos pasa a la versión 3.
+- Envío de la cola a FIIADO-API en segundo plano con WorkManager: espera a tener red, sube lotes de hasta 100 operaciones en orden, quita solo lo que el servidor confirma y reintenta con esperas crecientes. Sin sesión, o si otro teléfono la tomó, la cola se conserva.
 
 ## [0.3.0] - 2026-11-16
 

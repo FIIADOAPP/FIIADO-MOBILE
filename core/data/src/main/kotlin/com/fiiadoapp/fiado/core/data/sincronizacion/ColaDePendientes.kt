@@ -29,4 +29,7 @@ interface ColaDao {
 
     @Query("SELECT * FROM operaciones_pendientes ORDER BY orden LIMIT :limite")
     suspend fun primeras(limite: Int): List<OperacionPendienteEntity>
+
+    @Query("DELETE FROM operaciones_pendientes WHERE id IN (:ids)")
+    suspend fun quitar(ids: List<String>)
 }
