@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.fiiadoapp.fiado.core.data.BuildConfig
+import com.fiiadoapp.fiado.core.data.sincronizacion.Vinculacion
 import com.fiiadoapp.fiado.domain.RepositorioCuenta
 import dagger.Module
 import dagger.Provides
@@ -40,7 +41,8 @@ object CuentaModule {
     fun repositorioCuenta(
         retrofit: Retrofit,
         almacen: AlmacenSesion,
-    ): RepositorioCuenta = RepositorioCuentaRemoto(retrofit.create(ApiCuentas::class.java), almacen)
+        vinculacion: Vinculacion,
+    ): RepositorioCuenta = RepositorioCuentaRemoto(retrofit.create(ApiCuentas::class.java), almacen, vinculacion)
 }
 
 /**

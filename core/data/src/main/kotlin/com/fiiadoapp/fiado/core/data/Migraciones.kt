@@ -52,6 +52,23 @@ internal val MIGRACION_2_3 =
         }
     }
 
+/**
+ * Versión 4 (ADR-0003 de la API): vínculo del teléfono con una cuenta y registros traídos en la
+ * restauración en curso. Una sesión abierta en la versión anterior se vincula al sincronizar.
+ */
+internal val MIGRACION_3_4 =
+    object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `vinculo` (`id` INTEGER NOT NULL, `correo` TEXT NOT NULL, `cursor` TEXT, " +
+                    "`restaurada` INTEGER NOT NULL, `primera` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+            )
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `ids_restaurados` (`entidad` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`entidad`, `id`))",
+            )
+        }
+    }
+
 /** Idempotente: los iniciales tienen identificadores fijos. */
 internal fun insertarMetodosIniciales(db: SupportSQLiteDatabase) {
     MetodoCobro.INICIALES.forEach {

@@ -6,11 +6,21 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.fiiadoapp.fiado.core.data.sincronizacion.ColaDao
+import com.fiiadoapp.fiado.core.data.sincronizacion.IdRestauradoEntity
 import com.fiiadoapp.fiado.core.data.sincronizacion.OperacionPendienteEntity
+import com.fiiadoapp.fiado.core.data.sincronizacion.RestauracionDao
+import com.fiiadoapp.fiado.core.data.sincronizacion.VinculoEntity
 
 @Database(
-    entities = [ClienteEntity::class, MovimientoEntity::class, MetodoCobroEntity::class, OperacionPendienteEntity::class],
-    version = 3,
+    entities = [
+        ClienteEntity::class,
+        MovimientoEntity::class,
+        MetodoCobroEntity::class,
+        OperacionPendienteEntity::class,
+        VinculoEntity::class,
+        IdRestauradoEntity::class,
+    ],
+    version = 4,
 )
 abstract class FiadoDatabase : RoomDatabase() {
     abstract fun clienteDao(): ClienteDao
@@ -21,6 +31,8 @@ abstract class FiadoDatabase : RoomDatabase() {
 
     abstract fun colaDao(): ColaDao
 
+    abstract fun restauracionDao(): RestauracionDao
+
     companion object {
         /** Journal clásico en lugar de WAL, para que una escritura confirmada sobreviva a un apagado (ADR-0003). */
         fun construir(
@@ -30,7 +42,7 @@ abstract class FiadoDatabase : RoomDatabase() {
             Room
                 .databaseBuilder(contexto, FiadoDatabase::class.java, nombre)
                 .setJournalMode(JournalMode.TRUNCATE)
-                .addMigrations(MIGRACION_1_2, MIGRACION_2_3)
+                .addMigrations(MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4)
                 .addCallback(SembrarMetodosIniciales)
                 .build()
     }

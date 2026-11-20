@@ -5,8 +5,10 @@ import com.fiiadoapp.fiado.core.data.cuenta.SesionGuardada
 import com.fiiadoapp.fiado.core.data.cuenta.almacenDePrueba
 import com.fiiadoapp.fiado.core.data.cuenta.crearRetrofitConSesion
 import com.fiiadoapp.fiado.core.data.sincronizacion.ApiSincronizacion
+import com.fiiadoapp.fiado.core.data.sincronizacion.Restaurador
 import com.fiiadoapp.fiado.core.data.sincronizacion.ResultadoEnvio
 import com.fiiadoapp.fiado.core.data.sincronizacion.Sincronizador
+import com.fiiadoapp.fiado.core.data.sincronizacion.VinculoEntity
 import com.fiiadoapp.fiado.domain.TipoMovimiento.FIADO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +56,7 @@ class SincronizadorTest : BaseDeDatosDePrueba() {
         servidor.start()
         almacen = almacenDePrueba(carpeta.root, alcance)
         val api = crearRetrofitConSesion(servidor.url("/").toString(), almacen).create(ApiSincronizacion::class.java)
-        sincronizador = Sincronizador(db.colaDao(), api, almacen)
+        sincronizador = Sincronizador(db.colaDao(), api, almacen, Restaurador(db, api, GeneradorUuidV7()) {})
     }
 
     @After
@@ -63,7 +65,12 @@ class SincronizadorTest : BaseDeDatosDePrueba() {
         alcance.cancel()
     }
 
-    private fun conSesion() = runBlocking { almacen.guardar(SesionGuardada("acceso", "refresco", "rosa@bodega.pe", "Bodega")) }
+    /** Con sesión y la libreta ya restaurada: aquí se prueba solo el envío. */
+    private fun conSesion() =
+        runBlocking {
+            almacen.guardar(SesionGuardada("acceso", "refresco", "rosa@bodega.pe", "Bodega"))
+            db.restauracionDao().guardarVinculo(VinculoEntity(correo = "rosa@bodega.pe", cursor = null, restaurada = true, primera = false))
+        }
 
     private fun lote(peticion: RecordedRequest): List<JsonObject> =
         Json

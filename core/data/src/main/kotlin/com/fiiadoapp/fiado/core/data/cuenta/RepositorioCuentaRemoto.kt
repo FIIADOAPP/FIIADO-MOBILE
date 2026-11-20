@@ -1,5 +1,6 @@
 package com.fiiadoapp.fiado.core.data.cuenta
 
+import com.fiiadoapp.fiado.core.data.sincronizacion.Vinculacion
 import com.fiiadoapp.fiado.domain.CuentaAbierta
 import com.fiiadoapp.fiado.domain.ErrorCuenta
 import com.fiiadoapp.fiado.domain.RepositorioCuenta
@@ -13,6 +14,7 @@ import java.io.IOException
 class RepositorioCuentaRemoto(
     private val api: ApiCuentas,
     private val almacen: AlmacenSesion,
+    private val vinculacion: Vinculacion,
 ) : RepositorioCuenta {
     override fun observar(): Flow<CuentaAbierta?> = almacen.sesion.map { it?.let { s -> CuentaAbierta(s.correo, s.nombreNegocio) } }
 
@@ -60,6 +62,7 @@ class RepositorioCuentaRemoto(
                 almacen.guardar(
                     SesionGuardada(abierta.tokenAcceso, abierta.tokenRefresco, abierta.cuenta.correo, abierta.cuenta.nombreNegocio),
                 )
+                vinculacion.prepararRestauracion(abierta.cuenta.correo)
                 Resultado.Exito(CuentaAbierta(abierta.cuenta.correo, abierta.cuenta.nombreNegocio))
             }
         }

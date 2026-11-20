@@ -1,5 +1,6 @@
 package com.fiiadoapp.fiado.core.data.cuenta
 
+import com.fiiadoapp.fiado.core.data.sincronizacion.Vinculacion
 import com.fiiadoapp.fiado.domain.CuentaAbierta
 import com.fiiadoapp.fiado.domain.ErrorCuenta
 import com.fiiadoapp.fiado.domain.Resultado
@@ -37,6 +38,20 @@ class RepositorioCuentaRemotoTest {
     private lateinit var almacen: AlmacenSesion
     private lateinit var repositorio: RepositorioCuentaRemoto
 
+    /** Vínculo en memoria: anota con qué correo se preparó cada restauración. */
+    private val vinculacion =
+        object : Vinculacion {
+            var correo: String? = null
+            val preparadas = mutableListOf<String>()
+
+            override suspend fun correoVinculado() = correo
+
+            override suspend fun prepararRestauracion(correo: String) {
+                this.correo = correo
+                preparadas += correo
+            }
+        }
+
     @Before
     fun preparar() {
         servidor.start()
@@ -45,6 +60,7 @@ class RepositorioCuentaRemotoTest {
             RepositorioCuentaRemoto(
                 crearRetrofitConSesion(servidor.url("/").toString(), almacen).create(ApiCuentas::class.java),
                 almacen,
+                vinculacion,
             )
     }
 
@@ -97,6 +113,7 @@ class RepositorioCuentaRemotoTest {
             assertEquals(Resultado.Exito(CuentaAbierta("rosa@bodega.pe", "Bodega Doña Rosa")), resultado)
             assertEquals(CuentaAbierta("rosa@bodega.pe", "Bodega Doña Rosa"), repositorio.observar().first())
             assertEquals("refresco-1", almacen.actual()?.tokenRefresco)
+            assertEquals(listOf("rosa@bodega.pe"), vinculacion.preparadas)
         }
 
     @Test

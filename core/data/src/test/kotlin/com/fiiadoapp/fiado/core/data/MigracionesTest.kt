@@ -64,6 +64,25 @@ class MigracionesTest {
         db.close()
     }
 
+    @Test
+    fun `la version 4 agrega el vinculo sin tocar la cola`() {
+        ayudante.createDatabase(base, 3).use { db ->
+            db.execSQL("INSERT INTO operaciones_pendientes (id, entidad, datos) VALUES ('o1', 'cliente', '{}')")
+        }
+
+        val db = ayudante.runMigrationsAndValidate(base, 4, true, MIGRACION_3_4)
+
+        db.query("SELECT COUNT(*) FROM vinculo").use { c ->
+            c.moveToFirst()
+            assertEquals(0, c.getInt(0))
+        }
+        db.query("SELECT id FROM operaciones_pendientes").use { c ->
+            c.moveToFirst()
+            assertEquals("o1", c.getString(0))
+        }
+        db.close()
+    }
+
     /** Ruta absoluta: con un nombre relativo, el ayudante abre y valida rutas distintas. */
     private val base =
         InstrumentationRegistry
