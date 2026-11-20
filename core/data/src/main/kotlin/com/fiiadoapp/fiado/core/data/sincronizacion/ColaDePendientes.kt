@@ -6,6 +6,7 @@ import androidx.room.Index
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Cambio local que el servidor aún no confirmó (ADR-0003). Se escribe en la misma transacción que
@@ -32,4 +33,7 @@ interface ColaDao {
 
     @Query("DELETE FROM operaciones_pendientes WHERE id IN (:ids)")
     suspend fun quitar(ids: List<String>)
+
+    @Query("SELECT COUNT(*) FROM operaciones_pendientes")
+    fun observarCantidad(): Flow<Int>
 }
