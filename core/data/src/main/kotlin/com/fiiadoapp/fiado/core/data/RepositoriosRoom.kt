@@ -2,6 +2,7 @@ package com.fiiadoapp.fiado.core.data
 
 import androidx.room.withTransaction
 import com.fiiadoapp.fiado.core.data.sincronizacion.OperacionPendienteEntity
+import com.fiiadoapp.fiado.core.data.sincronizacion.ProgramadorDeEnvio
 import com.fiiadoapp.fiado.core.data.sincronizacion.TipoDeRegistro
 import com.fiiadoapp.fiado.core.data.sincronizacion.foto
 import com.fiiadoapp.fiado.domain.Cliente
@@ -21,6 +22,7 @@ import kotlin.uuid.Uuid
 class RepositorioClientesRoom(
     private val db: FiadoDatabase,
     private val ids: GeneradorDeIds,
+    private val programador: ProgramadorDeEnvio,
 ) : RepositorioClientes {
     private val dao = db.clienteDao()
 
@@ -33,7 +35,7 @@ class RepositorioClientesRoom(
 
     override suspend fun guardar(cliente: Cliente) {
         val fila = cliente.aEntidad()
-        db.guardarConOperacion(ids, TipoDeRegistro.CLIENTE, fila.foto()) { dao.guardar(fila) }
+        db.guardarConOperacion(ids, programador, TipoDeRegistro.CLIENTE, fila.foto()) { dao.guardar(fila) }
     }
 }
 
@@ -41,6 +43,7 @@ class RepositorioClientesRoom(
 class RepositorioMovimientosRoom(
     private val db: FiadoDatabase,
     private val ids: GeneradorDeIds,
+    private val programador: ProgramadorDeEnvio,
 ) : RepositorioMovimientos {
     private val dao = db.movimientoDao()
 
@@ -55,13 +58,14 @@ class RepositorioMovimientosRoom(
 
     override suspend fun guardar(movimiento: Movimiento) {
         val fila = movimiento.aEntidad()
-        db.guardarConOperacion(ids, TipoDeRegistro.MOVIMIENTO, fila.foto()) { dao.guardar(fila) }
+        db.guardarConOperacion(ids, programador, TipoDeRegistro.MOVIMIENTO, fila.foto()) { dao.guardar(fila) }
     }
 }
 
 class RepositorioMetodosCobroRoom(
     private val db: FiadoDatabase,
     private val ids: GeneradorDeIds,
+    private val programador: ProgramadorDeEnvio,
 ) : RepositorioMetodosCobro {
     private val dao = db.metodoCobroDao()
 
@@ -71,17 +75,21 @@ class RepositorioMetodosCobroRoom(
 
     override suspend fun guardar(metodo: MetodoCobro) {
         val fila = metodo.aEntidad()
-        db.guardarConOperacion(ids, TipoDeRegistro.METODO_COBRO, fila.foto()) { dao.guardar(fila) }
+        db.guardarConOperacion(ids, programador, TipoDeRegistro.METODO_COBRO, fila.foto()) { dao.guardar(fila) }
     }
 }
 
 /** El registro y su operación pendiente se escriben juntos o no se escribe ninguno (ADR-0003). */
 private suspend fun FiadoDatabase.guardarConOperacion(
     ids: GeneradorDeIds,
+    programador: ProgramadorDeEnvio,
     tipo: TipoDeRegistro,
     foto: String,
     guardar: suspend () -> Unit,
-) = withTransaction {
-    guardar()
-    colaDao().agregar(OperacionPendienteEntity(id = ids.nuevo().toString(), entidad = tipo.valor, datos = foto))
+) {
+    withTransaction {
+        guardar()
+        colaDao().agregar(OperacionPendienteEntity(id = ids.nuevo().toString(), entidad = tipo.valor, datos = foto))
+    }
+    programador.programar()
 }

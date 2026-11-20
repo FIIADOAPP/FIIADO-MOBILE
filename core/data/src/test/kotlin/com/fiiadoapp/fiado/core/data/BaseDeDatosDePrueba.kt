@@ -2,6 +2,7 @@ package com.fiiadoapp.fiado.core.data
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import com.fiiadoapp.fiado.core.data.sincronizacion.ProgramadorDeEnvio
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.MetodoCobro
@@ -21,9 +22,13 @@ abstract class BaseDeDatosDePrueba {
             .addCallback(SembrarMetodosIniciales)
             .build()
 
-    protected val clientes = RepositorioClientesRoom(db, GeneradorUuidV7())
-    protected val movimientos = RepositorioMovimientosRoom(db, GeneradorUuidV7())
-    protected val metodos = RepositorioMetodosCobroRoom(db, GeneradorUuidV7())
+    /** Cuántas veces se pidió subir la cola. */
+    protected var enviosProgramados = 0
+    private val programador = ProgramadorDeEnvio { enviosProgramados++ }
+
+    protected val clientes = RepositorioClientesRoom(db, GeneradorUuidV7(), programador)
+    protected val movimientos = RepositorioMovimientosRoom(db, GeneradorUuidV7(), programador)
+    protected val metodos = RepositorioMetodosCobroRoom(db, GeneradorUuidV7(), programador)
 
     protected val ahora: Instant = Instant.parse("2026-11-15T15:30:00.123Z")
     protected val hoy: LocalDate = LocalDate.of(2026, 11, 15)

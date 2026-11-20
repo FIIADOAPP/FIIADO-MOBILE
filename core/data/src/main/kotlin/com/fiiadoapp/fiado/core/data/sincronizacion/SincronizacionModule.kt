@@ -14,6 +14,9 @@ abstract class SincronizacionModule {
     @Binds
     abstract fun envioDePendientes(sincronizador: Sincronizador): EnvioDePendientes
 
+    @Binds
+    abstract fun programadorDeEnvio(programador: ProgramadorWorkManager): ProgramadorDeEnvio
+
     companion object {
         @Provides
         fun colaDao(db: FiadoDatabase): ColaDao = db.colaDao()

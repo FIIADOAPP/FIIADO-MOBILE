@@ -1,6 +1,7 @@
 package com.fiiadoapp.fiado.core.data
 
 import android.content.Context
+import com.fiiadoapp.fiado.core.data.sincronizacion.ProgramadorDeEnvio
 import com.fiiadoapp.fiado.domain.GeneradorDeIds
 import com.fiiadoapp.fiado.domain.RepositorioClientes
 import com.fiiadoapp.fiado.domain.RepositorioMetodosCobro
@@ -25,19 +26,22 @@ object DatosModule {
     fun repositorioClientes(
         db: FiadoDatabase,
         ids: GeneradorDeIds,
-    ): RepositorioClientes = RepositorioClientesRoom(db, ids)
+        programador: ProgramadorDeEnvio,
+    ): RepositorioClientes = RepositorioClientesRoom(db, ids, programador)
 
     @Provides
     fun repositorioMovimientos(
         db: FiadoDatabase,
         ids: GeneradorDeIds,
-    ): RepositorioMovimientos = RepositorioMovimientosRoom(db, ids)
+        programador: ProgramadorDeEnvio,
+    ): RepositorioMovimientos = RepositorioMovimientosRoom(db, ids, programador)
 
     @Provides
     fun repositorioMetodosCobro(
         db: FiadoDatabase,
         ids: GeneradorDeIds,
-    ): RepositorioMetodosCobro = RepositorioMetodosCobroRoom(db, ids)
+        programador: ProgramadorDeEnvio,
+    ): RepositorioMetodosCobro = RepositorioMetodosCobroRoom(db, ids, programador)
 
     @Provides
     fun generadorDeIds(): GeneradorDeIds = GeneradorUuidV7()
