@@ -31,6 +31,10 @@
     <string name="historial_recordar_sin_celular">Agrega su celular para recordarle por WhatsApp</string>
     <string name="historial_sin_whatsapp">No se encontró una app para abrir WhatsApp.</string>
 
+    <string name="cobros_titulo">Cobros</string>
+    <string name="cobros_subtitulo">Cómo te pagan y cómo les recuerdas</string>
+    <string name="cobros_metodos_ayuda">Efectivo, Yape, Plin y los que agregues</string>
+    <string name="cobros_mensaje_ayuda">El texto del recordatorio por WhatsApp</string>
     <string name="mensaje_titulo">Mensaje de cobro</string>
     <string name="mensaje_ayuda">Este texto se usa en cada recordatorio por WhatsApp. %1$s se cambia por el nombre del cliente, %2$s por lo que debe y %3$s por el nombre de tu negocio. Sin cuenta, la frase con el negocio se omite.</string>
     <string name="mensaje_campo">Mensaje</string>

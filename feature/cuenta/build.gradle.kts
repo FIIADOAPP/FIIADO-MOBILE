@@ -29,6 +29,7 @@ kotlin {
 
 dependencies {
     implementation(project(":core:domain"))
+    implementation(project(":core:ui"))
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)

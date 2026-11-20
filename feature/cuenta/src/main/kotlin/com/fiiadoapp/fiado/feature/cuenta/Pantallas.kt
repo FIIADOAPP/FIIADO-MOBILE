@@ -30,14 +30,13 @@ import com.fiiadoapp.fiado.domain.EstadoRespaldo
 
 @Composable
 internal fun CuentaPantalla(
-    onVolver: () -> Unit,
     onCrearCuenta: () -> Unit,
     onIniciarSesion: () -> Unit,
     viewModel: CuentaViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
     var confirmandoCierre by remember { mutableStateOf(false) }
-    PantallaDeCuenta(stringResource(R.string.cuenta_titulo), onVolver) {
+    PantallaDeCuenta(stringResource(R.string.cuenta_titulo), onVolver = null) {
         when (val actual = estado) {
             EstadoCuenta.Cargando -> {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }

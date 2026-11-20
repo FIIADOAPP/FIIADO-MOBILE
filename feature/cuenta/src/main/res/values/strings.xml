@@ -1,6 +1,5 @@
 <resources>
     <string name="cuenta_titulo">Cuenta</string>
-    <string name="cuenta_volver">Volver</string>
     <string name="cuenta_sin_cuenta_explicacion">Tu libreta funciona sin cuenta y sin internet. Con una cuenta podrás respaldarla y recuperarla si cambias de teléfono.</string>
     <string name="cuenta_crear">Crear cuenta</string>
     <string name="cuenta_iniciar_sesion">Iniciar sesión</string>

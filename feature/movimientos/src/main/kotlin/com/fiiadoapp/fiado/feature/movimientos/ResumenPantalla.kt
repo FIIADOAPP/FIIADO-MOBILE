@@ -4,23 +4,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,6 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fiiadoapp.fiado.core.ui.EncabezadoGrande
+import com.fiiadoapp.fiado.core.ui.LocalEspacioBarraInferior
 import com.fiiadoapp.fiado.domain.Dinero
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -38,30 +37,16 @@ import java.util.Locale
 private val FORMATO_MES = DateTimeFormatter.ofPattern("MMMM", Locale.forLanguageTag("es-PE"))
 
 @Composable
-internal fun ResumenPantalla(
-    onVolver: () -> Unit,
-    viewModel: ResumenViewModel = hiltViewModel(),
-) {
+internal fun ResumenPantalla(viewModel: ResumenViewModel = hiltViewModel()) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
-    ResumenContenido(estado, onVolver)
+    ResumenContenido(estado)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ResumenContenido(
-    estado: EstadoResumen?,
-    onVolver: () -> Unit,
-) {
+internal fun ResumenContenido(estado: EstadoResumen?) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.resumen_titulo)) },
-                navigationIcon = {
-                    IconButton(onClick = onVolver) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.metodos_volver))
-                    }
-                },
-            )
+            EncabezadoGrande(stringResource(R.string.resumen_titulo), Modifier.statusBarsPadding())
         },
     ) { relleno ->
         if (estado == null) {
@@ -95,6 +80,7 @@ internal fun ResumenContenido(
             }
             TarjetaPeriodo(stringResource(R.string.resumen_hoy), estado.delDia)
             TarjetaPeriodo(stringResource(R.string.resumen_mes, estado.hoy.format(FORMATO_MES)), estado.delMes)
+            Spacer(Modifier.height(LocalEspacioBarraInferior.current))
         }
     }
 }

@@ -10,21 +10,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -38,13 +34,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -55,6 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fiiadoapp.fiado.core.ui.EncabezadoGrande
+import com.fiiadoapp.fiado.core.ui.LocalEspacioBarraInferior
 import com.fiiadoapp.fiado.core.ui.SaldoTexto
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.ClienteConSaldo
@@ -67,12 +62,8 @@ import kotlin.uuid.Uuid
 internal fun ListaClientesPantalla(
     movimientoRegistrado: Uuid?,
     onAvisoConsumido: () -> Unit,
-    onNuevo: () -> Unit,
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
-    onMetodosCobro: () -> Unit,
-    onMensajeDeCobro: () -> Unit,
-    onCuenta: () -> Unit,
     onResumen: () -> Unit,
     viewModel: ListaClientesViewModel = hiltViewModel(),
 ) {
@@ -98,12 +89,8 @@ internal fun ListaClientesPantalla(
         porCobrar = porCobrar,
         aviso = aviso,
         onBuscar = viewModel::buscar,
-        onNuevo = onNuevo,
         onCliente = onCliente,
         onRegistrar = onRegistrar,
-        onMetodosCobro = onMetodosCobro,
-        onMensajeDeCobro = onMensajeDeCobro,
-        onCuenta = onCuenta,
         onResumen = onResumen,
         onDeshacer = viewModel::deshacer,
         onDescartarAviso = viewModel::descartarAviso,
@@ -118,12 +105,8 @@ internal fun ListaClientesContenido(
     porCobrar: Dinero?,
     aviso: AvisoRegistro?,
     onBuscar: (String) -> Unit,
-    onNuevo: () -> Unit,
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
-    onMetodosCobro: () -> Unit,
-    onMensajeDeCobro: () -> Unit,
-    onCuenta: () -> Unit,
     onResumen: () -> Unit,
     onDeshacer: () -> Unit,
     onDescartarAviso: () -> Unit,
@@ -143,20 +126,8 @@ internal fun ListaClientesContenido(
         }
     }
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.clientes_titulo)) },
-                actions = { MenuDeOpciones(onMetodosCobro, onMensajeDeCobro, onCuenta) },
-            )
-        },
+        topBar = { EncabezadoGrande(stringResource(R.string.clientes_titulo), Modifier.statusBarsPadding()) },
         snackbarHost = { SnackbarHost(avisos) },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = onNuevo,
-                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text(stringResource(R.string.clientes_nuevo)) },
-            )
-        },
     ) { relleno ->
         Column(Modifier.padding(relleno).fillMaxSize()) {
             if (porCobrar != null) TarjetaPorCobrar(porCobrar, onResumen)
@@ -191,7 +162,7 @@ private fun ListaDeClientes(
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
 ) {
-    LazyColumn(contentPadding = PaddingValues(bottom = 88.dp)) {
+    LazyColumn(contentPadding = PaddingValues(bottom = LocalEspacioBarraInferior.current)) {
         items(clientes, key = { it.cliente.id.toString() }) { (cliente, saldo) ->
             FilaCliente(cliente, saldo, onCliente, onRegistrar)
             HorizontalDivider()
@@ -247,41 +218,6 @@ private fun TarjetaPorCobrar(
             Text(stringResource(R.string.clientes_ver_resumen), color = MaterialTheme.colorScheme.primary)
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
         }
-    }
-}
-
-@Composable
-private fun MenuDeOpciones(
-    onMetodosCobro: () -> Unit,
-    onMensajeDeCobro: () -> Unit,
-    onCuenta: () -> Unit,
-) {
-    var abierto by remember { mutableStateOf(false) }
-    IconButton(onClick = { abierto = true }) {
-        Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.clientes_mas_opciones))
-    }
-    DropdownMenu(expanded = abierto, onDismissRequest = { abierto = false }) {
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.clientes_metodos_cobro)) },
-            onClick = {
-                abierto = false
-                onMetodosCobro()
-            },
-        )
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.clientes_mensaje_de_cobro)) },
-            onClick = {
-                abierto = false
-                onMensajeDeCobro()
-            },
-        )
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.clientes_cuenta)) },
-            onClick = {
-                abierto = false
-                onCuenta()
-            },
-        )
     }
 }
 
