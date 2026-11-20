@@ -45,7 +45,7 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 - JDK 21
 - Android SDK con la plataforma 37
 - Node.js 20 o superior, solo para el hook de mensajes de commit
-- Para la cuenta: [FIIADO-API](https://github.com/FIIADOAPP/FIIADO-API) `v0.2.0` o superior
+- Para la cuenta y el respaldo: [FIIADO-API](https://github.com/FIIADOAPP/FIIADO-API) `v0.3.0` o superior
 
 ## Cómo ejecutarlo
 
