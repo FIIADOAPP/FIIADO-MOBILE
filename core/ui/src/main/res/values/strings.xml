@@ -2,4 +2,5 @@
     <string name="saldo_debe">Debe %1$s</string>
     <string name="saldo_a_favor">A favor %1$s</string>
     <string name="saldo_al_dia">Al día</string>
+    <string name="volver">Volver</string>
 </resources>
