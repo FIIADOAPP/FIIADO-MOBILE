@@ -6,6 +6,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+## [0.4.0] - 2026-11-20
+
+El respaldo y la restauración requieren FIIADO-API `v0.3.0` o superior.
+
 ### Agregado
 
 - Cola de cambios pendientes de subir: cada cliente, método de cobro o movimiento que se guarda deja, en la misma transacción, una operación con su foto en el formato de FIIADO-API. La base de datos pasa a la versión 3.
@@ -63,7 +67,8 @@ La cuenta requiere FIIADO-API `v0.2.0` o superior.
 - Formato con ktlint mediante Spotless y Android Lint con las advertencias tratadas como errores.
 - CI en GitHub Actions: commitlint, ktlint, Android Lint, pruebas y build en cada pull request.
 
-[Sin publicar]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.3.0...develop
+[Sin publicar]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.4.0...develop
+[0.4.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/releases/tag/v0.1.0
