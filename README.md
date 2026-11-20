@@ -19,6 +19,8 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
   <img src="docs/capturas/resumen.png" alt="Resumen de hoy y del mes con lo cobrado por método" width="240">
   <img src="docs/capturas/metodos-lista.png" alt="Métodos de cobro propios" width="240">
   <img src="docs/capturas/cuenta-ceder.png" alt="Aviso al iniciar sesión con la cuenta abierta en otro teléfono" width="240">
+  <img src="docs/capturas/respaldo-pendientes.png" alt="Cuenta con dos cambios por respaldar sin conexión" width="240">
+  <img src="docs/capturas/respaldo-cerrar-sesion.png" alt="Aviso al cerrar sesión con cambios sin respaldar" width="240">
 </p>
 
 ## Estado
@@ -34,7 +36,7 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Sincronización: cola de cambios pendientes, guardada junto con cada cambio | Listo |
 | Sincronización: envío de la cola en segundo plano al haber red | Listo |
 | Sincronización: restauración reanudable al iniciar sesión, unida con la libreta local | Listo |
-| Sincronización: estado visible y avisos al cerrar sesión o ceder el teléfono | Pendiente |
+| Sincronización: estado del respaldo y avisos al cerrar sesión o ceder el teléfono | Listo |
 | Recordatorio por WhatsApp | Pendiente |
 | Bloqueo con huella | Pendiente |
 
