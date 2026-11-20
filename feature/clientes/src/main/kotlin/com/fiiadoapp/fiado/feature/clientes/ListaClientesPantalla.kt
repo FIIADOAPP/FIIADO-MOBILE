@@ -71,6 +71,7 @@ internal fun ListaClientesPantalla(
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     onMetodosCobro: () -> Unit,
+    onMensajeDeCobro: () -> Unit,
     onCuenta: () -> Unit,
     onResumen: () -> Unit,
     viewModel: ListaClientesViewModel = hiltViewModel(),
@@ -101,6 +102,7 @@ internal fun ListaClientesPantalla(
         onCliente = onCliente,
         onRegistrar = onRegistrar,
         onMetodosCobro = onMetodosCobro,
+        onMensajeDeCobro = onMensajeDeCobro,
         onCuenta = onCuenta,
         onResumen = onResumen,
         onDeshacer = viewModel::deshacer,
@@ -120,6 +122,7 @@ internal fun ListaClientesContenido(
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     onMetodosCobro: () -> Unit,
+    onMensajeDeCobro: () -> Unit,
     onCuenta: () -> Unit,
     onResumen: () -> Unit,
     onDeshacer: () -> Unit,
@@ -143,7 +146,7 @@ internal fun ListaClientesContenido(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.clientes_titulo)) },
-                actions = { MenuDeOpciones(onMetodosCobro, onCuenta) },
+                actions = { MenuDeOpciones(onMetodosCobro, onMensajeDeCobro, onCuenta) },
             )
         },
         snackbarHost = { SnackbarHost(avisos) },
@@ -250,6 +253,7 @@ private fun TarjetaPorCobrar(
 @Composable
 private fun MenuDeOpciones(
     onMetodosCobro: () -> Unit,
+    onMensajeDeCobro: () -> Unit,
     onCuenta: () -> Unit,
 ) {
     var abierto by remember { mutableStateOf(false) }
@@ -262,6 +266,13 @@ private fun MenuDeOpciones(
             onClick = {
                 abierto = false
                 onMetodosCobro()
+            },
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.clientes_mensaje_de_cobro)) },
+            onClick = {
+                abierto = false
+                onMensajeDeCobro()
             },
         )
         DropdownMenuItem(

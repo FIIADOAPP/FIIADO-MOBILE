@@ -7,8 +7,11 @@ import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.Movimiento
 import com.fiiadoapp.fiado.domain.RepositorioClientes
+import com.fiiadoapp.fiado.domain.RepositorioCuenta
 import com.fiiadoapp.fiado.domain.RepositorioMetodosCobro
 import com.fiiadoapp.fiado.domain.RepositorioMovimientos
+import com.fiiadoapp.fiado.domain.RepositorioPlantillaRecordatorio
+import com.fiiadoapp.fiado.domain.paraWhatsApp
 import com.fiiadoapp.fiado.domain.saldo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,10 +34,22 @@ data class FilaHistorial(
     val nombreMetodo: String?,
 )
 
+/** Lo que hace falta para recordarle el cobro; solo existe si el cliente debe. */
+sealed interface Recordatorio {
+    /** [celular] en el formato de `wa.me`; [mensaje] ya armado con la plantilla. */
+    data class Listo(
+        val celular: String,
+        val mensaje: String,
+    ) : Recordatorio
+
+    data object SinCelular : Recordatorio
+}
+
 data class EstadoHistorial(
     val cliente: Cliente,
     val saldo: Dinero,
     val filas: List<FilaHistorial>,
+    val recordatorio: Recordatorio? = null,
 )
 
 @HiltViewModel
@@ -45,6 +60,8 @@ class HistorialViewModel
         clientes: RepositorioClientes,
         private val movimientos: RepositorioMovimientos,
         metodosCobro: RepositorioMetodosCobro,
+        cuenta: RepositorioCuenta,
+        plantillas: RepositorioPlantillaRecordatorio,
         private val reloj: Clock,
     ) : ViewModel() {
         private val clienteId = Uuid.parse(checkNotNull(estadoGuardado.get<String>(HistorialCliente::clienteId.name)))
@@ -57,9 +74,30 @@ class HistorialViewModel
                 clientes.observar(clienteId).filterNotNull(),
                 movimientos.observarDeCliente(clienteId),
                 metodosCobro.observarTodos(),
-            ) { cliente, deCliente, metodos ->
+                cuenta.observar(),
+                plantillas.observar(),
+            ) { cliente, deCliente, metodos, abierta, plantilla ->
                 val nombres = metodos.associate { it.id to it.nombre }
-                EstadoHistorial(cliente, deCliente.saldo(), deCliente.map { FilaHistorial(it, it.metodoCobroId?.let(nombres::get)) })
+                val saldo = deCliente.saldo()
+                val telefono = cliente.telefono
+                val recordatorio =
+                    when {
+                        saldo.centimos <= 0 -> {
+                            null
+                        }
+
+                        telefono == null -> {
+                            Recordatorio.SinCelular
+                        }
+
+                        else -> {
+                            Recordatorio.Listo(
+                                telefono.paraWhatsApp,
+                                plantilla.mensaje(cliente.nombre, saldo, abierta?.nombreNegocio),
+                            )
+                        }
+                    }
+                EstadoHistorial(cliente, saldo, deCliente.map { FilaHistorial(it, it.metodoCobroId?.let(nombres::get)) }, recordatorio)
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
         private val _porAnular = MutableStateFlow<Movimiento?>(null)

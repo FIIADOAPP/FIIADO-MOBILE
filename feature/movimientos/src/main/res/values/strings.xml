@@ -27,6 +27,18 @@
     <string name="historial_anular_titulo">¿Anular %1$s de %2$s?</string>
     <string name="historial_anular_explicacion">Seguirá en el historial, tachado, y dejará de contar en el saldo. No se puede deshacer.</string>
     <string name="historial_anular">Anular</string>
+    <string name="historial_recordar">Recordar por WhatsApp</string>
+    <string name="historial_recordar_sin_celular">Agrega su celular para recordarle por WhatsApp</string>
+    <string name="historial_sin_whatsapp">No se encontró una app para abrir WhatsApp.</string>
+
+    <string name="mensaje_titulo">Mensaje de cobro</string>
+    <string name="mensaje_ayuda">Este texto se usa en cada recordatorio por WhatsApp. %1$s se cambia por el nombre del cliente, %2$s por lo que debe y %3$s por el nombre de tu negocio. Sin cuenta, la frase con el negocio se omite.</string>
+    <string name="mensaje_campo">Mensaje</string>
+    <string name="mensaje_vista_previa">Así se verá</string>
+    <string name="mensaje_restablecer">Restablecer</string>
+    <string name="mensaje_guardar">Guardar</string>
+    <string name="mensaje_error_vacio">Escribe el mensaje.</string>
+    <string name="mensaje_error_sin_saldo">Incluye %1$s para que el cliente sepa cuánto debe.</string>
 
     <string name="resumen_titulo">Resumen</string>
     <string name="resumen_por_cobrar">Por cobrar</string>
@@ -57,5 +69,10 @@
         <item quantity="one">Máximo %1$d carácter.</item>
         <item quantity="many">Máximo %1$d caracteres.</item>
         <item quantity="other">Máximo %1$d caracteres.</item>
+    </plurals>
+    <plurals name="mensaje_error_largo">
+        <item quantity="one">El mensaje admite hasta %1$d carácter.</item>
+        <item quantity="many">El mensaje admite hasta %1$d caracteres.</item>
+        <item quantity="other">El mensaje admite hasta %1$d caracteres.</item>
     </plurals>
 </resources>

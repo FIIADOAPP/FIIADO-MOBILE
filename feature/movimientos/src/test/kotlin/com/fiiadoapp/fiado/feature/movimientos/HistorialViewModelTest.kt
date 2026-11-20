@@ -1,12 +1,18 @@
 package com.fiiadoapp.fiado.feature.movimientos
 
 import androidx.lifecycle.SavedStateHandle
+import com.fiiadoapp.fiado.core.testing.CuentaFalsa
 import com.fiiadoapp.fiado.core.testing.LibretaFalsa
+import com.fiiadoapp.fiado.core.testing.PlantillaFalsa
 import com.fiiadoapp.fiado.core.testing.ReglaDispatcherPrincipal
 import com.fiiadoapp.fiado.domain.Cliente
+import com.fiiadoapp.fiado.domain.CuentaAbierta
 import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
+import com.fiiadoapp.fiado.domain.PlantillaRecordatorio
+import com.fiiadoapp.fiado.domain.Resultado
+import com.fiiadoapp.fiado.domain.Telefono
 import com.fiiadoapp.fiado.domain.TipoMovimiento.FIADO
 import com.fiiadoapp.fiado.domain.TipoMovimiento.PAGO
 import kotlinx.coroutines.flow.launchIn
@@ -31,18 +37,23 @@ class HistorialViewModelTest {
     private val ahora = Instant.parse("2026-11-15T15:00:00Z")
     private val hoy = LocalDate.of(2026, 11, 15)
     private val libreta = LibretaFalsa()
+    private val cuenta = CuentaFalsa()
+    private val plantillas = PlantillaFalsa()
     private val rosa = Cliente(Uuid.random(), "Doña Rosa", null, ahora, ahora, null)
     private val fiado = Movimiento(Uuid.random(), rosa.id, FIADO, Dinero(1250), "pan", hoy, ahora, null)
     private val pago = Movimiento(Uuid.random(), rosa.id, PAGO, Dinero(500), null, hoy, ahora.plusSeconds(60), null, MetodoCobro.YAPE.id)
 
+    /** Con Rosa, un fiado y un pago, salvo que la prueba ya haya preparado otra cosa. */
     private fun TestScope.viewModelObservado(): HistorialViewModel {
-        libreta.clientes.value = mapOf(rosa.id to rosa)
-        libreta.movimientos.value = listOf(fiado, pago).associateBy { it.id }
+        if (libreta.clientes.value.isEmpty()) libreta.clientes.value = mapOf(rosa.id to rosa)
+        if (libreta.movimientos.value.isEmpty()) libreta.movimientos.value = listOf(fiado, pago).associateBy { it.id }
         return HistorialViewModel(
             SavedStateHandle(mapOf("clienteId" to rosa.id.toString())),
             libreta.repositorioClientes,
             libreta.repositorioMovimientos,
             libreta.repositorioMetodosCobro,
+            cuenta,
+            plantillas,
             Clock.fixed(ahora.plusSeconds(120), ZoneId.of("America/Lima")),
         ).also { it.estado.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler)) }
     }
@@ -114,5 +125,35 @@ class HistorialViewModelTest {
             viewModel.pedirAnulacion(fiado.anular(ahora))
 
             assertNull(viewModel.porAnular.value)
+        }
+
+    @Test
+    fun `si debe y tiene celular, el recordatorio lleva el mensaje de la plantilla`() =
+        runTest {
+            libreta.clientes.value = mapOf(rosa.id to rosa.copy(telefono = Telefono.desdeTexto("987654321")))
+            cuenta.cuenta.value = CuentaAbierta("rosa@bodega.pe", "Bodega Doña Rosa")
+            plantillas.plantilla.value =
+                (PlantillaRecordatorio.desdeTexto("{negocio}: {cliente}, debes {saldo}.") as Resultado.Exito).valor
+            val viewModel = viewModelObservado()
+
+            assertEquals(
+                Recordatorio.Listo("51987654321", "Bodega Doña Rosa: Doña Rosa, debes S/ 7.50."),
+                viewModel.estado.value?.recordatorio,
+            )
+        }
+
+    @Test
+    fun `si debe pero no tiene celular, ofrece agregarlo`() =
+        runTest {
+            assertEquals(Recordatorio.SinCelular, viewModelObservado().estado.value?.recordatorio)
+        }
+
+    @Test
+    fun `si no debe, no hay recordatorio`() =
+        runTest {
+            libreta.movimientos.value = mapOf(pago.id to pago)
+            val viewModel = viewModelObservado()
+
+            assertNull(viewModel.estado.value?.recordatorio)
         }
 }
