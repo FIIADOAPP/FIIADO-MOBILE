@@ -12,6 +12,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - Envío de la cola a FIIADO-API en segundo plano con WorkManager: espera a tener red, sube lotes de hasta 100 operaciones en orden, quita solo lo que el servidor confirma y reintenta con esperas crecientes. Sin sesión, o si otro teléfono la tomó, la cola se conserva.
 - Restauración al iniciar sesión, antes de enviar nada: trae la libreta del servidor por páginas, continúa desde la última página guardada si se corta y la une con la local sin borrar nada. Lo que existe en ambos lados queda como en el servidor, salvo la anulación, que se conserva; lo que solo existe en el teléfono se sube. La base de datos pasa a la versión 4.
 - El teléfono queda vinculado a la primera cuenta con la que inicia sesión; iniciar sesión con otra se rechaza sin llamar a la API.
+- Estado del respaldo en la pantalla de cuenta: todo respaldado, cuántos cambios faltan subir o si el envío se detuvo porque el servidor rechazó un cambio. Al cerrar sesión con cambios pendientes, el aviso dice cuántos son y que se quedan en el teléfono.
+
+### Cambiado
+
+- El aviso al ceder la cuenta ya no dice que lo no sincronizado en el otro teléfono se perderá: se queda en ese teléfono y se sube si vuelve a iniciar sesión.
 
 ## [0.3.0] - 2026-11-16
 

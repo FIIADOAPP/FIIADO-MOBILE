@@ -1,6 +1,7 @@
 package com.fiiadoapp.fiado.core.data.sincronizacion
 
 import com.fiiadoapp.fiado.core.data.FiadoDatabase
+import com.fiiadoapp.fiado.domain.RepositorioRespaldo
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -19,6 +20,9 @@ abstract class SincronizacionModule {
 
     @Binds
     abstract fun vinculacion(restaurador: Restaurador): Vinculacion
+
+    @Binds
+    abstract fun repositorioRespaldo(respaldo: RespaldoRoom): RepositorioRespaldo
 
     companion object {
         @Provides

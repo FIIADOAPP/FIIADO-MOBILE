@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiiadoapp.fiado.domain.CuentaAbierta
 import com.fiiadoapp.fiado.domain.ErrorCuenta
+import com.fiiadoapp.fiado.domain.EstadoRespaldo
 import com.fiiadoapp.fiado.domain.RepositorioCuenta
+import com.fiiadoapp.fiado.domain.RepositorioRespaldo
 import com.fiiadoapp.fiado.domain.Resultado
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -14,8 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,6 +33,7 @@ sealed interface EstadoCuenta {
 
     data class Abierta(
         val cuenta: CuentaAbierta,
+        val respaldo: EstadoRespaldo,
     ) : EstadoCuenta
 }
 
@@ -39,12 +42,12 @@ class CuentaViewModel
     @Inject
     constructor(
         private val repositorio: RepositorioCuenta,
+        respaldo: RepositorioRespaldo,
     ) : ViewModel() {
         val estado: StateFlow<EstadoCuenta> =
-            repositorio
-                .observar()
-                .map { cuenta -> if (cuenta == null) EstadoCuenta.SinCuenta else EstadoCuenta.Abierta(cuenta) }
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EstadoCuenta.Cargando)
+            combine(repositorio.observar(), respaldo.observar()) { cuenta, estadoRespaldo ->
+                if (cuenta == null) EstadoCuenta.SinCuenta else EstadoCuenta.Abierta(cuenta, estadoRespaldo)
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EstadoCuenta.Cargando)
 
         init {
             // Si la cuenta se abrió en otro teléfono, se descubre al entrar aquí y no recién al sincronizar.

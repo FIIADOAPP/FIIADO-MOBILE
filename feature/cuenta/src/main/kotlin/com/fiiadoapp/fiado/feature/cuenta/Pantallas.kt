@@ -20,11 +20,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fiiadoapp.fiado.domain.EstadoRespaldo
 
 @Composable
 internal fun CuentaPantalla(
@@ -56,6 +58,7 @@ internal fun CuentaPantalla(
                         Text(actual.cuenta.correo, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
+                EstadoDelRespaldo(actual.respaldo)
                 OutlinedButton(onClick = { confirmandoCierre = true }, modifier = Modifier.fillMaxWidth()) {
                     Text(stringResource(R.string.cuenta_cerrar_sesion))
                 }
@@ -66,7 +69,16 @@ internal fun CuentaPantalla(
         AlertDialog(
             onDismissRequest = { confirmandoCierre = false },
             title = { Text(stringResource(R.string.cuenta_cerrar_sesion_titulo)) },
-            text = { Text(stringResource(R.string.cuenta_cerrar_sesion_explicacion)) },
+            text = {
+                val pendientes = (estado as? EstadoCuenta.Abierta)?.respaldo?.pendientes ?: 0
+                Text(
+                    if (pendientes == 0) {
+                        stringResource(R.string.cuenta_cerrar_sesion_explicacion)
+                    } else {
+                        pluralStringResource(R.plurals.cuenta_cerrar_sesion_con_pendientes, pendientes, pendientes)
+                    },
+                )
+            },
             confirmButton = {
                 TextButton(onClick = {
                     confirmandoCierre = false
@@ -76,6 +88,27 @@ internal fun CuentaPantalla(
             dismissButton = { TextButton(onClick = { confirmandoCierre = false }) { Text(stringResource(R.string.cuenta_cancelar)) } },
         )
     }
+}
+
+/** Si todo está en el servidor, cuánto falta subir o si el envío se detuvo (ADR-0003 de FIIADO-API). */
+@Composable
+private fun EstadoDelRespaldo(respaldo: EstadoRespaldo) {
+    val (texto, color) =
+        when {
+            respaldo.detenido -> {
+                stringResource(R.string.cuenta_respaldo_detenido) to MaterialTheme.colorScheme.error
+            }
+
+            respaldo.pendientes == 0 -> {
+                stringResource(R.string.cuenta_respaldo_al_dia) to MaterialTheme.colorScheme.onSurfaceVariant
+            }
+
+            else -> {
+                pluralStringResource(R.plurals.cuenta_respaldo_pendientes, respaldo.pendientes, respaldo.pendientes) to
+                    MaterialTheme.colorScheme.onSurfaceVariant
+            }
+        }
+    Text(texto, color = color, style = MaterialTheme.typography.bodyMedium)
 }
 
 @Composable
