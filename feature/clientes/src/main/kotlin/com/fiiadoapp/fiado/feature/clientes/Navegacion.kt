@@ -27,6 +27,7 @@ fun NavGraphBuilder.pantallasDeClientes(
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     onMetodosCobro: () -> Unit,
+    onMensajeDeCobro: () -> Unit,
     onCuenta: () -> Unit,
     onResumen: () -> Unit,
 ) {
@@ -41,6 +42,7 @@ fun NavGraphBuilder.pantallasDeClientes(
             onCliente = onCliente,
             onRegistrar = onRegistrar,
             onMetodosCobro = onMetodosCobro,
+            onMensajeDeCobro = onMensajeDeCobro,
             onCuenta = onCuenta,
             onResumen = onResumen,
         )

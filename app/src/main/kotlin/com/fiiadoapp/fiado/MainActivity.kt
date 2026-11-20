@@ -14,6 +14,7 @@ import com.fiiadoapp.fiado.feature.cuenta.AvisoSesionTerminada
 import com.fiiadoapp.fiado.feature.cuenta.Cuenta
 import com.fiiadoapp.fiado.feature.cuenta.pantallasDeCuenta
 import com.fiiadoapp.fiado.feature.movimientos.HistorialCliente
+import com.fiiadoapp.fiado.feature.movimientos.MensajeDeCobro
 import com.fiiadoapp.fiado.feature.movimientos.MetodosCobro
 import com.fiiadoapp.fiado.feature.movimientos.RegistrarMovimiento
 import com.fiiadoapp.fiado.feature.movimientos.ResumenGeneral
@@ -39,6 +40,7 @@ class MainActivity : ComponentActivity() {
                         onCliente = { navController.navigate(HistorialCliente(it.toString())) },
                         onRegistrar = registrar,
                         onMetodosCobro = { navController.navigate(MetodosCobro) },
+                        onMensajeDeCobro = { navController.navigate(MensajeDeCobro) },
                         onResumen = { navController.navigate(ResumenGeneral) },
                         onCuenta = { navController.navigate(Cuenta) },
                     )

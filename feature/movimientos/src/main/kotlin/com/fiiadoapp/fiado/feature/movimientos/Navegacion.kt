@@ -21,6 +21,9 @@ data object MetodosCobro
 data object ResumenGeneral
 
 @Serializable
+data object MensajeDeCobro
+
+@Serializable
 data class HistorialCliente(
     val clienteId: String,
 )
@@ -40,6 +43,9 @@ fun NavGraphBuilder.pantallasDeMovimientos(
     }
     composable<ResumenGeneral> {
         ResumenPantalla(onVolver = onCerrar)
+    }
+    composable<MensajeDeCobro> {
+        MensajeDeCobroPantalla(onVolver = onCerrar)
     }
     composable<HistorialCliente> {
         HistorialPantalla(onVolver = onCerrar, onEditar = onEditarCliente, onRegistrar = onRegistrar)

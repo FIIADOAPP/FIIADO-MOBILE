@@ -1,5 +1,10 @@
 package com.fiiadoapp.fiado.feature.movimientos
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -32,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -51,6 +58,8 @@ internal fun HistorialPantalla(
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     viewModel: HistorialViewModel = hiltViewModel(),
 ) {
+    val contexto = LocalContext.current
+    val sinWhatsApp = stringResource(R.string.historial_sin_whatsapp)
     val estado by viewModel.estado.collectAsStateWithLifecycle()
     val porAnular by viewModel.porAnular.collectAsStateWithLifecycle()
     HistorialContenido(
@@ -60,6 +69,7 @@ internal fun HistorialPantalla(
         onVolver = onVolver,
         onEditar = onEditar,
         onRegistrar = onRegistrar,
+        onRecordar = { abrirWhatsApp(contexto, it, sinWhatsApp) },
         onPedirAnulacion = viewModel::pedirAnulacion,
         onConfirmarAnulacion = viewModel::confirmarAnulacion,
         onCancelarAnulacion = viewModel::cancelarAnulacion,
@@ -75,6 +85,7 @@ internal fun HistorialContenido(
     onVolver: () -> Unit,
     onEditar: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
+    onRecordar: (Recordatorio.Listo) -> Unit,
     onPedirAnulacion: (Movimiento) -> Unit,
     onConfirmarAnulacion: () -> Unit,
     onCancelarAnulacion: () -> Unit,
@@ -103,7 +114,7 @@ internal fun HistorialContenido(
             return@Scaffold
         }
         LazyColumn(Modifier.padding(relleno).fillMaxSize(), contentPadding = PaddingValues(bottom = 24.dp)) {
-            item { Cabecera(estado, onRegistrar) }
+            item { Cabecera(estado, onRegistrar, onRecordar, onEditar) }
             if (estado.filas.isEmpty()) {
                 item {
                     Text(
@@ -129,6 +140,8 @@ internal fun HistorialContenido(
 private fun Cabecera(
     estado: EstadoHistorial,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
+    onRecordar: (Recordatorio.Listo) -> Unit,
+    onEditar: (Uuid) -> Unit,
 ) {
     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SaldoTexto(estado.saldo)
@@ -142,6 +155,22 @@ private fun Cabecera(
             OutlinedButton(onClick = { onRegistrar(estado.cliente.id, TipoMovimiento.PAGO) }, modifier = Modifier.weight(1f)) {
                 Text(stringResource(R.string.historial_cobrar))
             }
+        }
+        when (val recordatorio = estado.recordatorio) {
+            is Recordatorio.Listo -> {
+                OutlinedButton(onClick = { onRecordar(recordatorio) }, modifier = Modifier.fillMaxWidth()) {
+                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null)
+                    Text(stringResource(R.string.historial_recordar), Modifier.padding(start = 8.dp))
+                }
+            }
+
+            Recordatorio.SinCelular -> {
+                TextButton(onClick = { onEditar(estado.cliente.id) }) {
+                    Text(stringResource(R.string.historial_recordar_sin_celular))
+                }
+            }
+
+            null -> {}
         }
         if (estado.filas.any { it.movimiento.estaVigente }) {
             Text(
@@ -210,4 +239,25 @@ private fun ConfirmarAnulacion(
         confirmButton = { TextButton(onClick = onConfirmar) { Text(stringResource(R.string.historial_anular)) } },
         dismissButton = { TextButton(onClick = onCancelar) { Text(stringResource(R.string.registro_cancelar)) } },
     )
+}
+
+/** Abre WhatsApp (o WhatsApp Business) con el mensaje escrito; el bodeguero lo revisa y lo envía. */
+private fun abrirWhatsApp(
+    contexto: Context,
+    recordatorio: Recordatorio.Listo,
+    sinWhatsApp: String,
+) {
+    val enlace =
+        Uri
+            .Builder()
+            .scheme("https")
+            .authority("wa.me")
+            .appendPath(recordatorio.celular)
+            .appendQueryParameter("text", recordatorio.mensaje)
+            .build()
+    try {
+        contexto.startActivity(Intent(Intent.ACTION_VIEW, enlace))
+    } catch (_: ActivityNotFoundException) {
+        Toast.makeText(contexto, sinWhatsApp, Toast.LENGTH_LONG).show()
+    }
 }
