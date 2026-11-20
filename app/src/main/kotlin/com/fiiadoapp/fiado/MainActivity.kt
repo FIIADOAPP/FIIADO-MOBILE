@@ -6,13 +6,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -72,19 +72,22 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val entrada by navController.currentBackStackEntryAsState()
                 val principal = PRINCIPALES.indexOfFirst { (_, ruta) -> entrada?.destination?.hasRoute(ruta) == true }.takeIf { it >= 0 }
-                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-                    CompositionLocalProvider(LocalEspacioBarraInferior provides AltoBarraInferior) {
-                        Navegacion(navController)
-                    }
-                    if (principal != null) {
-                        BarraInferiorFlotante(
-                            destinos = destinos(),
-                            seleccionado = principal,
-                            onDestino = { navController.irAPrincipal(PRINCIPALES[it].first) },
-                            descripcionCentral = stringResource(R.string.barra_nuevo_cliente),
-                            onCentral = { navController.navigate(FormularioCliente()) },
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                        )
+                // Surface da el fondo y el color de texto del tema también a las pantallas sin Scaffold.
+                Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    Box(Modifier.fillMaxSize()) {
+                        CompositionLocalProvider(LocalEspacioBarraInferior provides AltoBarraInferior) {
+                            Navegacion(navController)
+                        }
+                        if (principal != null) {
+                            BarraInferiorFlotante(
+                                destinos = destinos(),
+                                seleccionado = principal,
+                                onDestino = { navController.irAPrincipal(PRINCIPALES[it].first) },
+                                descripcionCentral = stringResource(R.string.barra_nuevo_cliente),
+                                onCentral = { navController.navigate(FormularioCliente()) },
+                                modifier = Modifier.align(Alignment.BottomCenter),
+                            )
+                        }
                     }
                 }
                 AvisoSesionTerminada()

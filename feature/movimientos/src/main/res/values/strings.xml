@@ -46,6 +46,9 @@
     <string name="mensaje_error_sin_saldo">Incluye %1$s para que el cliente sepa cuánto debe.</string>
 
     <string name="resumen_titulo">Resumen</string>
+    <string name="resumen_cobrado_de_lo_fiado">cobrado de lo fiado</string>
+    <string name="resumen_por_metodo">Cobrado por método</string>
+    <string name="resumen_por_metodo_hoy">Cobrado hoy por método</string>
     <string name="resumen_por_cobrar">Por cobrar</string>
     <string name="resumen_por_cobrar_ayuda">Lo que te deben todos tus clientes. El saldo a favor de uno no descuenta lo que deben los demás.</string>
     <string name="resumen_hoy">Hoy</string>
