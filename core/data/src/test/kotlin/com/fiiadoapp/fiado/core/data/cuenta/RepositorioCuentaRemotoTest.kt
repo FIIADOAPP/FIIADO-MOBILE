@@ -57,7 +57,11 @@ class RepositorioCuentaRemotoTest {
                 aTexto = { Base64.getEncoder().encodeToString(it) },
                 aBytes = { Base64.getDecoder().decode(it) },
             )
-        repositorio = crearRepositorioCuenta(servidor.url("/").toString(), almacen)
+        repositorio =
+            RepositorioCuentaRemoto(
+                crearRetrofitConSesion(servidor.url("/").toString(), almacen).create(ApiCuentas::class.java),
+                almacen,
+            )
     }
 
     @After
