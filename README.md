@@ -12,17 +12,15 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 ## Capturas
 
 <p>
-  <img src="docs/capturas/lista.png" alt="Lista de clientes con su saldo, lo pendiente por cobrar y los botones Fiar y Cobrar" width="240">
-  <img src="docs/capturas/movimientos-dialogo.png" alt="Registro de un fiado con el monto enfocado" width="240">
+  <img src="docs/capturas/lista.png" alt="Lista de clientes con lo pendiente por cobrar, el buscador y la barra inferior flotante" width="240">
+  <img src="docs/capturas/historial.png" alt="Historial de un cliente con su saldo, Fiar, Cobrar y Recordar por WhatsApp" width="240">
   <img src="docs/capturas/cobro-metodos.png" alt="Cobro con el método preseleccionado" width="240">
-  <img src="docs/capturas/historial.png" alt="Historial de un cliente con un pago anulado" width="240">
-  <img src="docs/capturas/resumen.png" alt="Resumen de hoy y del mes con lo cobrado por método" width="240">
+  <img src="docs/capturas/resumen.png" alt="Resumen con el porcentaje cobrado del mes y lo cobrado por método" width="240">
+  <img src="docs/capturas/cobros.png" alt="Pantalla Cobros con los métodos y el mensaje de cobro" width="240">
   <img src="docs/capturas/metodos-lista.png" alt="Métodos de cobro propios" width="240">
-  <img src="docs/capturas/cuenta-ceder.png" alt="Aviso al iniciar sesión con la cuenta abierta en otro teléfono" width="240">
-  <img src="docs/capturas/respaldo-pendientes.png" alt="Cuenta con dos cambios por respaldar sin conexión" width="240">
-  <img src="docs/capturas/respaldo-cerrar-sesion.png" alt="Aviso al cerrar sesión con cambios sin respaldar" width="240">
-  <img src="docs/capturas/recordatorio-historial.png" alt="Historial de un cliente con el botón Recordar por WhatsApp" width="240">
   <img src="docs/capturas/mensaje-de-cobro.png" alt="Plantilla del mensaje de cobro con su vista previa" width="240">
+  <img src="docs/capturas/cuenta.png" alt="Cuenta con el estado del respaldo" width="240">
+  <img src="docs/capturas/cuenta-ceder.png" alt="Aviso al iniciar sesión con la cuenta abierta en otro teléfono" width="240">
 </p>
 
 ## Estado
@@ -40,6 +38,7 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Sincronización: restauración reanudable al iniciar sesión, unida con la libreta local | Listo |
 | Sincronización: estado del respaldo y avisos al cerrar sesión o ceder el teléfono | Listo |
 | Recordatorio por WhatsApp con un mensaje de cobro editable | Listo |
+| Diseño oscuro con tarjetas y barra inferior flotante | Listo |
 | Bloqueo con huella | Pendiente |
 
 ## Requisitos

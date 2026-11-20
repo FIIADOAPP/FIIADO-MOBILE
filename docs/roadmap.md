@@ -91,6 +91,7 @@ Cada entrega indica su repositorio: **M** (mobile) o **A** (API).
 | Rama | Repo | Entrega |
 |---|---|---|
 | `feat/recordatorio-whatsapp` | M | Mensaje de cobro con el monto ya escrito. |
+| `feat/rediseno-oscuro` | M | Diseño oscuro con tarjetas, gráficos en el resumen y barra inferior flotante, sin cambiar la lógica. |
 | `feat/bloqueo-biometrico` | M | Bloqueo al abrir y al volver de segundo plano. |
 
 ### Fase 5: Publicación → `v1.0.0` en ambos

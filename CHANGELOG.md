@@ -10,6 +10,13 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 - Recordatorio de cobro por WhatsApp desde el historial de un cliente que debe: abre WhatsApp con el mensaje escrito. Si el cliente no tiene celular, ofrece agregarlo.
 - Mensaje de cobro editable desde el menú, con `{cliente}`, `{saldo}` y `{negocio}`, vista previa y opción de restablecer. Por defecto saluda con el nombre del negocio; sin cuenta, esa frase se omite. Se guarda solo en el teléfono.
+- Barra inferior flotante con Clientes, Resumen, Cobros y Cuenta, y un botón central para crear un cliente. La pantalla Cobros reúne los métodos de cobro y el mensaje de cobro.
+- Resumen con un anillo del porcentaje cobrado de lo fiado en el mes y barras con lo cobrado por cada método.
+
+### Cambiado
+
+- Nuevo diseño oscuro: fondo gris carbón, tarjetas redondeadas, acento lila, verde para lo cobrado y lo que está al día y coral para lo que se debe. La app ya no cambia de tema según el teléfono.
+- El menú de la lista de clientes y su botón «Nuevo cliente» dan paso a la barra inferior.
 
 ## [0.4.0] - 2026-11-20
 
