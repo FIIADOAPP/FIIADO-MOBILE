@@ -33,7 +33,8 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Cuenta opcional: crear, verificar el correo, iniciar sesión cediendo el dispositivo y recuperar la contraseña | Listo |
 | Sincronización: cola de cambios pendientes, guardada junto con cada cambio | Listo |
 | Sincronización: envío de la cola en segundo plano al haber red | Listo |
-| Sincronización: restauración al iniciar sesión | Pendiente |
+| Sincronización: restauración reanudable al iniciar sesión, unida con la libreta local | Listo |
+| Sincronización: estado visible y avisos al cerrar sesión o ceder el teléfono | Pendiente |
 | Recordatorio por WhatsApp | Pendiente |
 | Bloqueo con huella | Pendiente |
 

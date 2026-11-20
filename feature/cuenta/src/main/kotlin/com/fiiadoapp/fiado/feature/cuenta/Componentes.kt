@@ -91,6 +91,7 @@ internal fun MensajeDeError(error: ErrorCuenta?) {
             null -> return
             ErrorCuenta.SinConexion -> stringResource(R.string.cuenta_sin_conexion)
             is ErrorCuenta.DeLaApi -> error.mensaje
+            is ErrorCuenta.OtraCuenta -> stringResource(R.string.cuenta_otra_cuenta, error.correoVinculado)
         }
     Text(texto, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
 }

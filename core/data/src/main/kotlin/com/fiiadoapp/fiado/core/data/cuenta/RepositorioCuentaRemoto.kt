@@ -1,5 +1,6 @@
 package com.fiiadoapp.fiado.core.data.cuenta
 
+import com.fiiadoapp.fiado.core.data.sincronizacion.Vinculacion
 import com.fiiadoapp.fiado.domain.CuentaAbierta
 import com.fiiadoapp.fiado.domain.ErrorCuenta
 import com.fiiadoapp.fiado.domain.RepositorioCuenta
@@ -13,6 +14,7 @@ import java.io.IOException
 class RepositorioCuentaRemoto(
     private val api: ApiCuentas,
     private val almacen: AlmacenSesion,
+    private val vinculacion: Vinculacion,
 ) : RepositorioCuenta {
     override fun observar(): Flow<CuentaAbierta?> = almacen.sesion.map { it?.let { s -> CuentaAbierta(s.correo, s.nombreNegocio) } }
 
@@ -49,8 +51,11 @@ class RepositorioCuentaRemoto(
         correo: String,
         contrasena: String,
         ceder: Boolean,
-    ): Resultado<CuentaAbierta, ErrorCuenta> =
-        when (val resultado = llamar { api.iniciarSesion(InicioDeSesionDto(correo, contrasena, ceder)) }) {
+    ): Resultado<CuentaAbierta, ErrorCuenta> {
+        // Se comprueba antes de llamar a la API: iniciar sesión podría desplazar al otro teléfono de esa cuenta.
+        val vinculado = vinculacion.correoVinculado()
+        if (vinculado != null && vinculado != correo.trim().lowercase()) return Resultado.Fallo(ErrorCuenta.OtraCuenta(vinculado))
+        return when (val resultado = llamar { api.iniciarSesion(InicioDeSesionDto(correo, contrasena, ceder)) }) {
             is Resultado.Fallo -> {
                 resultado
             }
@@ -60,9 +65,11 @@ class RepositorioCuentaRemoto(
                 almacen.guardar(
                     SesionGuardada(abierta.tokenAcceso, abierta.tokenRefresco, abierta.cuenta.correo, abierta.cuenta.nombreNegocio),
                 )
+                vinculacion.prepararRestauracion(abierta.cuenta.correo)
                 Resultado.Exito(CuentaAbierta(abierta.cuenta.correo, abierta.cuenta.nombreNegocio))
             }
         }
+    }
 
     override suspend fun cerrarSesion() {
         llamar { api.cerrarSesion() }

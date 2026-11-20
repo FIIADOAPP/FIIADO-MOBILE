@@ -12,6 +12,11 @@ data class CuentaAbierta(
 sealed interface ErrorCuenta {
     data object SinConexion : ErrorCuenta
 
+    /** Este teléfono guarda la libreta de [correoVinculado]: no se mezcla con la de otra cuenta (ADR-0003). */
+    data class OtraCuenta(
+        val correoVinculado: String,
+    ) : ErrorCuenta
+
     /** [codigo] es estable (ADR-0002 de FIIADO-API); [mensaje] viene listo para mostrar. */
     data class DeLaApi(
         val codigo: String,

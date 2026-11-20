@@ -1,5 +1,6 @@
 package com.fiiadoapp.fiado.core.data.cuenta
 
+import com.fiiadoapp.fiado.core.data.sincronizacion.Vinculacion
 import com.fiiadoapp.fiado.domain.CuentaAbierta
 import com.fiiadoapp.fiado.domain.ErrorCuenta
 import com.fiiadoapp.fiado.domain.Resultado
@@ -37,6 +38,20 @@ class RepositorioCuentaRemotoTest {
     private lateinit var almacen: AlmacenSesion
     private lateinit var repositorio: RepositorioCuentaRemoto
 
+    /** Vínculo en memoria: anota con qué correo se preparó cada restauración. */
+    private val vinculacion =
+        object : Vinculacion {
+            var correo: String? = null
+            val preparadas = mutableListOf<String>()
+
+            override suspend fun correoVinculado() = correo
+
+            override suspend fun prepararRestauracion(correo: String) {
+                this.correo = correo
+                preparadas += correo
+            }
+        }
+
     @Before
     fun preparar() {
         servidor.start()
@@ -45,6 +60,7 @@ class RepositorioCuentaRemotoTest {
             RepositorioCuentaRemoto(
                 crearRetrofitConSesion(servidor.url("/").toString(), almacen).create(ApiCuentas::class.java),
                 almacen,
+                vinculacion,
             )
     }
 
@@ -97,6 +113,30 @@ class RepositorioCuentaRemotoTest {
             assertEquals(Resultado.Exito(CuentaAbierta("rosa@bodega.pe", "Bodega Doña Rosa")), resultado)
             assertEquals(CuentaAbierta("rosa@bodega.pe", "Bodega Doña Rosa"), repositorio.observar().first())
             assertEquals("refresco-1", almacen.actual()?.tokenRefresco)
+            assertEquals(listOf("rosa@bodega.pe"), vinculacion.preparadas)
+        }
+
+    @Test
+    fun `un telefono vinculado a otra cuenta no inicia sesion ni llama a la api`() =
+        runBlocking {
+            vinculacion.correo = "pedro@bodega.pe"
+
+            val resultado = repositorio.iniciarSesion("Rosa@Bodega.pe ", "secreto123", ceder = false)
+
+            assertEquals(Resultado.Fallo(ErrorCuenta.OtraCuenta("pedro@bodega.pe")), resultado)
+            assertEquals(0, servidor.requestCount)
+            assertNull(almacen.actual())
+        }
+
+    @Test
+    fun `la misma cuenta escrita con otras mayusculas si inicia sesion`() =
+        runBlocking {
+            vinculacion.correo = "rosa@bodega.pe"
+            responder(201, sesion("acceso-1", "refresco-1"))
+
+            val resultado = repositorio.iniciarSesion(" ROSA@bodega.pe", "secreto123", ceder = false)
+
+            assertTrue(resultado is Resultado.Exito)
         }
 
     @Test
