@@ -51,8 +51,11 @@ class RepositorioCuentaRemoto(
         correo: String,
         contrasena: String,
         ceder: Boolean,
-    ): Resultado<CuentaAbierta, ErrorCuenta> =
-        when (val resultado = llamar { api.iniciarSesion(InicioDeSesionDto(correo, contrasena, ceder)) }) {
+    ): Resultado<CuentaAbierta, ErrorCuenta> {
+        // Se comprueba antes de llamar a la API: iniciar sesión podría desplazar al otro teléfono de esa cuenta.
+        val vinculado = vinculacion.correoVinculado()
+        if (vinculado != null && vinculado != correo.trim().lowercase()) return Resultado.Fallo(ErrorCuenta.OtraCuenta(vinculado))
+        return when (val resultado = llamar { api.iniciarSesion(InicioDeSesionDto(correo, contrasena, ceder)) }) {
             is Resultado.Fallo -> {
                 resultado
             }
@@ -66,6 +69,7 @@ class RepositorioCuentaRemoto(
                 Resultado.Exito(CuentaAbierta(abierta.cuenta.correo, abierta.cuenta.nombreNegocio))
             }
         }
+    }
 
     override suspend fun cerrarSesion() {
         llamar { api.cerrarSesion() }

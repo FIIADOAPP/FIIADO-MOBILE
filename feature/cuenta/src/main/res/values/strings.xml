@@ -12,6 +12,7 @@
     <string name="cuenta_correo">Correo</string>
     <string name="cuenta_contrasena">Contraseña</string>
     <string name="cuenta_contrasena_nueva">Contraseña (mínimo 8 caracteres)</string>
+    <string name="cuenta_otra_cuenta">Este teléfono guarda la libreta de %1$s. Para usar otra cuenta, borra los datos de la app desde los ajustes de Android.</string>
     <string name="cuenta_sin_conexion">No hay conexión. Revisa tu internet e intenta de nuevo.</string>
     <string name="cuenta_verificar_titulo">Verifica tu correo</string>
     <string name="cuenta_verificar_explicacion">Te enviamos un código de 6 dígitos a %1$s.</string>

@@ -117,6 +117,29 @@ class RepositorioCuentaRemotoTest {
         }
 
     @Test
+    fun `un telefono vinculado a otra cuenta no inicia sesion ni llama a la api`() =
+        runBlocking {
+            vinculacion.correo = "pedro@bodega.pe"
+
+            val resultado = repositorio.iniciarSesion("Rosa@Bodega.pe ", "secreto123", ceder = false)
+
+            assertEquals(Resultado.Fallo(ErrorCuenta.OtraCuenta("pedro@bodega.pe")), resultado)
+            assertEquals(0, servidor.requestCount)
+            assertNull(almacen.actual())
+        }
+
+    @Test
+    fun `la misma cuenta escrita con otras mayusculas si inicia sesion`() =
+        runBlocking {
+            vinculacion.correo = "rosa@bodega.pe"
+            responder(201, sesion("acceso-1", "refresco-1"))
+
+            val resultado = repositorio.iniciarSesion(" ROSA@bodega.pe", "secreto123", ceder = false)
+
+            assertTrue(resultado is Resultado.Exito)
+        }
+
+    @Test
     fun `los tokens no se guardan en claro`() {
         abrirSesion()
 
