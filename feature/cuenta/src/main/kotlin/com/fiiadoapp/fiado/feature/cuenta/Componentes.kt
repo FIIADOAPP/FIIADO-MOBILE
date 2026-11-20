@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.fiiadoapp.fiado.core.ui.BarraSecundaria
 import com.fiiadoapp.fiado.core.ui.EncabezadoGrande
 import com.fiiadoapp.fiado.core.ui.LocalEspacioBarraInferior
+import com.fiiadoapp.fiado.core.ui.MargenPantalla
 import com.fiiadoapp.fiado.domain.ErrorCuenta
 
 /**
@@ -56,7 +57,7 @@ internal fun PantallaDeCuenta(
                     .padding(relleno)
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
+                    .padding(horizontal = MargenPantalla, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             contenido()
@@ -105,7 +106,7 @@ internal fun BotonPrincipal(
     habilitado: Boolean = true,
     onClick: () -> Unit,
 ) {
-    Button(onClick = onClick, enabled = habilitado && !enviando, modifier = Modifier.fillMaxWidth()) {
+    Button(onClick = onClick, enabled = habilitado && !enviando, modifier = Modifier.fillMaxWidth().height(52.dp)) {
         if (enviando) CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp) else Text(texto)
     }
 }

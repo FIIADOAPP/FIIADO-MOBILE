@@ -1,8 +1,10 @@
 package com.fiiadoapp.fiado.feature.movimientos
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,6 +14,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +40,10 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fiiadoapp.fiado.core.ui.Avatar
+import com.fiiadoapp.fiado.core.ui.BarraSecundaria
+import com.fiiadoapp.fiado.core.ui.MargenPantalla
+import com.fiiadoapp.fiado.core.ui.Tarjeta
 import com.fiiadoapp.fiado.domain.ErrorMetodoCobro
 import com.fiiadoapp.fiado.domain.MetodoCobro
 
@@ -73,42 +81,45 @@ internal fun MetodosCobroContenido(
     onCancelar: () -> Unit,
 ) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.metodos_titulo)) },
-                navigationIcon = {
-                    IconButton(onClick = onVolver) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.metodos_volver))
-                    }
-                },
-            )
-        },
+        topBar = { BarraSecundaria(stringResource(R.string.metodos_titulo), onVolver) },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onNuevo,
-                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
+                icon = { Icon(Icons.Rounded.Add, contentDescription = null) },
                 text = { Text(stringResource(R.string.metodos_nuevo)) },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
             )
         },
     ) { relleno ->
         if (metodos == null) {
             Box(Modifier.padding(relleno).fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         } else {
-            LazyColumn(Modifier.padding(relleno), contentPadding = PaddingValues(bottom = 88.dp)) {
+            LazyColumn(
+                Modifier.padding(relleno),
+                contentPadding = PaddingValues(start = MargenPantalla, end = MargenPantalla, bottom = 96.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
                 item {
                     Text(
                         text = stringResource(R.string.metodos_ayuda),
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(vertical = 8.dp),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 items(metodos, key = { it.id.toString() }) { metodo ->
-                    ListItem(
-                        headlineContent = { Text(metodo.nombre, style = MaterialTheme.typography.titleMedium) },
-                        modifier = Modifier.clickable { onEditar(metodo) },
-                    )
-                    HorizontalDivider()
+                    Tarjeta(Modifier.fillMaxWidth(), onClick = { onEditar(metodo) }) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Avatar(metodo.nombre, tamano = 40.dp)
+                            Text(
+                                metodo.nombre,
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.weight(1f).padding(start = 14.dp),
+                            )
+                            Icon(Icons.Rounded.Edit, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
                 }
             }
         }

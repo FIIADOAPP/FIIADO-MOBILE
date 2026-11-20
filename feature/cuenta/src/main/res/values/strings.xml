@@ -32,6 +32,7 @@
     <string name="cuenta_sesion_terminada_titulo">Tu sesión se cerró</string>
     <string name="cuenta_sesion_terminada_explicacion">Tu cuenta se abrió en otro teléfono o se cambió la contraseña. Tu libreta sigue en este teléfono.</string>
     <string name="cuenta_entendido">Entendido</string>
+    <string name="cuenta_respaldo">Respaldo</string>
     <string name="cuenta_respaldo_al_dia">Todo está respaldado.</string>
     <string name="cuenta_respaldo_detenido">El respaldo se detuvo porque el servidor rechazó un cambio. Actualiza la app; tu libreta sigue completa en este teléfono.</string>
 

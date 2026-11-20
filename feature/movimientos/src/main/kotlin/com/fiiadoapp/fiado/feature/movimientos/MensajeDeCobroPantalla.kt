@@ -31,6 +31,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fiiadoapp.fiado.core.ui.BarraSecundaria
+import com.fiiadoapp.fiado.core.ui.MargenPantalla
+import com.fiiadoapp.fiado.core.ui.Tarjeta
 import com.fiiadoapp.fiado.domain.ErrorPlantilla
 import com.fiiadoapp.fiado.domain.PlantillaRecordatorio
 
@@ -50,7 +53,6 @@ internal fun MensajeDeCobroPantalla(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MensajeDeCobroContenido(
     estado: EstadoMensajeDeCobro,
@@ -60,23 +62,14 @@ internal fun MensajeDeCobroContenido(
     onGuardar: () -> Unit,
 ) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.mensaje_titulo)) },
-                navigationIcon = {
-                    IconButton(onClick = onVolver) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.metodos_volver))
-                    }
-                },
-            )
-        },
+        topBar = { BarraSecundaria(stringResource(R.string.mensaje_titulo), onVolver) },
     ) { relleno ->
         Column(
             Modifier
                 .padding(relleno)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .padding(horizontal = MargenPantalla, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
@@ -101,7 +94,7 @@ internal fun MensajeDeCobroContenido(
             )
             estado.vistaPrevia?.let {
                 Text(stringResource(R.string.mensaje_vista_previa), style = MaterialTheme.typography.labelLarge)
-                Card(Modifier.fillMaxWidth()) { Text(it, Modifier.padding(16.dp), style = MaterialTheme.typography.bodyLarge) }
+                Tarjeta(Modifier.fillMaxWidth()) { Text(it, style = MaterialTheme.typography.bodyLarge) }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
                 TextButton(onClick = onRestablecer) { Text(stringResource(R.string.mensaje_restablecer)) }
