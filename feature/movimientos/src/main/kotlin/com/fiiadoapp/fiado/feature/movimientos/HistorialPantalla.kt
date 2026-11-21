@@ -76,6 +76,8 @@ internal fun HistorialPantalla(
     val sinWhatsApp = stringResource(R.string.historial_sin_whatsapp)
     val estado by viewModel.estado.collectAsStateWithLifecycle()
     val porAnular by viewModel.porAnular.collectAsStateWithLifecycle()
+    val opciones by viewModel.opciones.collectAsStateWithLifecycle()
+    val porProrrogar by viewModel.porProrrogar.collectAsStateWithLifecycle()
     HistorialContenido(
         estado = estado,
         hoy = viewModel.hoy,
@@ -84,10 +86,21 @@ internal fun HistorialPantalla(
         onEditar = onEditar,
         onRegistrar = onRegistrar,
         onRecordar = { abrirWhatsApp(contexto, it, sinWhatsApp) },
-        onPedirAnulacion = viewModel::pedirAnulacion,
+        onTocar = viewModel::tocar,
         onConfirmarAnulacion = viewModel::confirmarAnulacion,
         onCancelarAnulacion = viewModel::cancelarAnulacion,
     )
+    opciones?.let { OpcionesDeFiado(it, viewModel.hoy, viewModel::elegirProrrogar, viewModel::elegirAnular, viewModel::cancelarOpciones) }
+    porProrrogar?.let { fila ->
+        val vigente = checkNotNull(fila.plazo)
+        SelectorDeFecha(
+            fecha = vigente.plusDays(1),
+            anios = vigente.year..(vigente.year + 1),
+            seleccionable = { it.isAfter(vigente) },
+            onElegir = viewModel::darMasPlazo,
+            onCancelar = viewModel::cancelarOpciones,
+        )
+    }
 }
 
 @Composable
@@ -99,7 +112,7 @@ internal fun HistorialContenido(
     onEditar: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     onRecordar: (Recordatorio.Listo) -> Unit,
-    onPedirAnulacion: (Movimiento) -> Unit,
+    onTocar: (FilaHistorial) -> Unit,
     onConfirmarAnulacion: () -> Unit,
     onCancelarAnulacion: () -> Unit,
 ) {
@@ -145,12 +158,35 @@ internal fun HistorialContenido(
                     )
                 }
             }
-            items(estado.filas, key = { it.movimiento.id.toString() }) { fila -> FilaMovimiento(fila, hoy, onPedirAnulacion) }
+            items(estado.filas, key = { it.movimiento.id.toString() }) { fila -> FilaMovimiento(fila, hoy, onTocar) }
         }
     }
     if (porAnular != null) {
         ConfirmarAnulacion(porAnular, onConfirmarAnulacion, onCancelarAnulacion)
     }
+}
+
+/** Para un fiado con plazo: dar más plazo o anularlo (ADR-0007). */
+@Composable
+private fun OpcionesDeFiado(
+    fila: FilaHistorial,
+    hoy: LocalDate,
+    onProrrogar: () -> Unit,
+    onAnular: () -> Unit,
+    onCancelar: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onCancelar,
+        title = { Text(stringResource(R.string.historial_opciones_titulo, fila.movimiento.monto.formatear())) },
+        text = { Text(fila.plazo?.let { textoDePlazo(it, hoy) }.orEmpty()) },
+        confirmButton = { TextButton(onClick = onProrrogar) { Text(stringResource(R.string.historial_dar_mas_plazo)) } },
+        dismissButton = {
+            Row {
+                TextButton(onClick = onCancelar) { Text(stringResource(R.string.registro_cancelar)) }
+                TextButton(onClick = onAnular) { Text(stringResource(R.string.historial_anular)) }
+            }
+        },
+    )
 }
 
 @Composable
@@ -210,7 +246,7 @@ private fun Cabecera(
 private fun FilaMovimiento(
     fila: FilaHistorial,
     hoy: LocalDate,
-    onPedirAnulacion: (Movimiento) -> Unit,
+    onTocar: (FilaHistorial) -> Unit,
 ) {
     val movimiento = fila.movimiento
     val vigente = movimiento.estaVigente
@@ -221,7 +257,10 @@ private fun FilaMovimiento(
             TipoMovimiento.FIADO -> stringResource(R.string.historial_fiado)
             TipoMovimiento.PAGO -> stringResource(R.string.historial_pago, fila.nombreMetodo.orEmpty())
         }
-    val plazo = movimiento.vence?.let { textoDePlazo(it, hoy) }
+    val plazo =
+        fila.plazo?.let {
+            textoDePlazo(it, hoy) + if (fila.prorrogado) " " + stringResource(R.string.historial_con_mas_plazo) else ""
+        }
     val detalle = listOfNotNull(textoDeFecha(movimiento.fecha, hoy), plazo, movimiento.nota).joinToString(" · ")
     val color =
         when {
@@ -231,7 +270,7 @@ private fun FilaMovimiento(
         }
     Tarjeta(
         Modifier.fillMaxWidth(),
-        onClick = if (vigente) ({ onPedirAnulacion(movimiento) }) else null,
+        onClick = if (vigente) ({ onTocar(fila) }) else null,
         relleno = 14.dp,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
