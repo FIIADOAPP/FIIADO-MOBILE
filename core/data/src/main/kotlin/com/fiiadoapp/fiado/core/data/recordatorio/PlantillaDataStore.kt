@@ -1,18 +1,16 @@
 package com.fiiadoapp.fiado.core.data.recordatorio
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import com.fiiadoapp.fiado.core.data.preferencias.Preferencias
 import com.fiiadoapp.fiado.domain.PlantillaRecordatorio
 import com.fiiadoapp.fiado.domain.RepositorioPlantillaRecordatorio
 import com.fiiadoapp.fiado.domain.Resultado
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -42,14 +40,12 @@ class PlantillaDataStore(
     }
 }
 
-private val Context.preferenciasDataStore: DataStore<Preferences> by preferencesDataStore(name = "preferencias")
-
 @Module
 @InstallIn(SingletonComponent::class)
 object RecordatorioModule {
     @Provides
     @Singleton
     fun repositorioPlantilla(
-        @ApplicationContext contexto: Context,
-    ): RepositorioPlantillaRecordatorio = PlantillaDataStore(contexto.preferenciasDataStore)
+        @Preferencias dataStore: DataStore<Preferences>,
+    ): RepositorioPlantillaRecordatorio = PlantillaDataStore(dataStore)
 }
