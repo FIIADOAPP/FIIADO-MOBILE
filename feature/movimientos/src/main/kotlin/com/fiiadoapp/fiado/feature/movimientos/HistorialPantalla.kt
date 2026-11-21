@@ -221,7 +221,8 @@ private fun FilaMovimiento(
             TipoMovimiento.FIADO -> stringResource(R.string.historial_fiado)
             TipoMovimiento.PAGO -> stringResource(R.string.historial_pago, fila.nombreMetodo.orEmpty())
         }
-    val detalle = listOfNotNull(textoDeFecha(movimiento.fecha, hoy), movimiento.nota).joinToString(" · ")
+    val plazo = movimiento.vence?.let { textoDePlazo(it, hoy) }
+    val detalle = listOfNotNull(textoDeFecha(movimiento.fecha, hoy), plazo, movimiento.nota).joinToString(" · ")
     val color =
         when {
             !vigente -> MaterialTheme.colorScheme.onSurfaceVariant

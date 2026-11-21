@@ -33,6 +33,7 @@ import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.time.Instant
+import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -102,12 +103,13 @@ class RestauradorTest : BaseDeDatosDePrueba() {
     private fun movimientoJson(
         movimiento: Movimiento,
         anuladoEn: String? = null,
+        vence: String? = null,
     ) = """{"entidad":"movimiento","datos":{"id":"${movimiento.id}","cliente_id":"${movimiento.clienteId}",
         "tipo":"${movimiento.tipo.name.lowercase()}","monto":${movimiento.monto.centimos},"nota":${movimiento.nota?.let {
         "\"$it\""
     } ?: "null"},
         "fecha":"${movimiento.fecha}","registrado_en":"${movimiento.registradoEn}","anulado_en":${anuladoEn?.let { "\"$it\"" } ?: "null"},
-        "metodo_cobro_id":${movimiento.metodoCobroId?.let { "\"$it\"" } ?: "null"}}}"""
+        "metodo_cobro_id":${movimiento.metodoCobroId?.let { "\"$it\"" } ?: "null"}${vence?.let { ",\"vence\":\"$it\"" } ?: ""}}}"""
 
     private suspend fun cola() = db.colaDao().primeras(1_000)
 
@@ -283,6 +285,26 @@ class RestauradorTest : BaseDeDatosDePrueba() {
             val vinculo = db.restauracionDao().vinculo()!!
             assertEquals(false, vinculo.restaurada)
             assertTrue(vinculo.primera)
+        }
+
+    @Test
+    fun `trae el plazo de los fiados y acepta una API que aun no lo envia`() =
+        runBlocking {
+            val juana = cliente("Juana")
+            val conPlazo = movimiento(juana, FIADO, 1000)
+            val sinCampo = movimiento(juana, FIADO, 500)
+            pagina(
+                null,
+                metodoJson(MetodoCobro.EFECTIVO),
+                clienteJson(juana),
+                movimientoJson(conPlazo, vence = "2026-11-20"),
+                movimientoJson(sinCampo),
+            )
+
+            assertNull(restaurador.restaurarSiFalta(CORREO))
+
+            assertEquals(LocalDate.of(2026, 11, 20), movimientos.obtener(conPlazo.id)?.vence)
+            assertNull(movimientos.obtener(sinCampo.id)?.vence)
         }
 
     private companion object {

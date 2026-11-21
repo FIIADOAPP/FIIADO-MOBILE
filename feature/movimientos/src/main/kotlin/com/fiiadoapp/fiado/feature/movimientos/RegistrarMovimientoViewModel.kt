@@ -3,6 +3,7 @@ package com.fiiadoapp.fiado.feature.movimientos
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fiiadoapp.fiado.domain.AtajoDePlazo
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.ErrorMovimiento
@@ -40,13 +41,19 @@ data class EstadoRegistro(
     /** Solo para un pago: métodos activos y el elegido, preseleccionado con el último usado (ADR-0004). */
     val metodos: List<MetodoCobro> = emptyList(),
     val metodoElegido: Uuid? = null,
+    /** Solo para un fiado: un atajo, que se cuenta desde [fecha], u otra fecha elegida (ADR-0007). */
+    val atajo: AtajoDePlazo? = null,
+    val otraFecha: LocalDate? = null,
     /** El monto no se pudo leer o es cero. */
     val montoInvalido: Boolean = false,
     val error: ErrorMovimiento? = null,
     val guardando: Boolean = false,
     /** Id del movimiento guardado; la pantalla debe cerrarse. */
     val registrado: Uuid? = null,
-)
+) {
+    /** `null` sin plazo. */
+    val vence: LocalDate? get() = otraFecha ?: atajo?.desde(fecha)
+}
 
 @HiltViewModel
 class RegistrarMovimientoViewModel
@@ -98,6 +105,11 @@ class RegistrarMovimientoViewModel
 
         fun elegirMetodo(id: Uuid) = _estado.update { it.copy(metodoElegido = id, error = null) }
 
+        /** `null` deja el fiado sin plazo. */
+        fun elegirAtajo(atajo: AtajoDePlazo?) = _estado.update { it.copy(atajo = atajo, otraFecha = null, error = null) }
+
+        fun elegirOtraFecha(fecha: LocalDate) = _estado.update { it.copy(atajo = null, otraFecha = fecha, error = null) }
+
         fun guardar() {
             val actual = _estado.value
             val cliente = cliente ?: return
@@ -118,6 +130,7 @@ class RegistrarMovimientoViewModel
                     fecha = actual.fecha,
                     hoy = actual.hoy,
                     ahora = Instant.now(reloj),
+                    vence = actual.vence,
                 )
             when (resultado) {
                 is Resultado.Fallo -> {

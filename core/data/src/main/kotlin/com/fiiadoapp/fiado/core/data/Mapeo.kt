@@ -57,6 +57,7 @@ internal fun Movimiento.aEntidad() =
         registradoEn = registradoEn.toEpochMilli(),
         anuladoEn = anuladoEn?.toEpochMilli(),
         metodoCobroId = metodoCobroId?.toString(),
+        vence = vence?.toEpochDay(),
     )
 
 internal fun MovimientoEntity.aDominio() =
@@ -70,6 +71,7 @@ internal fun MovimientoEntity.aDominio() =
         registradoEn = Instant.ofEpochMilli(registradoEn),
         anuladoEn = anuladoEn?.let(Instant::ofEpochMilli),
         metodoCobroId = metodoCobroId?.let(Uuid::parse),
+        vence = vence?.let(LocalDate::ofEpochDay),
     )
 
 internal fun MetodoCobro.aEntidad() =
