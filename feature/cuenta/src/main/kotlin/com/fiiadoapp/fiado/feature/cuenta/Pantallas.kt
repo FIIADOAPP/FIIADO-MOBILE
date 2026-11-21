@@ -13,6 +13,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fiiadoapp.fiado.core.ui.Avatar
+import com.fiiadoapp.fiado.core.ui.LocalAutenticador
 import com.fiiadoapp.fiado.core.ui.Tarjeta
 import com.fiiadoapp.fiado.domain.EstadoRespaldo
 
@@ -40,6 +42,7 @@ internal fun CuentaPantalla(
     viewModel: CuentaViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
+    val bloqueoActivo by viewModel.bloqueoActivo.collectAsStateWithLifecycle()
     var confirmandoCierre by remember { mutableStateOf(false) }
     PantallaDeCuenta(stringResource(R.string.cuenta_titulo), onVolver = null) {
         when (val actual = estado) {
@@ -78,6 +81,7 @@ internal fun CuentaPantalla(
                 }
             }
         }
+        if (estado != EstadoCuenta.Cargando) TarjetaDeSeguridad(bloqueoActivo, viewModel::cambiarBloqueo)
     }
     if (confirmandoCierre) {
         AlertDialog(
@@ -270,4 +274,43 @@ fun AvisoSesionTerminada(viewModel: AvisoSesionViewModel = hiltViewModel()) {
         text = { Text(stringResource(R.string.cuenta_sesion_terminada_explicacion)) },
         confirmButton = { TextButton(onClick = viewModel::entendido) { Text(stringResource(R.string.cuenta_entendido)) } },
     )
+}
+
+/** Activar o apagar el bloqueo pide la huella o el PIN, para que solo el dueño lo cambie (ADR-0006). */
+@Composable
+private fun TarjetaDeSeguridad(
+    activo: Boolean,
+    onCambiar: (Boolean) -> Unit,
+) {
+    val autenticador = LocalAutenticador.current
+    var sinBloqueoDePantalla by remember { mutableStateOf(false) }
+    val titulo = stringResource(if (activo) R.string.cuenta_bloqueo_confirmar_apagar else R.string.cuenta_bloqueo_confirmar_activar)
+    val cambiar = { nuevo: Boolean ->
+        if (autenticador.disponible()) {
+            sinBloqueoDePantalla = false
+            autenticador.autenticar(titulo) { onCambiar(nuevo) }
+        } else {
+            sinBloqueoDePantalla = true
+        }
+    }
+    Tarjeta(Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(stringResource(R.string.cuenta_bloqueo_titulo), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    stringResource(R.string.cuenta_bloqueo_explicacion),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Switch(checked = activo, onCheckedChange = cambiar)
+        }
+        if (sinBloqueoDePantalla) {
+            Text(
+                stringResource(R.string.cuenta_bloqueo_sin_bloqueo_de_pantalla),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
+    }
 }

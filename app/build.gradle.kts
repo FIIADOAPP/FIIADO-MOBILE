@@ -61,7 +61,14 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     implementation(libs.androidx.work.runtime)
+    implementation(libs.androidx.biometric)
+    implementation(libs.androidx.fragment)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.work)
     ksp(libs.hilt.compiler)
+
+    testImplementation(project(":core:testing"))
+    testImplementation(libs.junit4)
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
