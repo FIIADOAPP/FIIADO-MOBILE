@@ -9,6 +9,7 @@ enum class TipoMovimiento { FIADO, PAGO }
 /**
  * Un fiado o un pago. Es inmutable: solo puede pasar de vigente a anulado.
  * Un pago siempre indica por qué [MetodoCobro] entró; un fiado nunca (ADR-0004).
+ * Un fiado puede tener plazo, [vence], que no es anterior a su [fecha] (ADR-0007).
  */
 data class Movimiento(
     val id: Uuid,
@@ -20,6 +21,7 @@ data class Movimiento(
     val registradoEn: Instant,
     val anuladoEn: Instant?,
     val metodoCobroId: Uuid? = null,
+    val vence: LocalDate? = null,
 ) {
     init {
         require(monto.esPositivo) { "El monto debe ser mayor que cero: $monto" }
@@ -28,6 +30,7 @@ data class Movimiento(
         require(
             (tipo == TipoMovimiento.PAGO) == (metodoCobroId != null),
         ) { "Un pago lleva método de cobro y un fiado no: $tipo, $metodoCobroId" }
+        require(vence == null || (tipo == TipoMovimiento.FIADO && !vence.isBefore(fecha))) { "Plazo inválido: $tipo, $fecha, $vence" }
     }
 
     val estaVigente: Boolean get() = anuladoEn == null
@@ -46,7 +49,7 @@ data class Movimiento(
     companion object {
         const val LARGO_MAXIMO_NOTA = 140
 
-        /** [metodoCobro] es obligatorio para un pago y se ignora en un fiado. */
+        /** [metodoCobro] es obligatorio para un pago y se ignora en un fiado; [vence], al revés. */
         fun registrar(
             id: Uuid,
             cliente: Cliente,
@@ -57,6 +60,7 @@ data class Movimiento(
             fecha: LocalDate,
             hoy: LocalDate,
             ahora: Instant,
+            vence: LocalDate? = null,
         ): Resultado<Movimiento, ErrorMovimiento> {
             val notaNormalizada = nota?.let(::normalizarNota)
             val error =
@@ -67,11 +71,15 @@ data class Movimiento(
                     notaNormalizada != null && notaNormalizada.length > LARGO_MAXIMO_NOTA -> ErrorMovimiento.NotaMuyLarga
                     tipo == TipoMovimiento.PAGO && metodoCobro == null -> ErrorMovimiento.SinMetodoCobro
                     tipo == TipoMovimiento.PAGO && metodoCobro?.estaArchivado == true -> ErrorMovimiento.MetodoCobroArchivado
+                    tipo == TipoMovimiento.FIADO && vence != null && vence.isBefore(fecha) -> ErrorMovimiento.PlazoAntesDeLaFecha
                     else -> null
                 }
             if (error != null) return Resultado.Fallo(error)
             val metodoCobroId = metodoCobro?.id?.takeIf { tipo == TipoMovimiento.PAGO }
-            return Resultado.Exito(Movimiento(id, cliente.id, tipo, monto, notaNormalizada, fecha, ahora, anuladoEn = null, metodoCobroId))
+            val plazo = vence?.takeIf { tipo == TipoMovimiento.FIADO }
+            return Resultado.Exito(
+                Movimiento(id, cliente.id, tipo, monto, notaNormalizada, fecha, ahora, anuladoEn = null, metodoCobroId, plazo),
+            )
         }
 
         private fun normalizarNota(nota: String): String? = nota.trim().ifEmpty { null }
@@ -90,4 +98,23 @@ sealed interface ErrorMovimiento {
     data object SinMetodoCobro : ErrorMovimiento
 
     data object MetodoCobroArchivado : ErrorMovimiento
+
+    data object PlazoAntesDeLaFecha : ErrorMovimiento
+}
+
+/** Atajos para el plazo de un fiado, contados desde el día del fiado (ADR-0007). */
+enum class AtajoDePlazo {
+    MANANA,
+    TRES_DIAS,
+    UNA_SEMANA,
+    FIN_DE_MES,
+    ;
+
+    fun desde(fecha: LocalDate): LocalDate =
+        when (this) {
+            MANANA -> fecha.plusDays(1)
+            TRES_DIAS -> fecha.plusDays(3)
+            UNA_SEMANA -> fecha.plusWeeks(1)
+            FIN_DE_MES -> fecha.withDayOfMonth(fecha.lengthOfMonth())
+        }
 }
