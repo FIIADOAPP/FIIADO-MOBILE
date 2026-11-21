@@ -10,6 +10,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 - Recordatorio de cobro por WhatsApp desde el historial de un cliente que debe: abre WhatsApp con el mensaje escrito. Si el cliente no tiene celular, ofrece agregarlo.
 - Mensaje de cobro editable desde el menú, con `{cliente}`, `{saldo}` y `{negocio}`, vista previa y opción de restablecer. Por defecto saluda con el nombre del negocio; sin cuenta, esa frase se omite. Se guarda solo en el teléfono.
+- ADR-0006 y bloqueo opcional con la huella o el PIN del teléfono, desde Cuenta: se pide al abrir la app y al volver tras un minuto o más en segundo plano. Activarlo o apagarlo pide confirmar con la huella. Mientras está activo, la vista de apps recientes no muestra saldos. Si el teléfono quita su bloqueo de pantalla, el de la app se apaga solo y avisa.
 - Barra inferior flotante con Clientes, Resumen, Cobros y Cuenta, y un botón central para crear un cliente. La pantalla Cobros reúne los métodos de cobro y el mensaje de cobro.
 - Resumen con un anillo del porcentaje cobrado de lo fiado en el mes y barras con lo cobrado por cada método.
 
