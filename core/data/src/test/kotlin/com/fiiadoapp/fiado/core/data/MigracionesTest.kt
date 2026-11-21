@@ -99,6 +99,19 @@ class MigracionesTest {
         db.close()
     }
 
+    @Test
+    fun `la version 6 agrega las prorrogas`() {
+        ayudante.createDatabase(base, 5).close()
+
+        val db = ayudante.runMigrationsAndValidate(base, 6, true, MIGRACION_5_6)
+
+        db.query("SELECT COUNT(*) FROM prorrogas").use { c ->
+            c.moveToFirst()
+            assertEquals(0, c.getInt(0))
+        }
+        db.close()
+    }
+
     /** Ruta absoluta: con un nombre relativo, el ayudante abre y valida rutas distintas. */
     private val base =
         InstrumentationRegistry

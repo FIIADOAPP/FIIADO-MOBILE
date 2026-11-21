@@ -52,6 +52,19 @@ data class MovimientoEntity(
     val vence: Long? = null,
 )
 
+/** Más plazo para un fiado (ADR-0007). `vence` en días desde la época; `registradaEn` en milisegundos UTC. */
+@Entity(
+    tableName = "prorrogas",
+    foreignKeys = [ForeignKey(entity = MovimientoEntity::class, parentColumns = ["id"], childColumns = ["movimientoId"])],
+    indices = [Index("movimientoId")],
+)
+data class ProrrogaEntity(
+    @PrimaryKey val id: String,
+    val movimientoId: String,
+    val vence: Long,
+    val registradaEn: Long,
+)
+
 data class ClienteConSaldoFila(
     @Embedded val cliente: ClienteEntity,
     val saldoCentimos: Long,

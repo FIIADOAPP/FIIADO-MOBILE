@@ -29,6 +29,7 @@ abstract class BaseDeDatosDePrueba {
     protected val clientes = RepositorioClientesRoom(db, GeneradorUuidV7(), programador)
     protected val movimientos = RepositorioMovimientosRoom(db, GeneradorUuidV7(), programador)
     protected val metodos = RepositorioMetodosCobroRoom(db, GeneradorUuidV7(), programador)
+    protected val prorrogas = RepositorioProrrogasRoom(db, GeneradorUuidV7(), programador)
 
     protected val ahora: Instant = Instant.parse("2026-11-15T15:30:00.123Z")
     protected val hoy: LocalDate = LocalDate.of(2026, 11, 15)

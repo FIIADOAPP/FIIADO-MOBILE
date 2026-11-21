@@ -6,6 +6,7 @@ import com.fiiadoapp.fiado.domain.GeneradorDeIds
 import com.fiiadoapp.fiado.domain.RepositorioClientes
 import com.fiiadoapp.fiado.domain.RepositorioMetodosCobro
 import com.fiiadoapp.fiado.domain.RepositorioMovimientos
+import com.fiiadoapp.fiado.domain.RepositorioProrrogas
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,6 +43,13 @@ object DatosModule {
         ids: GeneradorDeIds,
         programador: ProgramadorDeEnvio,
     ): RepositorioMetodosCobro = RepositorioMetodosCobroRoom(db, ids, programador)
+
+    @Provides
+    fun repositorioProrrogas(
+        db: FiadoDatabase,
+        ids: GeneradorDeIds,
+        programador: ProgramadorDeEnvio,
+    ): RepositorioProrrogas = RepositorioProrrogasRoom(db, ids, programador)
 
     @Provides
     fun generadorDeIds(): GeneradorDeIds = GeneradorUuidV7()

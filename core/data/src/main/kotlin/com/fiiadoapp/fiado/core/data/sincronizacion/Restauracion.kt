@@ -12,6 +12,7 @@ import com.fiiadoapp.fiado.core.data.ClienteEntity
 import com.fiiadoapp.fiado.core.data.FiadoDatabase
 import com.fiiadoapp.fiado.core.data.MetodoCobroEntity
 import com.fiiadoapp.fiado.core.data.MovimientoEntity
+import com.fiiadoapp.fiado.core.data.ProrrogaEntity
 import com.fiiadoapp.fiado.domain.GeneradorDeIds
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
@@ -73,6 +74,9 @@ interface RestauracionDao {
 
     @Query("SELECT * FROM movimientos WHERE id NOT IN (SELECT id FROM ids_restaurados WHERE entidad = 'movimiento') ORDER BY id")
     suspend fun movimientosSoloLocales(): List<MovimientoEntity>
+
+    @Query("SELECT * FROM prorrogas WHERE id NOT IN (SELECT id FROM ids_restaurados WHERE entidad = 'prorroga') ORDER BY id")
+    suspend fun prorrogasSoloLocales(): List<ProrrogaEntity>
 }
 
 @Serializable
@@ -172,6 +176,10 @@ class Restaurador
                     val local = db.movimientoDao().obtener(registro.fila.id)
                     db.movimientoDao().guardar(registro.fila.copy(anuladoEn = local?.anuladoEn ?: registro.fila.anuladoEn))
                 }
+
+                is Restaurado.Prorroga -> {
+                    db.prorrogaDao().guardar(registro.fila)
+                }
             }
         }
 
@@ -211,6 +219,7 @@ class Restaurador
             dao.metodosSoloLocales().forEach { encolar(TipoDeRegistro.METODO_COBRO, it.foto()) }
             dao.clientesSoloLocales().forEach { encolar(TipoDeRegistro.CLIENTE, it.foto()) }
             dao.movimientosSoloLocales().forEach { encolar(TipoDeRegistro.MOVIMIENTO, it.foto()) }
+            dao.prorrogasSoloLocales().forEach { encolar(TipoDeRegistro.PRORROGA, it.foto()) }
             dao.olvidarRestaurados()
             return vinculo.copy(cursor = null, restaurada = true, primera = false).also { dao.guardarVinculo(it) }
         }
@@ -223,6 +232,7 @@ class Restaurador
                     when (entidad) {
                         TipoDeRegistro.METODO_COBRO.valor -> db.metodoCobroDao().obtener(id)?.foto()
                         TipoDeRegistro.CLIENTE.valor -> db.clienteDao().obtener(id)?.foto()
+                        TipoDeRegistro.PRORROGA.valor -> db.prorrogaDao().obtener(id)?.foto()
                         else -> db.movimientoDao().obtener(id)?.foto()
                     } ?: return@forEach
                 db.colaDao().agregar(OperacionPendienteEntity(id = ids.nuevo().toString(), entidad = entidad, datos = foto))
