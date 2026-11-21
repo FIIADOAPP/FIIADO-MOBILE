@@ -45,6 +45,40 @@ object IconosFiado {
             }.build()
     }
 
+    /** Una persona con un "+" al lado: agregar un cliente, distinto de registrar un cobro. */
+    val NuevoCliente: ImageVector by lazy {
+        ImageVector
+            .Builder("NuevoCliente", 24.dp, 24.dp, 24f, 24f)
+            .path(fill = SolidColor(Color.Black)) {
+                // Cabeza.
+                moveTo(9f, 4f)
+                arcTo(4f, 4f, 0f, true, true, 9f, 12f)
+                arcTo(4f, 4f, 0f, true, true, 9f, 4f)
+                close()
+                // Hombros.
+                moveTo(1f, 19f)
+                curveTo(1f, 15.7f, 5f, 14f, 9f, 14f)
+                curveTo(13f, 14f, 17f, 15.7f, 17f, 19f)
+                lineTo(17f, 20f)
+                lineTo(1f, 20f)
+                close()
+                // El "+".
+                moveTo(19f, 6f)
+                lineTo(21f, 6f)
+                lineTo(21f, 9f)
+                lineTo(24f, 9f)
+                lineTo(24f, 11f)
+                lineTo(21f, 11f)
+                lineTo(21f, 14f)
+                lineTo(19f, 14f)
+                lineTo(19f, 11f)
+                lineTo(16f, 11f)
+                lineTo(16f, 9f)
+                lineTo(19f, 9f)
+                close()
+            }.build()
+    }
+
     private fun PathBuilder.barra(
         x: Float,
         y: Float,

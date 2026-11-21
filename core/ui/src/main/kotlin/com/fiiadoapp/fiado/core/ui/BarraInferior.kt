@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -42,7 +40,7 @@ val AltoBarraInferior = 104.dp
 
 /**
  * Barra inferior flotante: una pastilla oscura con los destinos y, al centro, el botón principal
- * redondo en lila. Los destinos se reparten a ambos lados del botón.
+ * redondo en lila para agregar un cliente. Los destinos se reparten a ambos lados del botón.
  */
 @Composable
 fun BarraInferiorFlotante(
@@ -94,7 +92,7 @@ private fun BotonCentral(
         contentColor = MaterialTheme.colorScheme.onPrimary,
         elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
     ) {
-        Icon(Icons.Rounded.Add, contentDescription = descripcion, modifier = Modifier.size(28.dp))
+        Icon(IconosFiado.NuevoCliente, contentDescription = descripcion, modifier = Modifier.size(26.dp))
     }
 }
 
