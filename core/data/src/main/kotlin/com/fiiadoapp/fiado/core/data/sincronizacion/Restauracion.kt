@@ -15,6 +15,8 @@ import com.fiiadoapp.fiado.core.data.MovimientoEntity
 import com.fiiadoapp.fiado.domain.GeneradorDeIds
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import javax.inject.Inject
 
 /**
@@ -53,6 +55,9 @@ interface RestauracionDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun anotarRestaurados(ids: List<IdRestauradoEntity>)
+
+    @Query("SELECT * FROM ids_restaurados")
+    suspend fun restaurados(): List<IdRestauradoEntity>
 
     @Query("DELETE FROM ids_restaurados")
     suspend fun olvidarRestaurados()
@@ -140,7 +145,11 @@ class Restaurador
                     }
                 vinculo =
                     db.withTransaction {
-                        registros.forEach { aplicar(it) }
+                        val pendientes = conCambiosPendientes()
+                        // Un movimiento siempre se combina: la anulación se conserva venga de donde venga.
+                        registros
+                            .filterNot { it !is Restaurado.Movimiento && (it.tipo.valor to it.id) in pendientes }
+                            .forEach { aplicar(it) }
                         dao.anotarRestaurados(registros.map { IdRestauradoEntity(it.tipo.valor, it.id) })
                         val siguiente = vinculo.copy(cursor = pagina.cursor)
                         if (pagina.cursor == null) terminar(siguiente) else siguiente.also { dao.guardarVinculo(it) }
@@ -166,10 +175,34 @@ class Restaurador
             }
         }
 
-        /** La primera vez, la cola se reemplaza por una foto de lo que solo existe aquí: es lo mismo, sin repetidos. */
+        /**
+         * Registros con un cambio en la cola: al restaurar se conserva la versión del teléfono, que es la más
+         * reciente y se sube después (ADR-0008).
+         */
+        private suspend fun conCambiosPendientes(): Set<Pair<String, String>> =
+            db
+                .colaDao()
+                .todas()
+                .map {
+                    it.entidad to
+                        jsonDeSincronizacion
+                            .parseToJsonElement(it.datos)
+                            .jsonObject
+                            .getValue("id")
+                            .jsonPrimitive.content
+                }.toSet()
+
+        /**
+         * La primera vez, la cola se reemplaza por una foto de lo que solo existe aquí y de lo que se conservó
+         * por tener cambios pendientes: es lo mismo, sin repetidos.
+         */
         private suspend fun terminar(vinculo: VinculoEntity): VinculoEntity {
-            if (vinculo.primera) dao.vaciarCola()
             val cola = db.colaDao()
+            if (vinculo.primera) {
+                val conservados = conCambiosPendientes()
+                dao.vaciarCola()
+                reencolar(conservados)
+            }
 
             suspend fun encolar(
                 tipo: TipoDeRegistro,
@@ -180,6 +213,20 @@ class Restaurador
             dao.movimientosSoloLocales().forEach { encolar(TipoDeRegistro.MOVIMIENTO, it.foto()) }
             dao.olvidarRestaurados()
             return vinculo.copy(cursor = null, restaurada = true, primera = false).also { dao.guardarVinculo(it) }
+        }
+
+        /** Vuelve a encolar la foto actual de los registros conservados que también están en el servidor. */
+        private suspend fun reencolar(conservados: Set<Pair<String, String>>) {
+            val restaurados = dao.restaurados().map { it.entidad to it.id }.toSet()
+            conservados.filter { it in restaurados }.forEach { (entidad, id) ->
+                val foto =
+                    when (entidad) {
+                        TipoDeRegistro.METODO_COBRO.valor -> db.metodoCobroDao().obtener(id)?.foto()
+                        TipoDeRegistro.CLIENTE.valor -> db.clienteDao().obtener(id)?.foto()
+                        else -> db.movimientoDao().obtener(id)?.foto()
+                    } ?: return@forEach
+                db.colaDao().agregar(OperacionPendienteEntity(id = ids.nuevo().toString(), entidad = entidad, datos = foto))
+            }
         }
 
         private companion object {
