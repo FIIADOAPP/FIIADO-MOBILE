@@ -33,6 +33,11 @@
     <string name="cuenta_sesion_terminada_explicacion">Tu cuenta se abrió en otro teléfono o se cambió la contraseña. Tu libreta sigue en este teléfono.</string>
     <string name="cuenta_entendido">Entendido</string>
     <string name="cuenta_respaldo">Respaldo</string>
+    <string name="cuenta_bloqueo_titulo">Bloquear con huella o PIN</string>
+    <string name="cuenta_bloqueo_explicacion">Al abrir Fiado, o al volver después de un minuto, se pide la huella o el PIN de tu teléfono.</string>
+    <string name="cuenta_bloqueo_confirmar_activar">Activar el bloqueo</string>
+    <string name="cuenta_bloqueo_confirmar_apagar">Desactivar el bloqueo</string>
+    <string name="cuenta_bloqueo_sin_bloqueo_de_pantalla">Tu teléfono no tiene bloqueo de pantalla. Configura una huella o un PIN en los ajustes de Android para usar esta opción.</string>
     <string name="cuenta_respaldo_al_dia">Todo está respaldado.</string>
     <string name="cuenta_respaldo_detenido">El respaldo se detuvo porque el servidor rechazó un cambio. Actualiza la app; tu libreta sigue completa en este teléfono.</string>
 

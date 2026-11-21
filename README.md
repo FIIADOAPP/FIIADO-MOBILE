@@ -19,7 +19,7 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
   <img src="docs/capturas/cobros.png" alt="Pantalla Cobros con los métodos y el mensaje de cobro" width="240">
   <img src="docs/capturas/metodos-lista.png" alt="Métodos de cobro propios" width="240">
   <img src="docs/capturas/mensaje-de-cobro.png" alt="Plantilla del mensaje de cobro con su vista previa" width="240">
-  <img src="docs/capturas/cuenta.png" alt="Cuenta con el estado del respaldo" width="240">
+  <img src="docs/capturas/cuenta.png" alt="Cuenta con el estado del respaldo y el bloqueo con huella o PIN" width="240">
   <img src="docs/capturas/cuenta-ceder.png" alt="Aviso al iniciar sesión con la cuenta abierta en otro teléfono" width="240">
 </p>
 
@@ -39,7 +39,7 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Sincronización: estado del respaldo y avisos al cerrar sesión o ceder el teléfono | Listo |
 | Recordatorio por WhatsApp con un mensaje de cobro editable | Listo |
 | Diseño oscuro con tarjetas y barra inferior flotante | Listo |
-| Bloqueo con huella | Pendiente |
+| Bloqueo opcional con la huella o el PIN del teléfono | Listo |
 
 ## Requisitos
 
