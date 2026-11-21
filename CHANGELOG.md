@@ -6,6 +6,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+### Corregido
+
+- Al iniciar sesión, la restauración ya no reemplaza por la versión del servidor un cliente o un método de cobro con cambios sin subir: se conserva el del teléfono y se sube después, así el teléfono y el servidor quedan iguales (ADR-0008).
+
 ### Agregado
 
 - ADR-0007 y plazo de pago al fiar: «¿Para cuándo?» con los atajos Mañana, 3 días, 1 semana, Fin de mes u Otra fecha. El historial muestra el plazo de cada fiado y el plazo se respalda con FIIADO-API `v0.4.0` o superior. La base de datos pasa a la versión 5.
