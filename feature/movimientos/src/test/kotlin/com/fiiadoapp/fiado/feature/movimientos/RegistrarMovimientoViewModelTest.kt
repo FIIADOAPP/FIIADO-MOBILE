@@ -3,6 +3,7 @@ package com.fiiadoapp.fiado.feature.movimientos
 import androidx.lifecycle.SavedStateHandle
 import com.fiiadoapp.fiado.core.testing.LibretaFalsa
 import com.fiiadoapp.fiado.core.testing.ReglaDispatcherPrincipal
+import com.fiiadoapp.fiado.domain.AtajoDePlazo
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.ErrorMovimiento
@@ -201,5 +202,40 @@ class RegistrarMovimientoViewModelTest {
 
             assertEquals(emptyList(), viewModel.estado.value.metodos)
             assertNull(registrado()?.metodoCobroId)
+        }
+
+    @Test
+    fun `un fiado se guarda con el plazo del atajo, contado desde su fecha`() =
+        runTest {
+            val viewModel = viewModel(FIADO)
+            viewModel.cambiarMonto("10")
+            viewModel.cambiarFecha(
+                viewModel.estado.value.hoy
+                    .minusDays(1),
+            )
+
+            viewModel.elegirAtajo(AtajoDePlazo.TRES_DIAS)
+            viewModel.guardar()
+
+            val guardado = checkNotNull(registrado())
+            assertEquals(
+                viewModel.estado.value.hoy
+                    .plusDays(2),
+                guardado.vence,
+            )
+        }
+
+    @Test
+    fun `otra fecha reemplaza al atajo y sin plazo lo quita`() =
+        runTest {
+            val viewModel = viewModel(FIADO)
+            val hoy = viewModel.estado.value.hoy
+
+            viewModel.elegirAtajo(AtajoDePlazo.MANANA)
+            viewModel.elegirOtraFecha(hoy.plusDays(10))
+            assertEquals(hoy.plusDays(10), viewModel.estado.value.vence)
+
+            viewModel.elegirAtajo(null)
+            assertNull(viewModel.estado.value.vence)
         }
 }

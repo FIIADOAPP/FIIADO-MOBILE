@@ -13,6 +13,17 @@
     <string name="registro_error_archivado">Este cliente está archivado.</string>
     <string name="registro_metodo">Cobrado con</string>
     <string name="registro_error_metodo">Elige con qué te pagó.</string>
+    <string name="registro_error_plazo">El plazo no puede ser antes del día del fiado.</string>
+    <string name="registro_plazo">¿Para cuándo?</string>
+    <string name="registro_plazo_ninguno">Sin plazo</string>
+    <string name="registro_plazo_manana">Mañana</string>
+    <string name="registro_plazo_tres_dias">3 días</string>
+    <string name="registro_plazo_una_semana">1 semana</string>
+    <string name="registro_plazo_fin_de_mes">Fin de mes</string>
+    <string name="registro_plazo_otra_fecha">Otra fecha</string>
+    <string name="plazo_hoy">Para hoy</string>
+    <string name="plazo_manana">Para mañana</string>
+    <string name="plazo_fecha">Para el %1$s</string>
 
     <string name="historial_editar_cliente">Editar cliente</string>
     <string name="historial_fiar">Fiar</string>

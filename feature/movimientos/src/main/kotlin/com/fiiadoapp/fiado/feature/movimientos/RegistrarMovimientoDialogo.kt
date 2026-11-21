@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fiiadoapp.fiado.core.ui.SaldoTexto
+import com.fiiadoapp.fiado.domain.AtajoDePlazo
 import com.fiiadoapp.fiado.domain.ErrorMovimiento
 import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
@@ -74,6 +75,8 @@ internal fun RegistrarMovimientoDialogo(
         onNota = viewModel::cambiarNota,
         onFecha = viewModel::cambiarFecha,
         onMetodo = viewModel::elegirMetodo,
+        onAtajo = viewModel::elegirAtajo,
+        onOtraFecha = viewModel::elegirOtraFecha,
         onGuardar = viewModel::guardar,
         onCancelar = onCerrar,
     )
@@ -86,6 +89,8 @@ internal fun RegistrarMovimientoContenido(
     onNota: (String) -> Unit,
     onFecha: (LocalDate) -> Unit,
     onMetodo: (Uuid) -> Unit,
+    onAtajo: (AtajoDePlazo?) -> Unit,
+    onOtraFecha: (LocalDate) -> Unit,
     onGuardar: () -> Unit,
     onCancelar: () -> Unit,
 ) {
@@ -123,6 +128,8 @@ internal fun RegistrarMovimientoContenido(
             )
             if (estado.tipo == TipoMovimiento.PAGO) {
                 SelectorDeMetodo(estado.metodos, estado.metodoElegido, onMetodo)
+            } else {
+                SelectorDePlazo(estado, onAtajo, onOtraFecha)
             }
             val notaMuyLarga = estado.error == ErrorMovimiento.NotaMuyLarga
             val errorNota = pluralStringResource(R.plurals.registro_error_nota, Movimiento.LARGO_MAXIMO_NOTA, Movimiento.LARGO_MAXIMO_NOTA)
@@ -147,6 +154,7 @@ internal fun RegistrarMovimientoContenido(
                     ErrorMovimiento.FechaFutura -> R.string.registro_error_fecha
                     ErrorMovimiento.ClienteArchivado -> R.string.registro_error_archivado
                     ErrorMovimiento.SinMetodoCobro, ErrorMovimiento.MetodoCobroArchivado -> R.string.registro_error_metodo
+                    ErrorMovimiento.PlazoAntesDeLaFecha -> R.string.registro_error_plazo
                     else -> null
                 }
             if (errorGeneral != null) {
@@ -166,7 +174,8 @@ internal fun RegistrarMovimientoContenido(
         if (eligiendoFecha) {
             SelectorDeFecha(
                 fecha = estado.fecha,
-                hoy = estado.hoy,
+                anios = (estado.hoy.year - 1)..estado.hoy.year,
+                seleccionable = { !it.isAfter(estado.hoy) },
                 onElegir = {
                     onFecha(it)
                     eligiendoFecha = false
@@ -203,22 +212,91 @@ private fun SelectorDeMetodo(
     }
 }
 
+/** Sin plazo por defecto; los atajos se cuentan desde el día del fiado (ADR-0007). */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SelectorDePlazo(
+    estado: EstadoRegistro,
+    onAtajo: (AtajoDePlazo?) -> Unit,
+    onOtraFecha: (LocalDate) -> Unit,
+) {
+    var eligiendo by rememberSaveable { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(stringResource(R.string.registro_plazo), style = MaterialTheme.typography.labelLarge)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OpcionDePlazo(stringResource(R.string.registro_plazo_ninguno), estado.vence == null) { onAtajo(null) }
+            AtajoDePlazo.entries.forEach { atajo ->
+                OpcionDePlazo(textoDeAtajo(atajo), estado.otraFecha == null && estado.atajo == atajo) { onAtajo(atajo) }
+            }
+            OpcionDePlazo(stringResource(R.string.registro_plazo_otra_fecha), estado.otraFecha != null) { eligiendo = true }
+        }
+        estado.vence?.let {
+            Text(
+                textoDePlazo(it, estado.hoy),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+    if (eligiendo) {
+        SelectorDeFecha(
+            fecha = estado.vence ?: AtajoDePlazo.UNA_SEMANA.desde(estado.fecha),
+            anios = estado.fecha.year..(estado.fecha.year + 1),
+            seleccionable = { !it.isBefore(estado.fecha) },
+            onElegir = {
+                onOtraFecha(it)
+                eligiendo = false
+            },
+            onCancelar = { eligiendo = false },
+        )
+    }
+}
+
+@Composable
+private fun OpcionDePlazo(
+    texto: String,
+    elegida: Boolean,
+    onClick: () -> Unit,
+) {
+    FilterChip(
+        selected = elegida,
+        onClick = onClick,
+        label = { Text(texto) },
+        leadingIcon = if (elegida) ({ Icon(Icons.Rounded.Check, contentDescription = null) }) else null,
+        shape = CircleShape,
+    )
+}
+
+@Composable
+private fun textoDeAtajo(atajo: AtajoDePlazo): String =
+    stringResource(
+        when (atajo) {
+            AtajoDePlazo.MANANA -> R.string.registro_plazo_manana
+            AtajoDePlazo.TRES_DIAS -> R.string.registro_plazo_tres_dias
+            AtajoDePlazo.UNA_SEMANA -> R.string.registro_plazo_una_semana
+            AtajoDePlazo.FIN_DE_MES -> R.string.registro_plazo_fin_de_mes
+        },
+    )
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SelectorDeFecha(
     fecha: LocalDate,
-    hoy: LocalDate,
+    anios: IntRange,
+    seleccionable: (LocalDate) -> Boolean,
     onElegir: (LocalDate) -> Unit,
     onCancelar: () -> Unit,
 ) {
-    val ultimoDia = hoy.toEpochDay() * MILISEGUNDOS_POR_DIA
     val estado =
         rememberDatePickerState(
             initialSelectedDateMillis = fecha.toEpochDay() * MILISEGUNDOS_POR_DIA,
-            yearRange = (hoy.year - 1)..hoy.year,
+            yearRange = anios,
             selectableDates =
                 object : SelectableDates {
-                    override fun isSelectableDate(utcTimeMillis: Long) = utcTimeMillis <= ultimoDia
+                    override fun isSelectableDate(utcTimeMillis: Long) =
+                        seleccionable(
+                            LocalDate.ofEpochDay(utcTimeMillis / MILISEGUNDOS_POR_DIA),
+                        )
                 },
         )
     DatePickerDialog(
