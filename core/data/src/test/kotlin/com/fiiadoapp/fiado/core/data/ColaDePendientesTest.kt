@@ -62,7 +62,7 @@ class ColaDePendientesTest : BaseDeDatosDePrueba() {
                 Json.parseToJsonElement(
                     """{"id":"${pago.id}","cliente_id":"${rosa.id}","tipo":"pago","monto":500,"nota":null,
                     "fecha":"2026-11-15","registrado_en":"2026-11-15T15:30:00.123Z","anulado_en":null,
-                    "metodo_cobro_id":"${MetodoCobro.EFECTIVO.id}"}""",
+                    "metodo_cobro_id":"${MetodoCobro.EFECTIVO.id}","vence":null}""",
                 ),
                 fotoPago,
             )
@@ -99,5 +99,18 @@ class ColaDePendientesTest : BaseDeDatosDePrueba() {
         runTest {
             assertEquals(MetodoCobro.INICIALES.size, metodos.observarTodos().first().size)
             assertEquals(emptyList(), cola())
+        }
+
+    @Test
+    fun `un fiado con plazo lo lleva en la foto`() =
+        runTest {
+            val rosa = cliente("Doña Rosa")
+            clientes.guardar(rosa)
+            val conPlazo = movimiento(rosa, FIADO, 1250).copy(vence = hoy.plusDays(3))
+
+            movimientos.guardar(conPlazo)
+
+            assertEquals("\"2026-11-18\"", datos(cola().last())["vence"].toString())
+            assertEquals(conPlazo, movimientos.obtener(conPlazo.id))
         }
 }

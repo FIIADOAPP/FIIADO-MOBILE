@@ -69,6 +69,14 @@ internal val MIGRACION_3_4 =
         }
     }
 
+/** Versión 5 (ADR-0007): plazo de pago de los fiados. Lo registrado antes queda sin plazo. */
+internal val MIGRACION_4_5 =
+    object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `movimientos` ADD COLUMN `vence` INTEGER")
+        }
+    }
+
 /** Idempotente: los iniciales tienen identificadores fijos. */
 internal fun insertarMetodosIniciales(db: SupportSQLiteDatabase) {
     MetodoCobro.INICIALES.forEach {

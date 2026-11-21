@@ -20,7 +20,7 @@ import com.fiiadoapp.fiado.core.data.sincronizacion.VinculoEntity
         VinculoEntity::class,
         IdRestauradoEntity::class,
     ],
-    version = 4,
+    version = 5,
 )
 abstract class FiadoDatabase : RoomDatabase() {
     abstract fun clienteDao(): ClienteDao
@@ -42,7 +42,7 @@ abstract class FiadoDatabase : RoomDatabase() {
             Room
                 .databaseBuilder(contexto, FiadoDatabase::class.java, nombre)
                 .setJournalMode(JournalMode.TRUNCATE)
-                .addMigrations(MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4)
+                .addMigrations(MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4, MIGRACION_4_5)
                 .addCallback(SembrarMetodosIniciales)
                 .build()
     }

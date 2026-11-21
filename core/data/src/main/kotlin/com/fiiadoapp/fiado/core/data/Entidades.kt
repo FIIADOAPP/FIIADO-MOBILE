@@ -48,6 +48,8 @@ data class MovimientoEntity(
     val anuladoEn: Long?,
     /** Obligatorio en un pago y nulo en un fiado (ADR-0004). */
     val metodoCobroId: String?,
+    /** Plazo de un fiado, en días desde la época (ADR-0007). */
+    val vence: Long? = null,
 )
 
 data class ClienteConSaldoFila(

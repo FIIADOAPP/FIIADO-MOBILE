@@ -46,6 +46,8 @@ internal data class MovimientoFoto(
     @SerialName("registrado_en") val registradoEn: String,
     @SerialName("anulado_en") val anuladoEn: String?,
     @SerialName("metodo_cobro_id") val metodoCobroId: String?,
+    /** Una API anterior a la v0.4.0 no lo envía al restaurar. */
+    val vence: String? = null,
 )
 
 /** Valor del campo `entidad` de una operación. */
@@ -61,6 +63,8 @@ internal enum class TipoDeRegistro(
 internal val jsonDeSincronizacion =
     Json {
         explicitNulls = true
+        // La foto es completa: también se escriben los campos con valor por defecto, como `vence`.
+        encodeDefaults = true
         ignoreUnknownKeys = true
     }
 
@@ -92,6 +96,7 @@ internal fun MovimientoEntity.foto(): String =
                 registradoEn = instante(registradoEn),
                 anuladoEn = anuladoEn?.let(::instante),
                 metodoCobroId = metodoCobroId,
+                vence = vence?.let { LocalDate.ofEpochDay(it).toString() },
             ),
         )
 
@@ -171,6 +176,7 @@ internal fun decodificar(registro: RegistroDto): Restaurado {
                         registradoEn = milis(foto.registradoEn),
                         anuladoEn = foto.anuladoEn?.let(::milis),
                         metodoCobroId = foto.metodoCobroId,
+                        vence = foto.vence?.let { LocalDate.parse(it).toEpochDay() },
                     ),
                 )
             }
