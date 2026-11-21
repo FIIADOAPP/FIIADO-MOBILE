@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Fiado</string>
+    <string name="barra_clientes">Clientes</string>
+    <string name="barra_resumen">Resumen</string>
+    <string name="barra_cobros">Cobros</string>
+    <string name="barra_cuenta">Cuenta</string>
+    <string name="barra_nuevo_cliente">Nuevo cliente</string>
 </resources>

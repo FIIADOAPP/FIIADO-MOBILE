@@ -3,25 +3,22 @@ package com.fiiadoapp.fiado.feature.cuenta
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,26 +26,29 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.fiiadoapp.fiado.core.ui.BarraSecundaria
+import com.fiiadoapp.fiado.core.ui.EncabezadoGrande
+import com.fiiadoapp.fiado.core.ui.LocalEspacioBarraInferior
+import com.fiiadoapp.fiado.core.ui.MargenPantalla
 import com.fiiadoapp.fiado.domain.ErrorCuenta
 
-/** Pantalla de un paso de la cuenta: barra con "volver" y contenido desplazable. */
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Pantalla de la cuenta con contenido desplazable. Con [onVolver] es un paso con su barra para volver;
+ * sin él, es la pantalla principal de la barra inferior, con el título grande.
+ */
 @Composable
 internal fun PantallaDeCuenta(
     titulo: String,
-    onVolver: () -> Unit,
+    onVolver: (() -> Unit)?,
     contenido: @Composable ColumnScope.() -> Unit,
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(titulo) },
-                navigationIcon = {
-                    IconButton(onClick = onVolver) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cuenta_volver))
-                    }
-                },
-            )
+            if (onVolver == null) {
+                EncabezadoGrande(titulo, Modifier.statusBarsPadding())
+            } else {
+                BarraSecundaria(titulo, onVolver)
+            }
         },
     ) { relleno ->
         Column(
@@ -57,10 +57,12 @@ internal fun PantallaDeCuenta(
                     .padding(relleno)
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
+                    .padding(horizontal = MargenPantalla, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            content = contenido,
-        )
+        ) {
+            contenido()
+            Spacer(Modifier.height(if (onVolver == null) LocalEspacioBarraInferior.current else 0.dp))
+        }
     }
 }
 
@@ -73,6 +75,7 @@ internal fun Campo(
     secreto: Boolean = false,
 ) {
     OutlinedTextField(
+        shape = MaterialTheme.shapes.small,
         value = valor,
         onValueChange = onCambio,
         modifier = Modifier.fillMaxWidth(),
@@ -103,7 +106,7 @@ internal fun BotonPrincipal(
     habilitado: Boolean = true,
     onClick: () -> Unit,
 ) {
-    Button(onClick = onClick, enabled = habilitado && !enviando, modifier = Modifier.fillMaxWidth()) {
+    Button(onClick = onClick, enabled = habilitado && !enviando, modifier = Modifier.fillMaxWidth().height(52.dp)) {
         if (enviando) CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp) else Text(texto)
     }
 }

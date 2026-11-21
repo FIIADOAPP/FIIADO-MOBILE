@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -86,7 +89,7 @@ internal fun RegistrarMovimientoContenido(
     onGuardar: () -> Unit,
     onCancelar: () -> Unit,
 ) {
-    Surface(shape = MaterialTheme.shapes.extraLarge, tonalElevation = 6.dp) {
+    Surface(shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
         if (estado.cargando) {
             Box(Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             return@Surface
@@ -105,6 +108,7 @@ internal fun RegistrarMovimientoContenido(
             )
             SaldoTexto(estado.saldo)
             OutlinedTextField(
+                shape = MaterialTheme.shapes.small,
                 value = estado.monto,
                 onValueChange = onMonto,
                 modifier = Modifier.fillMaxWidth().focusRequester(foco),
@@ -123,6 +127,7 @@ internal fun RegistrarMovimientoContenido(
             val notaMuyLarga = estado.error == ErrorMovimiento.NotaMuyLarga
             val errorNota = pluralStringResource(R.plurals.registro_error_nota, Movimiento.LARGO_MAXIMO_NOTA, Movimiento.LARGO_MAXIMO_NOTA)
             OutlinedTextField(
+                shape = MaterialTheme.shapes.small,
                 value = estado.nota,
                 onValueChange = onNota,
                 modifier = Modifier.fillMaxWidth(),
@@ -134,7 +139,8 @@ internal fun RegistrarMovimientoContenido(
             AssistChip(
                 onClick = { eligiendoFecha = true },
                 label = { Text(textoDeFecha(estado.fecha, estado.hoy)) },
-                leadingIcon = { Icon(Icons.Filled.DateRange, contentDescription = null) },
+                leadingIcon = { Icon(Icons.Rounded.DateRange, contentDescription = null) },
+                shape = CircleShape,
             )
             val errorGeneral =
                 when (estado.error) {
@@ -152,7 +158,9 @@ internal fun RegistrarMovimientoContenido(
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 TextButton(onClick = onCancelar) { Text(stringResource(R.string.registro_cancelar)) }
-                Button(onClick = onGuardar, enabled = !estado.guardando) { Text(stringResource(R.string.registro_guardar)) }
+                Button(onClick = onGuardar, enabled = !estado.guardando, modifier = Modifier.padding(start = 8.dp)) {
+                    Text(stringResource(R.string.registro_guardar))
+                }
             }
         }
         if (eligiendoFecha) {
@@ -187,7 +195,8 @@ private fun SelectorDeMetodo(
                     onClick = { onMetodo(metodo.id) },
                     label = { Text(metodo.nombre) },
                     // El check distingue el elegido sin depender solo del color.
-                    leadingIcon = if (seleccionado) ({ Icon(Icons.Filled.Check, contentDescription = null) }) else null,
+                    leadingIcon = if (seleccionado) ({ Icon(Icons.Rounded.Check, contentDescription = null) }) else null,
+                    shape = CircleShape,
                 )
             }
         }

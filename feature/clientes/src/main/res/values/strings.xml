@@ -1,18 +1,13 @@
 <resources>
     <string name="clientes_titulo">Clientes</string>
-    <string name="clientes_nuevo">Nuevo cliente</string>
     <string name="clientes_buscar">Buscar por nombre</string>
     <string name="clientes_limpiar_busqueda">Limpiar búsqueda</string>
-    <string name="clientes_vacio">Aún no tienes clientes. Toca «Nuevo cliente» para agregar el primero.</string>
+    <string name="clientes_vacio">Aún no tienes clientes. Toca + abajo para agregar el primero.</string>
     <string name="clientes_sin_resultados">Ningún cliente coincide con «%1$s».</string>
     <string name="clientes_fiar">Fiar</string>
     <string name="clientes_cobrar">Cobrar</string>
     <string name="clientes_por_cobrar">Por cobrar</string>
     <string name="clientes_ver_resumen">Ver resumen</string>
-    <string name="clientes_mas_opciones">Más opciones</string>
-    <string name="clientes_metodos_cobro">Métodos de cobro</string>
-    <string name="clientes_mensaje_de_cobro">Mensaje de cobro</string>
-    <string name="clientes_cuenta">Cuenta</string>
     <string name="aviso_fiado">Fiaste %1$s a %2$s</string>
     <string name="aviso_pago">Cobraste %1$s a %2$s</string>
     <string name="aviso_deshacer">Deshacer</string>
@@ -36,5 +31,10 @@
         <item quantity="one">Máximo %1$d carácter.</item>
         <item quantity="many">Máximo %1$d caracteres.</item>
         <item quantity="other">Máximo %1$d caracteres.</item>
+    </plurals>
+    <plurals name="clientes_cantidad">
+        <item quantity="one">%1$d cliente</item>
+        <item quantity="many">%1$d clientes</item>
+        <item quantity="other">%1$d clientes</item>
     </plurals>
 </resources>

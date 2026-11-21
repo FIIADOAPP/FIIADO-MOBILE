@@ -17,6 +17,7 @@
     <string name="historial_editar_cliente">Editar cliente</string>
     <string name="historial_fiar">Fiar</string>
     <string name="historial_cobrar">Cobrar</string>
+    <string name="historial_movimientos">Movimientos</string>
     <string name="historial_vacio">Aún no hay movimientos con este cliente.</string>
     <string name="historial_ayuda">Toca un movimiento si necesitas anularlo.</string>
     <string name="historial_fiado">Fiado</string>
@@ -31,6 +32,10 @@
     <string name="historial_recordar_sin_celular">Agrega su celular para recordarle por WhatsApp</string>
     <string name="historial_sin_whatsapp">No se encontró una app para abrir WhatsApp.</string>
 
+    <string name="cobros_titulo">Cobros</string>
+    <string name="cobros_subtitulo">Cómo te pagan y cómo les recuerdas</string>
+    <string name="cobros_metodos_ayuda">Efectivo, Yape, Plin y los que agregues</string>
+    <string name="cobros_mensaje_ayuda">El texto del recordatorio por WhatsApp</string>
     <string name="mensaje_titulo">Mensaje de cobro</string>
     <string name="mensaje_ayuda">Este texto se usa en cada recordatorio por WhatsApp. %1$s se cambia por el nombre del cliente, %2$s por lo que debe y %3$s por el nombre de tu negocio. Sin cuenta, la frase con el negocio se omite.</string>
     <string name="mensaje_campo">Mensaje</string>
@@ -41,6 +46,9 @@
     <string name="mensaje_error_sin_saldo">Incluye %1$s para que el cliente sepa cuánto debe.</string>
 
     <string name="resumen_titulo">Resumen</string>
+    <string name="resumen_cobrado_de_lo_fiado">cobrado de lo fiado</string>
+    <string name="resumen_por_metodo">Cobrado por método</string>
+    <string name="resumen_por_metodo_hoy">Cobrado hoy por método</string>
     <string name="resumen_por_cobrar">Por cobrar</string>
     <string name="resumen_por_cobrar_ayuda">Lo que te deben todos tus clientes. El saldo a favor de uno no descuenta lo que deben los demás.</string>
     <string name="resumen_hoy">Hoy</string>
