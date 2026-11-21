@@ -39,6 +39,8 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Sincronización: estado del respaldo y avisos al cerrar sesión o ceder el teléfono | Listo |
 | Recordatorio por WhatsApp con un mensaje de cobro editable | Listo |
 | Diseño oscuro con tarjetas y barra inferior flotante | Listo |
+| Plazo de pago al fiar | Listo |
+| Prórrogas y puntualidad de los clientes | Pendiente |
 | Bloqueo opcional con la huella o el PIN del teléfono | Listo |
 
 ## Requisitos
