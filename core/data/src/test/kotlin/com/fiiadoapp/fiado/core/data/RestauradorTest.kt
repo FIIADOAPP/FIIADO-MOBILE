@@ -307,6 +307,46 @@ class RestauradorTest : BaseDeDatosDePrueba() {
             assertNull(movimientos.obtener(sinCampo.id)?.vence)
         }
 
+    @Test
+    fun `un cambio local pendiente no se pisa con la version del servidor y luego se sube`() =
+        runBlocking {
+            val juana = cliente("Juana")
+            restaurador.prepararRestauracion(CORREO)
+            pagina(null, metodoJson(MetodoCobro.EFECTIVO), metodoJson(MetodoCobro.YAPE), metodoJson(MetodoCobro.PLIN), clienteJson(juana))
+            restaurador.restaurarSiFalta(CORREO)
+            // Sin sesión, el dueño le agrega el celular; el cambio queda en la cola.
+            val conCelular = clientes.observar(juana.id).first()!!.copy(telefono = Telefono.desdeTexto("912345678"))
+            clientes.guardar(conCelular)
+            restaurador.prepararRestauracion(CORREO)
+            pagina(null, metodoJson(MetodoCobro.EFECTIVO), metodoJson(MetodoCobro.YAPE), metodoJson(MetodoCobro.PLIN), clienteJson(juana))
+
+            assertNull(restaurador.restaurarSiFalta(CORREO))
+
+            assertEquals(conCelular.telefono, clientes.observar(juana.id).first()?.telefono)
+            val subida = cola().last { it.entidad == "cliente" }
+            assertTrue(subida.datos.contains("+51912345678"))
+        }
+
+    @Test
+    fun `la primera vez tambien conserva y vuelve a encolar lo cambiado en el telefono`() =
+        runBlocking {
+            metodos.guardar(MetodoCobro.YAPE.copy(nombre = "Yape negocio"))
+            pagina(null, metodoJson(MetodoCobro.EFECTIVO), metodoJson(MetodoCobro.YAPE), metodoJson(MetodoCobro.PLIN))
+
+            assertNull(restaurador.restaurarSiFalta(CORREO))
+
+            assertEquals(
+                "Yape negocio",
+                metodos
+                    .observarTodos()
+                    .first()
+                    .first { it.id == MetodoCobro.YAPE.id }
+                    .nombre,
+            )
+            assertEquals(listOf("metodo_cobro" to MetodoCobro.YAPE.id.toString()), entidadesEnCola())
+            assertTrue(cola().single().datos.contains("Yape negocio"))
+        }
+
     private companion object {
         const val CORREO = "rosa@bodega.pe"
         val HACE: Instant = Instant.parse("2026-11-01T10:00:00Z")

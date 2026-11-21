@@ -31,6 +31,9 @@ interface ClienteDao {
     @Query("SELECT * FROM clientes WHERE id = :id")
     fun observar(id: String): Flow<ClienteEntity?>
 
+    @Query("SELECT * FROM clientes WHERE id = :id")
+    suspend fun obtener(id: String): ClienteEntity?
+
     @Upsert
     suspend fun guardar(cliente: ClienteEntity)
 }
@@ -63,6 +66,9 @@ interface MetodoCobroDao {
 
     @Query("SELECT * FROM metodos_cobro ORDER BY creadoEn, id")
     fun observarTodos(): Flow<List<MetodoCobroEntity>>
+
+    @Query("SELECT * FROM metodos_cobro WHERE id = :id")
+    suspend fun obtener(id: String): MetodoCobroEntity?
 
     @Upsert
     suspend fun guardar(metodo: MetodoCobroEntity)
