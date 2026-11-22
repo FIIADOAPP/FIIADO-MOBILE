@@ -6,6 +6,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+## [0.5.0] - 2026-11-21
+
+El respaldo de plazos y prórrogas requiere FIIADO-API `v0.4.0` o superior.
+
 ### Corregido
 
 - Al iniciar sesión, la restauración ya no reemplaza por la versión del servidor un cliente o un método de cobro con cambios sin subir: se conserva el del teléfono y se sube después, así el teléfono y el servidor quedan iguales (ADR-0008).
@@ -89,7 +93,8 @@ La cuenta requiere FIIADO-API `v0.2.0` o superior.
 - Formato con ktlint mediante Spotless y Android Lint con las advertencias tratadas como errores.
 - CI en GitHub Actions: commitlint, ktlint, Android Lint, pruebas y build en cada pull request.
 
-[Sin publicar]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.4.0...develop
+[Sin publicar]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.5.0...develop
+[0.5.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.1.0...v0.2.0
