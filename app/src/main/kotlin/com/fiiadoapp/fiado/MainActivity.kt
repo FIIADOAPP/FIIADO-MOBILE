@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
@@ -24,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -42,10 +44,12 @@ import com.fiiadoapp.fiado.bloqueo.EstadoBloqueo
 import com.fiiadoapp.fiado.bloqueo.PantallaBloqueada
 import com.fiiadoapp.fiado.core.ui.AltoBarraInferior
 import com.fiiadoapp.fiado.core.ui.BarraInferiorFlotante
+import com.fiiadoapp.fiado.core.ui.ControlDeAnuncios
 import com.fiiadoapp.fiado.core.ui.DestinoBarra
 import com.fiiadoapp.fiado.core.ui.FiadoTheme
 import com.fiiadoapp.fiado.core.ui.IconosFiado
 import com.fiiadoapp.fiado.core.ui.LocalAutenticador
+import com.fiiadoapp.fiado.core.ui.LocalControlDeAnuncios
 import com.fiiadoapp.fiado.core.ui.LocalEspacioBarraInferior
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import com.fiiadoapp.fiado.feature.clientes.FormularioCliente
@@ -61,10 +65,18 @@ import com.fiiadoapp.fiado.feature.movimientos.MetodosCobro
 import com.fiiadoapp.fiado.feature.movimientos.RegistrarMovimiento
 import com.fiiadoapp.fiado.feature.movimientos.ResumenGeneral
 import com.fiiadoapp.fiado.feature.movimientos.pantallasDeMovimientos
+import com.fiiadoapp.fiado.publicidad.BannerAnuncio
+import com.fiiadoapp.fiado.publicidad.Publicidad
+import com.fiiadoapp.fiado.publicidad.alto
+import com.fiiadoapp.fiado.publicidad.tamanoDeBanner
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.reflect.KClass
 import kotlin.uuid.Uuid
+
+/** Índices de Clientes y Resumen en [PRINCIPALES]: las únicas pantallas con banner. */
+private val CON_BANNER = setOf(0, 1)
 
 /** Las cuatro pantallas principales, en el orden de la barra inferior. */
 private val PRINCIPALES: List<Pair<Any, KClass<*>>> =
@@ -79,6 +91,8 @@ private val PRINCIPALES: List<Pair<Any, KClass<*>>> =
 class MainActivity : FragmentActivity() {
     private val bloqueo: BloqueoViewModel by viewModels()
 
+    @Inject lateinit var publicidad: Publicidad
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // La app es siempre oscura: barras del sistema transparentes con íconos claros.
@@ -89,9 +103,11 @@ class MainActivity : FragmentActivity() {
         vigilarSegundoPlano()
         ocultarEnRecientesSiHayBloqueo()
         val autenticador = AutenticadorBiometrico(this)
+        publicidad.pedirConsentimiento(this)
+        val controlDeAnuncios = controlDeAnuncios()
         setContent {
             FiadoTheme {
-                CompositionLocalProvider(LocalAutenticador provides autenticador) {
+                CompositionLocalProvider(LocalAutenticador provides autenticador, LocalControlDeAnuncios provides controlDeAnuncios) {
                     val estado by bloqueo.estado.collectAsStateWithLifecycle()
                     when (estado) {
                         EstadoBloqueo.CARGANDO -> {
@@ -114,7 +130,7 @@ class MainActivity : FragmentActivity() {
                         }
 
                         EstadoBloqueo.ABIERTA -> {
-                            Aplicacion()
+                            Aplicacion(publicidad)
                         }
                     }
                     AvisoBloqueoDesactivado()
@@ -122,6 +138,19 @@ class MainActivity : FragmentActivity() {
             }
         }
     }
+
+    /** La compra y la privacidad de los anuncios, con esta actividad para abrir los diálogos de Google. */
+    private fun controlDeAnuncios() =
+        object : ControlDeAnuncios {
+            override val estado = publicidad.estado
+            override val opcionesDePrivacidadRequeridas = publicidad.opcionesDePrivacidadRequeridas
+
+            override fun comprar() = publicidad.comprar(this@MainActivity)
+
+            override fun restaurar() = publicidad.restaurar()
+
+            override fun abrirOpcionesDePrivacidad() = publicidad.abrirOpcionesDePrivacidad(this@MainActivity)
+        }
 
     /** El minuto en segundo plano se mide con el reloj monótono del sistema (ADR-0006). */
     private fun vigilarSegundoPlano() {
@@ -171,25 +200,32 @@ class MainActivity : FragmentActivity() {
 }
 
 @Composable
-private fun Aplicacion() {
+private fun Aplicacion(publicidad: Publicidad) {
     val navController = rememberNavController()
     val entrada by navController.currentBackStackEntryAsState()
     val principal = PRINCIPALES.indexOfFirst { (_, ruta) -> entrada?.destination?.hasRoute(ruta) == true }.takeIf { it >= 0 }
+    val mostrarAnuncios by publicidad.mostrarAnuncios.collectAsStateWithLifecycle()
+    // El banner solo va en Clientes y Resumen, nunca mientras se fía, se cobra o se edita (ADR-0011).
+    val conBanner = mostrarAnuncios && principal != null && principal in CON_BANNER
+    val tamano = tamanoDeBanner()
     // Surface da el fondo y el color de texto del tema también a las pantallas sin Scaffold.
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Box(Modifier.fillMaxSize()) {
-            CompositionLocalProvider(LocalEspacioBarraInferior provides AltoBarraInferior) {
+            val espacio = AltoBarraInferior + if (conBanner) tamano.alto() else 0.dp
+            CompositionLocalProvider(LocalEspacioBarraInferior provides espacio) {
                 Navegacion(navController)
             }
             if (principal != null) {
-                BarraInferiorFlotante(
-                    destinos = destinos(),
-                    seleccionado = principal,
-                    onDestino = { navController.irAPrincipal(PRINCIPALES[it].first) },
-                    descripcionCentral = stringResource(R.string.barra_nuevo_cliente),
-                    onCentral = { navController.navigate(FormularioCliente()) },
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                )
+                Column(Modifier.align(Alignment.BottomCenter)) {
+                    if (conBanner) BannerAnuncio(tamano)
+                    BarraInferiorFlotante(
+                        destinos = destinos(),
+                        seleccionado = principal,
+                        onDestino = { navController.irAPrincipal(PRINCIPALES[it].first) },
+                        descripcionCentral = stringResource(R.string.barra_nuevo_cliente),
+                        onCentral = { navController.navigate(FormularioCliente()) },
+                    )
+                }
             }
         }
     }
