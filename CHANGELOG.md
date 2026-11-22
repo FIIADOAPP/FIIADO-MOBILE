@@ -6,6 +6,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+### Corregido
+
+- La barra inferior centra el ícono y el texto de cada destino a la altura del botón central, y reparte los cinco elementos con el mismo espacio.
+
 ## [1.0.0] - 2026-11-22
 
 Primera versión para Google Play: la libreta se guarda solo en el teléfono y se respalda con la copia de seguridad de Android (ADR-0010).
