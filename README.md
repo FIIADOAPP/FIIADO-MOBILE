@@ -44,6 +44,7 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Puntualidad: semáforo, «Cómo paga» y lo que vence | Listo |
 | «Cómo te pagan» en el resumen y avisos al fiar | Listo |
 | Bloqueo opcional con la huella o el PIN del teléfono | Listo |
+| Release firmado: AAB para Google Play y APK en cada release de GitHub | Listo |
 
 ## Requisitos
 
@@ -83,6 +84,32 @@ Ejecuta ktlint, Android Lint y las pruebas. `./gradlew spotlessApply` corrige el
 ```
 
 Ejecuta las pruebas instrumentadas en el dispositivo o emulador conectado. Verifican lo que Robolectric no puede emular, como el modo de journal real de SQLite. No corren en el CI.
+
+## Release firmado
+
+Al publicar un release en GitHub, el workflow `Release` compila el AAB para Google Play y el APK firmados y los adjunta al release ([ADR-0009](docs/adr/0009-firma-y-publicacion.md)). Necesita una sola configuración inicial:
+
+1. Genera la clave de subida **fuera del repositorio** y guarda una copia del `.jks` y de sus contraseñas en otro lugar seguro. Sin ella no se pueden publicar actualizaciones hasta que Google la reemplace.
+
+   ```bash
+   keytool -genkeypair -v -keystore fiado-subida.jks -storetype PKCS12 -alias subida -keyalg RSA -keysize 2048 -validity 10000
+   ```
+
+2. En *Settings → Secrets and variables → Actions* del repositorio, crea estos secretos:
+   - `FIRMA_KEYSTORE_BASE64`: el `.jks` en base64. En PowerShell: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("fiado-subida.jks"))`.
+   - `FIRMA_CLAVE` y `FIRMA_CLAVE_ALIAS`: las contraseñas que elegiste.
+   - `FIRMA_ALIAS`: `subida`.
+
+   Y esta variable:
+   - `API_URL_RELEASE`: la URL pública de la API terminada en `/`, por ejemplo `https://fiado-api.onrender.com/`.
+
+3. Para firmar en tu PC, exporta las mismas variables y compila:
+
+   ```bash
+   FIRMA_ARCHIVO=/ruta/fiado-subida.jks FIRMA_CLAVE=... FIRMA_ALIAS=subida FIRMA_CLAVE_ALIAS=...      ./gradlew bundleRelease -Pfiado.apiUrlRelease=https://fiado-api.onrender.com/
+   ```
+
+En Google Play Console, activa *Play App Signing* y sube el AAB: Google firma con su propia clave lo que instalan los usuarios.
 
 ## Estructura
 
