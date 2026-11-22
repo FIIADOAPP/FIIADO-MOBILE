@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.fiiadoapp.fiado.BuildConfig
 import com.fiiadoapp.fiado.R
+import com.fiiadoapp.fiado.core.ui.ConEscalaDeLetraMaxima
 import com.fiiadoapp.fiado.core.ui.MargenPantalla
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
@@ -123,14 +124,17 @@ fun BannerAnuncio(
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Column(Modifier.padding(RellenoTarjeta), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                stringResource(R.string.anuncio_etiqueta),
-                modifier = Modifier.align(Alignment.Start).height(AltoEtiqueta).padding(start = 6.dp),
-                style = MaterialTheme.typography.labelSmall,
-                fontSize = 11.sp,
-                lineHeight = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            // La tarjeta reserva un alto fijo para la etiqueta: con letra grande se montaba sobre el anuncio.
+            ConEscalaDeLetraMaxima(1f) {
+                Text(
+                    stringResource(R.string.anuncio_etiqueta),
+                    modifier = Modifier.align(Alignment.Start).height(AltoEtiqueta).padding(start = 6.dp),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontSize = 11.sp,
+                    lineHeight = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             AndroidView(
                 // La vista sobrevive al cambiar de pestaña: se suelta de su padre anterior antes de volver a usarla.
                 factory = {

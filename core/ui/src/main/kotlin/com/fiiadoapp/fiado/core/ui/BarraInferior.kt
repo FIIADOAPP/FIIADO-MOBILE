@@ -2,6 +2,7 @@ package com.fiiadoapp.fiado.core.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,11 +19,17 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -62,17 +69,18 @@ fun BarraInferiorFlotante(
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
             shadowElevation = 6.dp,
         ) {
-            // Los destinos y el botón central ocupan el mismo ancho: quedan igual de espaciados y el botón,
-            // en el centro exacto de la barra.
-            Row(
-                Modifier.padding(horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                destinos.forEachIndexed { indice, destino ->
-                    if (indice == mitad) {
-                        Box(Modifier.weight(1f), contentAlignment = Alignment.Center) { BotonCentral(descripcionCentral, onCentral) }
+            BoxWithConstraints(Modifier.padding(horizontal = RellenoBarra)) {
+                // Los destinos y el botón central ocupan el mismo ancho: quedan igual de espaciados y el botón,
+                // en el centro exacto de la barra.
+                val anchoEspacio = maxWidth / (destinos.size + 1)
+                val conEtiquetas = etiquetasEntran(destinos, anchoEspacio)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    destinos.forEachIndexed { indice, destino ->
+                        if (indice == mitad) {
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center) { BotonCentral(descripcionCentral, onCentral) }
+                        }
+                        ElementoBarra(destino, indice == seleccionado, conEtiquetas, Modifier.weight(1f)) { onDestino(indice) }
                     }
-                    ElementoBarra(destino, indice == seleccionado, Modifier.weight(1f)) { onDestino(indice) }
                 }
             }
         }
@@ -96,30 +104,65 @@ private fun BotonCentral(
     }
 }
 
+private val RellenoBarra = 8.dp
+private val AltoElemento = 64.dp
+private val EstiloEtiqueta = TextStyle(fontSize = 11.sp, lineHeight = 14.sp, fontWeight = FontWeight.Medium)
+
+/**
+ * `true` si todas las etiquetas caben en su espacio con la letra actual del teléfono. Si alguna no cabe
+ * (pantalla angosta o letra muy grande), la barra muestra solo íconos: todas a la vez, para que no quede dispareja.
+ */
+@Composable
+private fun etiquetasEntran(
+    destinos: List<DestinoBarra>,
+    anchoEspacio: Dp,
+): Boolean {
+    val medidor = rememberTextMeasurer()
+    val densidad = LocalDensity.current
+    val estilo = MaterialTheme.typography.labelSmall.merge(EstiloEtiqueta)
+    return with(densidad) {
+        val anchoDisponible = (anchoEspacio - 4.dp).toPx()
+        val altoDisponible = (AltoElemento - 24.dp - 8.dp).toPx()
+        destinos.all { destino ->
+            val medida = medidor.measure(destino.etiqueta, estilo, maxLines = 1, softWrap = false).size
+            medida.width <= anchoDisponible && medida.height <= altoDisponible
+        }
+    }
+}
+
 @Composable
 private fun ElementoBarra(
     destino: DestinoBarra,
     activo: Boolean,
+    conEtiqueta: Boolean,
     modifier: Modifier,
     onClick: () -> Unit,
 ) {
     val color = if (activo) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
     Box(
         modifier
-            .height(64.dp)
+            .height(AltoElemento)
             .selectable(selected = activo, onClick = onClick, role = Role.Tab),
         contentAlignment = Alignment.Center,
     ) {
         // El ícono y el texto quedan centrados en la barra, a la altura del botón central.
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(destino.icono, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
-            // En pantallas angostas la etiqueta se achica en vez de cortarse («Resum…»).
-            TextoQueSeAjusta(
-                destino.etiqueta,
-                color = color,
-                estilo = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, lineHeight = 14.sp),
-                minimo = 8.sp,
+            // Sin etiqueta, el ícono crece un poco y lleva el nombre para el lector de pantalla.
+            Icon(
+                destino.icono,
+                contentDescription = if (conEtiqueta) null else destino.etiqueta,
+                tint = color,
+                modifier = Modifier.size(if (conEtiqueta) 24.dp else 28.dp),
             )
+            if (conEtiqueta) {
+                Text(
+                    destino.etiqueta,
+                    color = color,
+                    maxLines = 1,
+                    softWrap = false,
+                    style = MaterialTheme.typography.labelSmall.merge(EstiloEtiqueta),
+                )
+            }
         }
         // El punto del destino activo va sobre el borde inferior, sin mover el ícono ni el texto.
         if (activo) {

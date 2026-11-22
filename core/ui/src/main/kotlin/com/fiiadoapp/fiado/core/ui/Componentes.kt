@@ -185,6 +185,9 @@ fun Avatar(
             .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center,
     ) {
-        Text(iniciales, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+        // El círculo no crece con la letra del teléfono: las iniciales tampoco, para no salirse.
+        ConEscalaDeLetraMaxima(1f) {
+            Text(iniciales, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+        }
     }
 }
