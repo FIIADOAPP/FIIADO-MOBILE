@@ -28,6 +28,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import kotlin.uuid.Uuid
 
 class HistorialViewModelTest {
@@ -51,9 +52,11 @@ class HistorialViewModelTest {
             SavedStateHandle(mapOf("clienteId" to rosa.id.toString())),
             libreta.repositorioClientes,
             libreta.repositorioMovimientos,
+            libreta.repositorioProrrogas,
             libreta.repositorioMetodosCobro,
             cuenta,
             plantillas,
+            { Uuid.random() },
             Clock.fixed(ahora.plusSeconds(120), ZoneId.of("America/Lima")),
         ).also { it.estado.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler)) }
     }
@@ -155,5 +158,45 @@ class HistorialViewModelTest {
             val viewModel = viewModelObservado()
 
             assertNull(viewModel.estado.value?.recordatorio)
+        }
+
+    @Test
+    fun `dar mas plazo a un fiado con plazo cambia su plazo vigente`() =
+        runTest {
+            val conPlazo = fiado.copy(vence = hoy.plusDays(1))
+            libreta.movimientos.value = listOf(conPlazo, pago).associateBy { it.id }
+            val viewModel = viewModelObservado()
+            val fila =
+                viewModel.estado.value!!
+                    .filas
+                    .single { it.movimiento.id == conPlazo.id }
+            assertTrue(fila.puedeProrrogar)
+
+            viewModel.tocar(fila)
+            viewModel.elegirProrrogar()
+            viewModel.darMasPlazo(hoy.plusDays(6))
+
+            val actualizada =
+                viewModel.estado.value!!
+                    .filas
+                    .single { it.movimiento.id == conPlazo.id }
+            assertEquals(hoy.plusDays(6), actualizada.plazo)
+            assertTrue(actualizada.prorrogado)
+            assertEquals(conPlazo.vence, libreta.movimientos.value[conPlazo.id]?.vence)
+        }
+
+    @Test
+    fun `un fiado sin plazo o un pago van directo a anular`() =
+        runTest {
+            val viewModel = viewModelObservado()
+            val filaFiado =
+                viewModel.estado.value!!
+                    .filas
+                    .single { it.movimiento.id == fiado.id }
+
+            viewModel.tocar(filaFiado)
+
+            assertNull(viewModel.opciones.value)
+            assertEquals(fiado, viewModel.porAnular.value)
         }
 }

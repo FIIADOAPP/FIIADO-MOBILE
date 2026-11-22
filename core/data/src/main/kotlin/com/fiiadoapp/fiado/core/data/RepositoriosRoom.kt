@@ -11,9 +11,11 @@ import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.GeneradorDeIds
 import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
+import com.fiiadoapp.fiado.domain.Prorroga
 import com.fiiadoapp.fiado.domain.RepositorioClientes
 import com.fiiadoapp.fiado.domain.RepositorioMetodosCobro
 import com.fiiadoapp.fiado.domain.RepositorioMovimientos
+import com.fiiadoapp.fiado.domain.RepositorioProrrogas
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.uuid.Uuid
@@ -76,6 +78,22 @@ class RepositorioMetodosCobroRoom(
     override suspend fun guardar(metodo: MetodoCobro) {
         val fila = metodo.aEntidad()
         db.guardarConOperacion(ids, programador, TipoDeRegistro.METODO_COBRO, fila.foto()) { dao.guardar(fila) }
+    }
+}
+
+class RepositorioProrrogasRoom(
+    private val db: FiadoDatabase,
+    private val ids: GeneradorDeIds,
+    private val programador: ProgramadorDeEnvio,
+) : RepositorioProrrogas {
+    private val dao = db.prorrogaDao()
+
+    override fun observarDeCliente(clienteId: Uuid): Flow<List<Prorroga>> =
+        dao.observarDeCliente(clienteId.toString()).map { filas -> filas.map { it.aDominio() } }
+
+    override suspend fun guardar(prorroga: Prorroga) {
+        val fila = prorroga.aEntidad()
+        db.guardarConOperacion(ids, programador, TipoDeRegistro.PRORROGA, fila.foto()) { dao.guardar(fila) }
     }
 }
 

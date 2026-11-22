@@ -39,6 +39,9 @@
     <string name="historial_anular_titulo">¿Anular %1$s de %2$s?</string>
     <string name="historial_anular_explicacion">Seguirá en el historial, tachado, y dejará de contar en el saldo. No se puede deshacer.</string>
     <string name="historial_anular">Anular</string>
+    <string name="historial_opciones_titulo">Fiado de %1$s</string>
+    <string name="historial_dar_mas_plazo">Dar más plazo</string>
+    <string name="historial_con_mas_plazo">(con más plazo)</string>
     <string name="historial_recordar">Recordar por WhatsApp</string>
     <string name="historial_recordar_sin_celular">Agrega su celular para recordarle por WhatsApp</string>
     <string name="historial_sin_whatsapp">No se encontró una app para abrir WhatsApp.</string>

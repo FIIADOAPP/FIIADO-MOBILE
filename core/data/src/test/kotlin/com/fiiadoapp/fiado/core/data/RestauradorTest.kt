@@ -11,6 +11,7 @@ import com.fiiadoapp.fiado.core.data.sincronizacion.Sincronizador
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
+import com.fiiadoapp.fiado.domain.Prorroga
 import com.fiiadoapp.fiado.domain.Telefono
 import com.fiiadoapp.fiado.domain.TipoMovimiento.FIADO
 import com.fiiadoapp.fiado.domain.TipoMovimiento.PAGO
@@ -37,6 +38,7 @@ import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.uuid.Uuid
 
 /** La restauración real (Retrofit y Room) contra un servidor simulado que responde como FIIADO-API. */
 @RunWith(RobolectricTestRunner::class)
@@ -345,6 +347,33 @@ class RestauradorTest : BaseDeDatosDePrueba() {
             )
             assertEquals(listOf("metodo_cobro" to MetodoCobro.YAPE.id.toString()), entidadesEnCola())
             assertTrue(cola().single().datos.contains("Yape negocio"))
+        }
+
+    @Test
+    fun `trae las prorrogas y sube las que solo existen en el telefono`() =
+        runBlocking {
+            val juana = cliente("Juana")
+            val fiado = movimiento(juana, FIADO, 1000).copy(vence = LocalDate.of(2026, 11, 16))
+            val delServidor = Prorroga(Uuid.random(), fiado.id, LocalDate.of(2026, 11, 20), Instant.parse("2026-11-16T10:00:00Z"))
+            val prorrogaJson =
+                """{"entidad":"prorroga","datos":{"id":"${delServidor.id}","movimiento_id":"${fiado.id}",
+                "vence":"2026-11-20","registrada_en":"2026-11-16T10:00:00Z"}}"""
+            pagina(
+                null,
+                metodoJson(MetodoCobro.EFECTIVO),
+                metodoJson(MetodoCobro.YAPE),
+                metodoJson(MetodoCobro.PLIN),
+                clienteJson(juana),
+                movimientoJson(fiado, vence = "2026-11-16"),
+                prorrogaJson,
+            )
+
+            assertNull(restaurador.restaurarSiFalta(CORREO))
+            val local = Prorroga(Uuid.random(), fiado.id, LocalDate.of(2026, 11, 25), ahora)
+            prorrogas.guardar(local)
+
+            assertEquals(setOf(delServidor, local), prorrogas.observarDeCliente(juana.id).first().toSet())
+            assertEquals(listOf("prorroga" to local.id.toString()), entidadesEnCola())
         }
 
     private companion object {

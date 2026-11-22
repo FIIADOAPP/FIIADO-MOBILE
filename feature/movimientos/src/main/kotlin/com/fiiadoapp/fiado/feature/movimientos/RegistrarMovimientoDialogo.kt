@@ -280,7 +280,7 @@ private fun textoDeAtajo(atajo: AtajoDePlazo): String =
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SelectorDeFecha(
+internal fun SelectorDeFecha(
     fecha: LocalDate,
     anios: IntRange,
     seleccionable: (LocalDate) -> Boolean,

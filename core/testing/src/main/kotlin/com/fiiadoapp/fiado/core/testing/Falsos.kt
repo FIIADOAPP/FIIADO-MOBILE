@@ -4,9 +4,11 @@ import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.ClienteConSaldo
 import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
+import com.fiiadoapp.fiado.domain.Prorroga
 import com.fiiadoapp.fiado.domain.RepositorioClientes
 import com.fiiadoapp.fiado.domain.RepositorioMetodosCobro
 import com.fiiadoapp.fiado.domain.RepositorioMovimientos
+import com.fiiadoapp.fiado.domain.RepositorioProrrogas
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import com.fiiadoapp.fiado.domain.saldo
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +30,17 @@ class LibretaFalsa {
     val clientes = MutableStateFlow<Map<Uuid, Cliente>>(emptyMap())
     val movimientos = MutableStateFlow<Map<Uuid, Movimiento>>(emptyMap())
     val metodos = MutableStateFlow(MetodoCobro.INICIALES.associateBy { it.id })
+    val prorrogas = MutableStateFlow<Map<Uuid, Prorroga>>(emptyMap())
+
+    val repositorioProrrogas =
+        object : RepositorioProrrogas {
+            override fun observarDeCliente(clienteId: Uuid): Flow<List<Prorroga>> =
+                combine(prorrogas, movimientos) { prorrogas, movimientos ->
+                    prorrogas.values.filter { movimientos[it.movimientoId]?.clienteId == clienteId }
+                }
+
+            override suspend fun guardar(prorroga: Prorroga) = prorrogas.update { it + (prorroga.id to prorroga) }
+        }
 
     val repositorioClientes =
         object : RepositorioClientes {

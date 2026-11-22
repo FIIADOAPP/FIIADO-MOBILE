@@ -1,6 +1,8 @@
 package com.fiiadoapp.fiado.core.data
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
@@ -72,4 +74,17 @@ interface MetodoCobroDao {
 
     @Upsert
     suspend fun guardar(metodo: MetodoCobroEntity)
+}
+
+@Dao
+interface ProrrogaDao {
+    @Query("SELECT p.* FROM prorrogas p JOIN movimientos m ON m.id = p.movimientoId WHERE m.clienteId = :clienteId")
+    fun observarDeCliente(clienteId: String): Flow<List<ProrrogaEntity>>
+
+    /** Una prórroga no cambia: guardarla otra vez no hace nada. */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun guardar(prorroga: ProrrogaEntity)
+
+    @Query("SELECT * FROM prorrogas WHERE id = :id")
+    suspend fun obtener(id: String): ProrrogaEntity?
 }
