@@ -27,6 +27,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.uuid.Uuid
@@ -68,7 +69,7 @@ class HistorialViewModelTest {
 
             assertEquals(rosa, estado?.cliente)
             assertEquals(Dinero(750), estado?.saldo)
-            assertEquals(setOf(FilaHistorial(fiado, null), FilaHistorial(pago, "Yape")), estado?.filas?.toSet())
+            assertEquals(setOf(fiado to null, pago to "Yape"), estado?.filas?.map { it.movimiento to it.nombreMetodo }?.toSet())
         }
 
     @Test
@@ -198,5 +199,22 @@ class HistorialViewModelTest {
 
             assertNull(viewModel.opciones.value)
             assertEquals(fiado, viewModel.porAnular.value)
+        }
+
+    @Test
+    fun `calcula como paga el cliente y no ofrece mas plazo a un fiado ya pagado`() =
+        runTest {
+            val pagadoTarde = fiado.copy(vence = hoy.minusDays(10), fecha = hoy.minusDays(12))
+            val pagoTardio = pago.copy(monto = Dinero(1250), fecha = hoy.minusDays(2))
+            val pendiente = fiado.copy(id = Uuid.random(), vence = hoy.plusDays(2), registradoEn = ahora.plusSeconds(90))
+            libreta.movimientos.value = listOf(pagadoTarde, pagoTardio, pendiente).associateBy { it.id }
+            val viewModel = viewModelObservado()
+
+            val estado = viewModel.estado.value!!
+            val filaPagada = estado.filas.single { it.movimiento.id == pagadoTarde.id }
+            assertEquals(8L, filaPagada.estado?.atraso)
+            assertFalse(filaPagada.puedeProrrogar)
+            assertTrue(estado.filas.single { it.movimiento.id == pendiente.id }.puedeProrrogar)
+            assertEquals(hoy.plusDays(2), estado.puntualidad?.proximoVencimiento)
         }
 }
