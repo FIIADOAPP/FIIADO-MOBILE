@@ -48,7 +48,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -57,12 +59,19 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fiiadoapp.fiado.core.ui.Avatar
 import com.fiiadoapp.fiado.core.ui.BarraSecundaria
+import com.fiiadoapp.fiado.core.ui.ColoresFiado
+import com.fiiadoapp.fiado.core.ui.IndicadorDePuntualidad
 import com.fiiadoapp.fiado.core.ui.MargenPantalla
 import com.fiiadoapp.fiado.core.ui.SaldoTexto
 import com.fiiadoapp.fiado.core.ui.Tarjeta
+import com.fiiadoapp.fiado.core.ui.etiquetaDeVencimiento
+import com.fiiadoapp.fiado.domain.EstadoFiado
 import com.fiiadoapp.fiado.domain.Movimiento
+import com.fiiadoapp.fiado.domain.NivelPuntualidad
+import com.fiiadoapp.fiado.domain.Puntualidad
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import java.time.LocalDate
+import kotlin.math.roundToInt
 import kotlin.uuid.Uuid
 
 @Composable
@@ -137,6 +146,7 @@ internal fun HistorialContenido(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             item(key = "cabecera") { Cabecera(estado, onRegistrar, onRecordar, onEditar) }
+            estado.puntualidad?.let { item(key = "como-paga") { ComoPaga(it, hoy) } }
             item(key = "titulo") {
                 Column(Modifier.padding(top = 14.dp, bottom = 2.dp)) {
                     Text(stringResource(R.string.historial_movimientos), style = MaterialTheme.typography.titleLarge)
@@ -261,6 +271,7 @@ private fun FilaMovimiento(
         fila.plazo?.let {
             textoDePlazo(it, hoy) + if (fila.prorrogado) " " + stringResource(R.string.historial_con_mas_plazo) else ""
         }
+    val situacion = fila.estado?.let { situacionDeFiado(it, hoy) }
     val detalle = listOfNotNull(textoDeFecha(movimiento.fecha, hoy), plazo, movimiento.nota).joinToString(" · ")
     val color =
         when {
@@ -297,6 +308,7 @@ private fun FilaMovimiento(
             Column(Modifier.weight(1f)) {
                 Text(titulo, style = MaterialTheme.typography.titleMedium, textDecoration = tachado)
                 Text(detalle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                situacion?.let { (texto, color) -> Text(texto, style = MaterialTheme.typography.bodySmall, color = color) }
                 if (!vigente) {
                     Text(
                         stringResource(R.string.historial_anulado),
@@ -350,5 +362,70 @@ private fun abrirWhatsApp(
         contexto.startActivity(Intent(Intent.ACTION_VIEW, enlace))
     } catch (_: ActivityNotFoundException) {
         Toast.makeText(contexto, sinWhatsApp, Toast.LENGTH_LONG).show()
+    }
+}
+
+/** "Vencido hace 3 días" si sigue pendiente; "Pagado a tiempo" o "Pagado 2 días tarde" si tenía plazo. */
+@Composable
+private fun situacionDeFiado(
+    estado: EstadoFiado,
+    hoy: LocalDate,
+): Pair<String, Color>? {
+    if (estado.plazo == null) return null
+    val vencido = estado.vencidoHace(hoy).toInt()
+    return when {
+        !estado.pagado && vencido > 0 -> {
+            pluralStringResource(R.plurals.historial_vencido_hace, vencido, vencido) to MaterialTheme.colorScheme.error
+        }
+
+        !estado.pagado -> {
+            null
+        }
+
+        estado.atraso <= Puntualidad.DIAS_TOLERADOS -> {
+            stringResource(R.string.historial_pagado_a_tiempo) to MaterialTheme.colorScheme.tertiary
+        }
+
+        else -> {
+            val dias = estado.atraso.toInt()
+            pluralStringResource(R.plurals.historial_pagado_tarde, dias, dias) to ColoresFiado.Atencion
+        }
+    }
+}
+
+/** Cómo paga el cliente: su nivel y los números que lo explican (ADR-0007). */
+@Composable
+private fun ComoPaga(
+    puntualidad: Puntualidad,
+    hoy: LocalDate,
+) {
+    Tarjeta(Modifier.fillMaxWidth(), relleno = 20.dp) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.historial_como_paga), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+            IndicadorDePuntualidad(puntualidad.nivel)
+        }
+        val lineas =
+            buildList {
+                puntualidad.diasPromedioParaPagar?.let {
+                    val dias = it.roundToInt()
+                    add(pluralStringResource(R.plurals.historial_tarda_en_pagar, dias, dias))
+                }
+                puntualidad.porcentajeATiempo?.let { add(stringResource(R.string.historial_a_tiempo, it)) }
+                if (puntualidad.vencido.esPositivo) {
+                    val dias = puntualidad.diasVencido.toInt()
+                    add(pluralStringResource(R.plurals.historial_vencido_total, dias, puntualidad.vencido.formatear(), dias))
+                }
+            }
+        if (puntualidad.nivel == NivelPuntualidad.SIN_HISTORIAL) {
+            Text(
+                stringResource(R.string.historial_sin_historial),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        lineas.forEach { Text(it, style = MaterialTheme.typography.bodyMedium) }
+        etiquetaDeVencimiento(puntualidad, hoy)
+            ?.takeIf { puntualidad.diasVencido == 0L }
+            ?.let { (texto, color) -> Text(texto, style = MaterialTheme.typography.bodyMedium, color = color) }
     }
 }

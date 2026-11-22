@@ -41,6 +41,10 @@
     <string name="historial_anular">Anular</string>
     <string name="historial_opciones_titulo">Fiado de %1$s</string>
     <string name="historial_dar_mas_plazo">Dar más plazo</string>
+    <string name="historial_como_paga">Cómo paga</string>
+    <string name="historial_sin_historial">Aún no hay suficientes fiados con plazo pagados para saber cómo paga.</string>
+    <string name="historial_a_tiempo">Paga a tiempo el %1$d %% de sus fiados con plazo</string>
+    <string name="historial_pagado_a_tiempo">Pagado a tiempo</string>
     <string name="historial_con_mas_plazo">(con más plazo)</string>
     <string name="historial_recordar">Recordar por WhatsApp</string>
     <string name="historial_recordar_sin_celular">Agrega su celular para recordarle por WhatsApp</string>
@@ -96,5 +100,25 @@
         <item quantity="one">El mensaje admite hasta %1$d carácter.</item>
         <item quantity="many">El mensaje admite hasta %1$d caracteres.</item>
         <item quantity="other">El mensaje admite hasta %1$d caracteres.</item>
+    </plurals>
+    <plurals name="historial_tarda_en_pagar">
+        <item quantity="one">Tarda %1$d día en pagar, en promedio</item>
+        <item quantity="many">Tarda %1$d días en pagar, en promedio</item>
+        <item quantity="other">Tarda %1$d días en pagar, en promedio</item>
+    </plurals>
+    <plurals name="historial_vencido_total">
+        <item quantity="one">Debe %1$s vencidos desde hace %2$d día</item>
+        <item quantity="many">Debe %1$s vencidos desde hace %2$d días</item>
+        <item quantity="other">Debe %1$s vencidos desde hace %2$d días</item>
+    </plurals>
+    <plurals name="historial_vencido_hace">
+        <item quantity="one">Vencido hace %1$d día</item>
+        <item quantity="many">Vencido hace %1$d días</item>
+        <item quantity="other">Vencido hace %1$d días</item>
+    </plurals>
+    <plurals name="historial_pagado_tarde">
+        <item quantity="one">Pagado %1$d día tarde</item>
+        <item quantity="many">Pagado %1$d días tarde</item>
+        <item quantity="other">Pagado %1$d días tarde</item>
     </plurals>
 </resources>

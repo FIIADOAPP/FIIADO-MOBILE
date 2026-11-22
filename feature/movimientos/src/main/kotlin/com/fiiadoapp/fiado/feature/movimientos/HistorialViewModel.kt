@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
+import com.fiiadoapp.fiado.domain.EstadoFiado
 import com.fiiadoapp.fiado.domain.GeneradorDeIds
 import com.fiiadoapp.fiado.domain.Movimiento
 import com.fiiadoapp.fiado.domain.Prorroga
+import com.fiiadoapp.fiado.domain.Puntualidad
 import com.fiiadoapp.fiado.domain.RepositorioClientes
 import com.fiiadoapp.fiado.domain.RepositorioCuenta
 import com.fiiadoapp.fiado.domain.RepositorioMetodosCobro
@@ -42,9 +44,12 @@ data class FilaHistorial(
     val nombreMetodo: String?,
     val plazo: LocalDate? = null,
     val prorrogado: Boolean = false,
-    /** Fiado vigente con plazo de un cliente que aún debe: se le puede dar más plazo. */
-    val puedeProrrogar: Boolean = false,
-)
+    /** Si es un fiado vigente: cuánto falta pagarle, cuándo quedó pagado y cuánto se atrasó (ADR-0007). */
+    val estado: EstadoFiado? = null,
+) {
+    /** Fiado con plazo que todavía no se paga: se le puede dar más plazo. */
+    val puedeProrrogar: Boolean get() = plazo != null && estado != null && !estado.pagado
+}
 
 /** Lo que hace falta para recordarle el cobro; solo existe si el cliente debe. */
 sealed interface Recordatorio {
@@ -62,6 +67,7 @@ data class EstadoHistorial(
     val saldo: Dinero,
     val filas: List<FilaHistorial>,
     val recordatorio: Recordatorio? = null,
+    val puntualidad: Puntualidad? = null,
 )
 
 @HiltViewModel
@@ -112,6 +118,7 @@ class HistorialViewModel
                             )
                         }
                     }
+                val puntualidad = Puntualidad.calcular(deCliente, deProrrogas, hoy, reloj.zone)
                 val filas =
                     deCliente.map { movimiento ->
                         val plazo = plazoVigente(movimiento, deProrrogas)
@@ -120,10 +127,10 @@ class HistorialViewModel
                             nombreMetodo = movimiento.metodoCobroId?.let(nombres::get),
                             plazo = plazo,
                             prorrogado = plazo != null && plazo != movimiento.vence,
-                            puedeProrrogar = plazo != null && movimiento.estaVigente && saldo.esPositivo,
+                            estado = puntualidad.estadoDe(movimiento.id),
                         )
                     }
-                EstadoHistorial(cliente, saldo, filas, recordatorio)
+                EstadoHistorial(cliente, saldo, filas, recordatorio, puntualidad)
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
         private var prorrogasActuales: List<Prorroga> = emptyList()

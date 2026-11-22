@@ -29,6 +29,9 @@ object ColoresFiado {
     val PositivoSuave = Color(0xFF243A2D)
     val Deuda = Color(0xFFFF7B6B)
     val DeudaSuave = Color(0xFF45282A)
+
+    /** Para lo que pide atención sin ser grave: un cliente que se demora o algo por vencer. */
+    val Atencion = Color(0xFFF2B84B)
 }
 
 private val Esquema =

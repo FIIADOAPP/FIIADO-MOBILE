@@ -39,6 +39,8 @@ class LibretaFalsa {
                     prorrogas.values.filter { movimientos[it.movimientoId]?.clienteId == clienteId }
                 }
 
+            override fun observarTodas(): Flow<List<Prorroga>> = prorrogas.map { it.values.toList() }
+
             override suspend fun guardar(prorroga: Prorroga) = prorrogas.update { it + (prorroga.id to prorroga) }
         }
 
