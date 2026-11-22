@@ -6,6 +6,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+### Corregido
+
+- En pantallas angostas o con la letra agrandada, las etiquetas de la barra inferior y los montos del resumen y del historial achican la letra en vez de cortarse («Resum…») o partirse en dos líneas.
+- El anuncio va en una tarjeta con los márgenes de la app, la etiqueta «Anuncio» y separado de la barra inferior.
+
 ### Agregado
 
 - ADR-0011 y publicidad:
