@@ -34,6 +34,7 @@ import com.fiiadoapp.fiado.core.ui.EncabezadoGrande
 import com.fiiadoapp.fiado.core.ui.LocalEspacioBarraInferior
 import com.fiiadoapp.fiado.core.ui.MargenPantalla
 import com.fiiadoapp.fiado.core.ui.Tarjeta
+import com.fiiadoapp.fiado.core.ui.TextoQueSeAjusta
 import com.fiiadoapp.fiado.core.ui.colorDe
 import com.fiiadoapp.fiado.core.ui.textoDe
 import com.fiiadoapp.fiado.domain.Dinero
@@ -103,9 +104,9 @@ internal fun ResumenContenido(
 private fun TarjetaPorCobrar(porCobrar: Dinero) {
     Tarjeta(Modifier.fillMaxWidth(), relleno = 20.dp) {
         Text(stringResource(R.string.resumen_por_cobrar), style = MaterialTheme.typography.titleMedium)
-        Text(
+        TextoQueSeAjusta(
             porCobrar.formatear(),
-            style = MaterialTheme.typography.displaySmall,
+            estilo = MaterialTheme.typography.displaySmall,
             color = if (porCobrar.esPositivo) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary,
         )
         Text(
@@ -197,7 +198,7 @@ private fun Monto(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(etiqueta, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(monto.formatear(), style = MaterialTheme.typography.titleLarge, color = color)
+        TextoQueSeAjusta(monto.formatear(), estilo = MaterialTheme.typography.titleLarge, color = color)
     }
 }
 

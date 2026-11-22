@@ -5,6 +5,7 @@
     <string name="barra_cobros">Cobros</string>
     <string name="barra_cuenta">Cuenta</string>
     <string name="barra_nuevo_cliente">Nuevo cliente</string>
+    <string name="anuncio_etiqueta">Anuncio</string>
     <string name="bloqueo_titulo">Fiado está bloqueada</string>
     <string name="bloqueo_explicacion">Usa tu huella o el PIN del teléfono para ver tu libreta.</string>
     <string name="bloqueo_desbloquear">Desbloquear</string>

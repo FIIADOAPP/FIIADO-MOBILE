@@ -24,11 +24,11 @@ fun SaldoTexto(
     modifier: Modifier = Modifier,
     estilo: TextStyle = MaterialTheme.typography.titleMedium,
 ) {
-    Text(
-        text = textoDeSaldo(saldo),
+    TextoQueSeAjusta(
+        texto = textoDeSaldo(saldo),
         modifier = modifier,
-        style = estilo,
-        fontWeight = if (saldo.esPositivo) FontWeight.SemiBold else FontWeight.Medium,
+        estilo = estilo,
+        grosor = if (saldo.esPositivo) FontWeight.SemiBold else FontWeight.Medium,
         color =
             when {
                 saldo.esPositivo -> MaterialTheme.colorScheme.error

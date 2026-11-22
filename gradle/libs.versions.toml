@@ -26,6 +26,9 @@ junit4 = "4.13.2"
 work = "2.12.0"
 hiltWork = "1.4.0"
 biometric = "1.1.0"
+playServicesAds = "25.5.0"
+ump = "4.0.0"
+billing = "9.1.0"
 fragment = "1.9.1"
 
 [libraries]
@@ -71,6 +74,9 @@ androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWork" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltWork" }
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
+play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
+ump = { module = "com.google.android.ump:user-messaging-platform", version.ref = "ump" }
+billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billing" }
 androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
 
 [plugins]

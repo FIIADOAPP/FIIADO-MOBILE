@@ -32,3 +32,4 @@ Un ADR aceptado no se edita: si la decisión cambia, se escribe uno nuevo que lo
 | [0008](0008-restaurar-sin-pisar-pendientes.md) | Restaurar sin pisar los cambios pendientes del teléfono | Aceptada |
 | [0009](0009-firma-y-publicacion.md) | Firma y publicación en Google Play | Aceptada |
 | [0010](0010-version-1-solo-en-el-telefono.md) | La versión 1.0 guarda la libreta solo en el teléfono | Aceptada |
+| [0011](0011-publicidad-y-compra-para-quitarla.md) | Publicidad con banner y compra única para quitarla | Aceptada |

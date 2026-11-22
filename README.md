@@ -46,6 +46,7 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Bloqueo opcional con la huella o el PIN del teléfono | Listo |
 | Release firmado: AAB para Google Play y APK en cada release de GitHub | Listo |
 | Versión 1.0 solo en el teléfono, con la copia de seguridad de Google | Listo |
+| Banner de AdMob en Clientes y Resumen, y compra única para quitarlo | Listo |
 
 ## Requisitos
 
@@ -103,6 +104,12 @@ Al publicar un release en GitHub, el workflow `Release` compila el AAB para Goog
 
    Y, solo si quieres ofrecer la cuenta y el respaldo en el servidor, esta variable:
    - `API_URL_RELEASE`: la URL pública de la API terminada en `/`, por ejemplo `https://fiado-api.onrender.com/`. Sin ella, la app sale sin cuenta y guarda la libreta solo en el teléfono ([ADR-0010](docs/adr/0010-version-1-solo-en-el-telefono.md)).
+
+   Y, para cobrar por los anuncios ([ADR-0011](docs/adr/0011-publicidad-y-compra-para-quitarla.md)), estas variables con los ids de tu cuenta de AdMob:
+   - `ADMOB_APP_ID`: el ID de la app, por ejemplo `ca-app-pub-1234567890123456~1234567890`.
+   - `ADMOB_BANNER`: el ID del bloque de anuncios de banner, por ejemplo `ca-app-pub-1234567890123456/1234567890`.
+
+   Sin ellas, el release lleva los anuncios de prueba de Google. El build `debug` siempre los usa.
 
 3. Para firmar en tu PC, exporta las mismas variables y compila:
 
