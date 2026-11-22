@@ -43,6 +43,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -55,10 +57,16 @@ import com.fiiadoapp.fiado.core.ui.LocalEspacioBarraInferior
 import com.fiiadoapp.fiado.core.ui.MargenPantalla
 import com.fiiadoapp.fiado.core.ui.SaldoTexto
 import com.fiiadoapp.fiado.core.ui.Tarjeta
+import com.fiiadoapp.fiado.core.ui.colorDe
+import com.fiiadoapp.fiado.core.ui.etiquetaDeVencimiento
+import com.fiiadoapp.fiado.core.ui.textoDe
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.ClienteConSaldo
 import com.fiiadoapp.fiado.domain.Dinero
+import com.fiiadoapp.fiado.domain.NivelPuntualidad
+import com.fiiadoapp.fiado.domain.Puntualidad
 import com.fiiadoapp.fiado.domain.TipoMovimiento
+import java.time.LocalDate
 import kotlin.uuid.Uuid
 
 /** [movimientoRegistrado] es el id que devuelve el registro al cerrarse; se muestra una vez y se consume. */
@@ -75,6 +83,7 @@ internal fun ListaClientesPantalla(
     val clientes by viewModel.lista.collectAsStateWithLifecycle()
     val aviso by viewModel.aviso.collectAsStateWithLifecycle()
     val porCobrar by viewModel.porCobrar.collectAsStateWithLifecycle()
+    val puntualidades by viewModel.puntualidades.collectAsStateWithLifecycle()
     val foco = LocalFocusManager.current
     // Al cerrarse el registro, Compose devuelve el foco al buscador y abre el teclado sobre la lista.
     LifecycleResumeEffect(Unit) {
@@ -91,6 +100,8 @@ internal fun ListaClientesPantalla(
         busqueda = busqueda,
         clientes = clientes,
         porCobrar = porCobrar,
+        puntualidades = puntualidades,
+        hoy = viewModel.hoy,
         aviso = aviso,
         onBuscar = viewModel::buscar,
         onCliente = onCliente,
@@ -106,6 +117,8 @@ internal fun ListaClientesContenido(
     busqueda: String,
     clientes: List<ClienteConSaldo>?,
     porCobrar: Dinero?,
+    puntualidades: Map<Uuid, Puntualidad>,
+    hoy: LocalDate,
     aviso: AvisoRegistro?,
     onBuscar: (String) -> Unit,
     onCliente: (Uuid) -> Unit,
@@ -160,7 +173,9 @@ internal fun ListaClientesContenido(
                     items(
                         clientes,
                         key = { it.cliente.id.toString() },
-                    ) { (cliente, saldo) -> FilaCliente(cliente, saldo, onCliente, onRegistrar) }
+                    ) { (cliente, saldo) ->
+                        FilaCliente(cliente, saldo, puntualidades[cliente.id], hoy, onCliente, onRegistrar)
+                    }
                 }
             }
         }
@@ -202,15 +217,37 @@ private fun Buscador(
 private fun FilaCliente(
     cliente: Cliente,
     saldo: Dinero,
+    puntualidad: Puntualidad?,
+    hoy: LocalDate,
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
 ) {
     Tarjeta(Modifier.fillMaxWidth(), onClick = { onCliente(cliente.id) }, relleno = 14.dp) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Avatar(cliente.nombre)
+            Box {
+                Avatar(cliente.nombre)
+                // El punto del semáforo; sin historial no se muestra para no juzgar.
+                puntualidad?.nivel?.takeIf { it != NivelPuntualidad.SIN_HISTORIAL }?.let { nivel ->
+                    val descripcion = textoDe(nivel)
+                    Box(
+                        Modifier
+                            .align(Alignment.BottomEnd)
+                            .size(14.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .padding(2.dp)
+                            .clip(CircleShape)
+                            .background(colorDe(nivel))
+                            .semantics { contentDescription = descripcion },
+                    )
+                }
+            }
             Column(Modifier.weight(1f)) {
                 Text(cliente.nombre, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 SaldoTexto(saldo, estilo = MaterialTheme.typography.bodyMedium)
+                puntualidad?.let { etiquetaDeVencimiento(it, hoy) }?.let { (texto, color) ->
+                    Text(texto, style = MaterialTheme.typography.bodySmall, color = color)
+                }
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

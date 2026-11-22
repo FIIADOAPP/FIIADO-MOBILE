@@ -5,6 +5,7 @@ import com.fiiadoapp.fiado.core.testing.ReglaDispatcherPrincipal
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.Movimiento
+import com.fiiadoapp.fiado.domain.NivelPuntualidad
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.plus
@@ -32,9 +33,10 @@ class ListaClientesViewModelTest {
     private val pedro = Cliente(Uuid.random(), "Pedro", null, ahora, ahora, null)
 
     private fun TestScope.viewModelObservado() =
-        ListaClientesViewModel(libreta.repositorioClientes, libreta.repositorioMovimientos, reloj).also {
+        ListaClientesViewModel(libreta.repositorioClientes, libreta.repositorioMovimientos, libreta.repositorioProrrogas, reloj).also {
             it.lista.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
             it.porCobrar.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
+            it.puntualidades.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
         }
 
     @Test
@@ -142,5 +144,31 @@ class ListaClientesViewModelTest {
             libreta.movimientos.value = mapOf(fiado.id to fiado)
 
             assertEquals(Dinero(1250), viewModelObservado().porCobrar.value)
+        }
+
+    @Test
+    fun `calcula la puntualidad de cada cliente con movimientos`() =
+        runTest {
+            val hoy = LocalDate.now(reloj)
+            val vencido =
+                Movimiento(
+                    Uuid.random(),
+                    rosa.id,
+                    TipoMovimiento.FIADO,
+                    Dinero(1000),
+                    null,
+                    hoy.minusDays(10),
+                    ahora,
+                    null,
+                    vence = hoy.minusDays(8),
+                )
+            libreta.clientes.value = mapOf(rosa.id to rosa, pedro.id to pedro)
+            libreta.movimientos.value = mapOf(vencido.id to vencido)
+
+            val puntualidades = viewModelObservado().puntualidades.value
+
+            assertEquals(NivelPuntualidad.CUIDADO, puntualidades[rosa.id]?.nivel)
+            assertEquals(8L, puntualidades[rosa.id]?.diasVencido)
+            assertNull(puntualidades[pedro.id])
         }
 }
