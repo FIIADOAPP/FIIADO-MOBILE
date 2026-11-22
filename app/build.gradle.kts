@@ -13,8 +13,8 @@ android {
         applicationId = "com.fiiadoapp.fiado"
         minSdk = 26
         targetSdk = 37
-        versionCode = 7
-        versionName = "1.0.1"
+        versionCode = 8
+        versionName = "1.1.0"
 
         // AdMob (ADR-0011): sin los ids reales se usan los de prueba de Google, que nunca cobran clics.
         manifestPlaceholders["admobAppId"] =

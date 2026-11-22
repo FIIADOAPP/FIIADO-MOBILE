@@ -6,6 +6,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+## [1.1.0] - 2026-11-22
+
 ### Corregido
 
 - En pantallas angostas o con la letra agrandada, las etiquetas de la barra inferior y los montos del resumen y del historial achican la letra en vez de cortarse («Resum…») o partirse en dos líneas.
@@ -124,7 +126,8 @@ La cuenta requiere FIIADO-API `v0.2.0` o superior.
 - Formato con ktlint mediante Spotless y Android Lint con las advertencias tratadas como errores.
 - CI en GitHub Actions: commitlint, ktlint, Android Lint, pruebas y build en cada pull request.
 
-[Sin publicar]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v1.0.1...develop
+[Sin publicar]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v1.1.0...develop
+[1.1.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.5.0...v1.0.0
 [0.5.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.4.0...v0.5.0
