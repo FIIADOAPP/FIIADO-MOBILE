@@ -18,13 +18,11 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -115,14 +113,12 @@ private fun ElementoBarra(
         // El ícono y el texto quedan centrados en la barra, a la altura del botón central.
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(destino.icono, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
-            Text(
+            // En pantallas angostas la etiqueta se achica en vez de cortarse («Resum…»).
+            TextoQueSeAjusta(
                 destino.etiqueta,
                 color = color,
-                fontSize = 11.sp,
-                lineHeight = 14.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.labelSmall,
+                estilo = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, lineHeight = 14.sp),
+                minimo = 8.sp,
             )
         }
         // El punto del destino activo va sobre el borde inferior, sin mover el ícono ni el texto.
