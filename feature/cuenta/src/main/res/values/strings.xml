@@ -51,4 +51,6 @@
         <item quantity="many">Hay %1$d cambios sin respaldar. Se quedan en este teléfono y se subirán cuando vuelvas a iniciar sesión.</item>
         <item quantity="other">Hay %1$d cambios sin respaldar. Se quedan en este teléfono y se subirán cuando vuelvas a iniciar sesión.</item>
     </plurals>
+    <string name="cuenta_solo_telefono_titulo">Tu libreta está en este teléfono</string>
+    <string name="cuenta_solo_telefono_explicacion">Todo se guarda aquí y funciona sin internet. Si activas la copia de seguridad de Google en los ajustes del teléfono, tu libreta vuelve sola al reinstalar Fiado o al pasarte a un teléfono nuevo.</string>
 </resources>
