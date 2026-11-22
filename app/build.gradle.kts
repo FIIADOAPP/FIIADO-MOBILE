@@ -17,8 +17,23 @@ android {
         versionName = "0.5.0"
     }
 
+    // Clave de subida a Google Play (ADR-0009): solo desde variables de entorno, nunca desde el repositorio.
+    val firma = System.getenv("FIRMA_ARCHIVO")?.takeIf { it.isNotBlank() }
+    signingConfigs {
+        if (firma != null) {
+            create("release") {
+                storeFile = file(firma)
+                storePassword = System.getenv("FIRMA_CLAVE")
+                keyAlias = System.getenv("FIRMA_ALIAS")
+                keyPassword = System.getenv("FIRMA_CLAVE_ALIAS")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            // Sin las variables de firma, el release se compila sin firmar.
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
