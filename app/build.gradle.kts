@@ -13,8 +13,8 @@ android {
         applicationId = "com.fiiadoapp.fiado"
         minSdk = 26
         targetSdk = 37
-        versionCode = 6
-        versionName = "1.0.0"
+        versionCode = 7
+        versionName = "1.0.1"
     }
 
     // Clave de subida a Google Play (ADR-0009): solo desde variables de entorno, nunca desde el repositorio.
