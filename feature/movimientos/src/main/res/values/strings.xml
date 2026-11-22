@@ -21,6 +21,9 @@
     <string name="registro_plazo_una_semana">1 semana</string>
     <string name="registro_plazo_fin_de_mes">Fin de mes</string>
     <string name="registro_plazo_otra_fecha">Otra fecha</string>
+    <string name="registro_usar_plazo_sugerido">Usar ese plazo</string>
+    <string name="registro_aviso_cuidado">%1$s %2$s. Considera cobrar lo pendiente antes de fiarle más.</string>
+    <string name="registro_aviso_y">" y "</string>
     <string name="plazo_hoy">Para hoy</string>
     <string name="plazo_manana">Para mañana</string>
     <string name="plazo_fecha">Para el %1$s</string>
@@ -73,6 +76,8 @@
     <string name="resumen_mes">Este mes (%1$s)</string>
     <string name="resumen_fiado">Fiado</string>
     <string name="resumen_cobrado">Cobrado</string>
+    <string name="resumen_como_te_pagan">Cómo te pagan</string>
+    <string name="resumen_para_tener_cuidado">Para tener cuidado</string>
 
     <string name="metodos_titulo">Métodos de cobro</string>
     <string name="metodos_ayuda">Al cobrar eliges uno de estos métodos. Toca uno para renombrarlo o archivarlo.</string>
@@ -120,5 +125,40 @@
         <item quantity="one">Pagado %1$d día tarde</item>
         <item quantity="many">Pagado %1$d días tarde</item>
         <item quantity="other">Pagado %1$d días tarde</item>
+    </plurals>
+    <plurals name="resumen_sin_historial">
+        <item quantity="one">%1$d cliente aún sin historial</item>
+        <item quantity="many">%1$d clientes aún sin historial</item>
+        <item quantity="other">%1$d clientes aún sin historial</item>
+    </plurals>
+    <plurals name="resumen_tardan_en_pagar">
+        <item quantity="one">Tus clientes tardan %1$d día en pagar, en promedio</item>
+        <item quantity="many">Tus clientes tardan %1$d días en pagar, en promedio</item>
+        <item quantity="other">Tus clientes tardan %1$d días en pagar, en promedio</item>
+    </plurals>
+    <plurals name="resumen_debe_vencido">
+        <item quantity="one">Debe %1$s vencidos desde hace %2$d día</item>
+        <item quantity="many">Debe %1$s vencidos desde hace %2$d días</item>
+        <item quantity="other">Debe %1$s vencidos desde hace %2$d días</item>
+    </plurals>
+    <plurals name="resumen_suele_pagar_tarde">
+        <item quantity="one">Suele pagar %1$d día tarde</item>
+        <item quantity="many">Suele pagar %1$d días tarde</item>
+        <item quantity="other">Suele pagar %1$d días tarde</item>
+    </plurals>
+    <plurals name="registro_suele_pagar_en">
+        <item quantity="one">%1$s suele pagar en %2$d día</item>
+        <item quantity="many">%1$s suele pagar en %2$d días</item>
+        <item quantity="other">%1$s suele pagar en %2$d días</item>
+    </plurals>
+    <plurals name="registro_aviso_atraso">
+        <item quantity="one">suele pagar %1$d día tarde</item>
+        <item quantity="many">suele pagar %1$d días tarde</item>
+        <item quantity="other">suele pagar %1$d días tarde</item>
+    </plurals>
+    <plurals name="registro_aviso_vencido">
+        <item quantity="one">tiene %1$s vencidos desde hace %2$d día</item>
+        <item quantity="many">tiene %1$s vencidos desde hace %2$d días</item>
+        <item quantity="other">tiene %1$s vencidos desde hace %2$d días</item>
     </plurals>
 </resources>

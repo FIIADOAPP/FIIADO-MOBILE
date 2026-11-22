@@ -42,7 +42,7 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Plazo de pago al fiar | Listo |
 | Prórrogas: dar más plazo a un fiado | Listo |
 | Puntualidad: semáforo, «Cómo paga» y lo que vence | Listo |
-| «Cómo te pagan» en el resumen y avisos al fiar | Pendiente |
+| «Cómo te pagan» en el resumen y avisos al fiar | Listo |
 | Bloqueo opcional con la huella o el PIN del teléfono | Listo |
 
 ## Requisitos

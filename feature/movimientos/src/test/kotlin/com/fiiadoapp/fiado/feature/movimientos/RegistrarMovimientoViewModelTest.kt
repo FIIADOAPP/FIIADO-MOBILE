@@ -49,6 +49,7 @@ class RegistrarMovimientoViewModelTest {
             libreta.repositorioClientes,
             libreta.repositorioMovimientos,
             libreta.repositorioMetodosCobro,
+            libreta.repositorioProrrogas,
             { idNuevo },
             reloj,
         )
@@ -237,5 +238,65 @@ class RegistrarMovimientoViewModelTest {
 
             viewModel.elegirAtajo(null)
             assertNull(viewModel.estado.value.vence)
+        }
+
+    @Test
+    fun `al fiar a un cliente en cuidado avisa sin impedir el fiado`() =
+        runTest {
+            val vencido =
+                Movimiento(
+                    Uuid.random(),
+                    rosa.id,
+                    FIADO,
+                    Dinero(4000),
+                    null,
+                    hoyEnLima.minusDays(12),
+                    ahora,
+                    null,
+                    vence = hoyEnLima.minusDays(9),
+                )
+            val viewModel = viewModel(FIADO, rosa, vencido)
+            assertTrue(viewModel.estado.value.avisarCuidado)
+
+            viewModel.cambiarMonto("5")
+            viewModel.guardar()
+
+            assertEquals(Dinero(500), registrado()?.monto)
+        }
+
+    @Test
+    fun `sugiere el plazo que suele tardar y lo cuenta desde la fecha del fiado`() =
+        runTest {
+            val previos =
+                listOf(3L to 1L, 8L to 6L).flatMap { (fiadoHace, pagoHace) ->
+                    listOf(
+                        Movimiento(Uuid.random(), rosa.id, FIADO, Dinero(1000), null, hoyEnLima.minusDays(fiadoHace + 10), ahora, null),
+                        Movimiento(
+                            Uuid.random(),
+                            rosa.id,
+                            PAGO,
+                            Dinero(1000),
+                            null,
+                            hoyEnLima.minusDays(pagoHace + 10),
+                            ahora,
+                            null,
+                            MetodoCobro.EFECTIVO.id,
+                        ),
+                    )
+                }
+            val viewModel = viewModel(FIADO, rosa, *previos.toTypedArray())
+            assertFalse(viewModel.estado.value.avisarCuidado)
+            assertEquals(2, viewModel.estado.value.diasSugeridos)
+
+            viewModel.cambiarFecha(hoyEnLima.minusDays(1))
+            viewModel.usarPlazoSugerido()
+
+            assertEquals(hoyEnLima.plusDays(1), viewModel.estado.value.vence)
+        }
+
+    @Test
+    fun `un pago no calcula la puntualidad`() =
+        runTest {
+            assertNull(viewModel(PAGO).estado.value.puntualidad)
         }
 }

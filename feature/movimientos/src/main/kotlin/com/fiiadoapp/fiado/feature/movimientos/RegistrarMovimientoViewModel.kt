@@ -10,9 +10,12 @@ import com.fiiadoapp.fiado.domain.ErrorMovimiento
 import com.fiiadoapp.fiado.domain.GeneradorDeIds
 import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
+import com.fiiadoapp.fiado.domain.NivelPuntualidad
+import com.fiiadoapp.fiado.domain.Puntualidad
 import com.fiiadoapp.fiado.domain.RepositorioClientes
 import com.fiiadoapp.fiado.domain.RepositorioMetodosCobro
 import com.fiiadoapp.fiado.domain.RepositorioMovimientos
+import com.fiiadoapp.fiado.domain.RepositorioProrrogas
 import com.fiiadoapp.fiado.domain.Resultado
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import com.fiiadoapp.fiado.domain.saldo
@@ -44,6 +47,8 @@ data class EstadoRegistro(
     /** Solo para un fiado: un atajo, que se cuenta desde [fecha], u otra fecha elegida (ADR-0007). */
     val atajo: AtajoDePlazo? = null,
     val otraFecha: LocalDate? = null,
+    /** Solo para un fiado: cómo paga el cliente, para avisar si está en Cuidado y sugerir un plazo (ADR-0007). */
+    val puntualidad: Puntualidad? = null,
     /** El monto no se pudo leer o es cero. */
     val montoInvalido: Boolean = false,
     val error: ErrorMovimiento? = null,
@@ -53,6 +58,12 @@ data class EstadoRegistro(
 ) {
     /** `null` sin plazo. */
     val vence: LocalDate? get() = otraFecha ?: atajo?.desde(fecha)
+
+    /** Aviso que no impide fiar: el cliente está en Cuidado. */
+    val avisarCuidado: Boolean get() = puntualidad?.nivel == NivelPuntualidad.CUIDADO
+
+    /** Días que suele tardar en pagar, para ofrecerlos como plazo. */
+    val diasSugeridos: Int? get() = puntualidad?.diasSugeridos
 }
 
 @HiltViewModel
@@ -63,6 +74,7 @@ class RegistrarMovimientoViewModel
         private val clientes: RepositorioClientes,
         private val movimientos: RepositorioMovimientos,
         private val metodosCobro: RepositorioMetodosCobro,
+        private val prorrogas: RepositorioProrrogas,
         private val generadorDeIds: GeneradorDeIds,
         private val reloj: Clock,
     ) : ViewModel() {
@@ -81,16 +93,24 @@ class RegistrarMovimientoViewModel
         init {
             viewModelScope.launch {
                 val encontrado = checkNotNull(clientes.observar(clienteId).first()) { "Cliente inexistente: $clienteId" }
-                val saldo = movimientos.observarDeCliente(clienteId).first().saldo()
-                val metodos = if (_estado.value.tipo == TipoMovimiento.PAGO) metodosCobro.observarActivos().first() else emptyList()
+                val deCliente = movimientos.observarDeCliente(clienteId).first()
+                val esPago = _estado.value.tipo == TipoMovimiento.PAGO
+                val metodos = if (esPago) metodosCobro.observarActivos().first() else emptyList()
+                val puntualidad =
+                    if (esPago) {
+                        null
+                    } else {
+                        Puntualidad.calcular(deCliente, prorrogas.observarDeCliente(clienteId).first(), _estado.value.hoy, reloj.zone)
+                    }
                 val ultimo = movimientos.ultimoMetodoCobroUsado()
                 cliente = encontrado
                 _estado.update {
                     it.copy(
                         cargando = false,
                         nombreCliente = encontrado.nombre,
-                        saldo = saldo,
+                        saldo = deCliente.saldo(),
                         metodos = metodos,
+                        puntualidad = puntualidad,
                         metodoElegido = metodos.firstOrNull { metodo -> metodo.id == ultimo }?.id ?: metodos.firstOrNull()?.id,
                     )
                 }
@@ -109,6 +129,12 @@ class RegistrarMovimientoViewModel
         fun elegirAtajo(atajo: AtajoDePlazo?) = _estado.update { it.copy(atajo = atajo, otraFecha = null, error = null) }
 
         fun elegirOtraFecha(fecha: LocalDate) = _estado.update { it.copy(atajo = null, otraFecha = fecha, error = null) }
+
+        /** Plazo de los días que el cliente suele tardar, contados desde el día del fiado. */
+        fun usarPlazoSugerido() {
+            val dias = _estado.value.diasSugeridos ?: return
+            elegirOtraFecha(_estado.value.fecha.plusDays(dias.toLong()))
+        }
 
         fun guardar() {
             val actual = _estado.value
