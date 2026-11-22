@@ -32,7 +32,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fiiadoapp.fiado.core.ui.Avatar
 import com.fiiadoapp.fiado.core.ui.LocalAutenticador
+import com.fiiadoapp.fiado.core.ui.LocalControlDeAnuncios
 import com.fiiadoapp.fiado.core.ui.Tarjeta
+import com.fiiadoapp.fiado.domain.EstadoQuitarAnuncios
 import com.fiiadoapp.fiado.domain.EstadoRespaldo
 
 @Composable
@@ -93,6 +95,7 @@ internal fun CuentaPantalla(
             }
         }
         if (estado != EstadoCuenta.Cargando) TarjetaDeSeguridad(bloqueoActivo, viewModel::cambiarBloqueo)
+        TarjetaDeAnuncios()
     }
     if (confirmandoCierre) {
         AlertDialog(
@@ -285,6 +288,36 @@ fun AvisoSesionTerminada(viewModel: AvisoSesionViewModel = hiltViewModel()) {
         text = { Text(stringResource(R.string.cuenta_sesion_terminada_explicacion)) },
         confirmButton = { TextButton(onClick = viewModel::entendido) { Text(stringResource(R.string.cuenta_entendido)) } },
     )
+}
+
+/** Quitar los anuncios con un pago único y, donde la ley lo exige, cambiar el consentimiento (ADR-0011). */
+@Composable
+private fun TarjetaDeAnuncios() {
+    val control = LocalControlDeAnuncios.current
+    val estado by control.estado.collectAsStateWithLifecycle()
+    val opcionesDePrivacidad by control.opcionesDePrivacidadRequeridas.collectAsStateWithLifecycle()
+    Tarjeta(Modifier.fillMaxWidth()) {
+        Text(stringResource(R.string.cuenta_anuncios_titulo), style = MaterialTheme.typography.titleMedium)
+        val explicacion =
+            when (estado) {
+                EstadoQuitarAnuncios.Comprado -> R.string.cuenta_anuncios_comprado
+                EstadoQuitarAnuncios.Pendiente -> R.string.cuenta_anuncios_pendiente
+                EstadoQuitarAnuncios.NoDisponible -> R.string.cuenta_anuncios_no_disponible
+                else -> R.string.cuenta_anuncios_explicacion
+            }
+        Text(stringResource(explicacion), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        (estado as? EstadoQuitarAnuncios.Disponible)?.let { disponible ->
+            BotonPrincipal(stringResource(R.string.cuenta_anuncios_quitar, disponible.precio), enviando = false, onClick = control::comprar)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (estado != EstadoQuitarAnuncios.Comprado) {
+                TextButton(onClick = control::restaurar) { Text(stringResource(R.string.cuenta_anuncios_restaurar)) }
+            }
+            if (opcionesDePrivacidad) {
+                TextButton(onClick = control::abrirOpcionesDePrivacidad) { Text(stringResource(R.string.cuenta_anuncios_privacidad)) }
+            }
+        }
+    }
 }
 
 /** Activar o apagar el bloqueo pide la huella o el PIN, para que solo el dueño lo cambie (ADR-0006). */
