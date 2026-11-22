@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.fiiadoapp.fiado.domain.CuentaAbierta
 import com.fiiadoapp.fiado.domain.ErrorCuenta
 import com.fiiadoapp.fiado.domain.EstadoRespaldo
+import com.fiiadoapp.fiado.domain.Funciones
 import com.fiiadoapp.fiado.domain.RepositorioBloqueo
 import com.fiiadoapp.fiado.domain.RepositorioCuenta
 import com.fiiadoapp.fiado.domain.RepositorioRespaldo
@@ -45,7 +46,11 @@ class CuentaViewModel
         private val repositorio: RepositorioCuenta,
         respaldo: RepositorioRespaldo,
         private val bloqueo: RepositorioBloqueo,
+        funciones: Funciones,
     ) : ViewModel() {
+        /** Sin cuenta (ADR-0010) la pantalla solo explica dónde se guarda la libreta y ofrece el bloqueo. */
+        val cuentaDisponible: Boolean = funciones.cuentaDisponible
+
         /** Si la app pide la huella o el PIN del teléfono (ADR-0006); no depende de tener cuenta. */
         val bloqueoActivo: StateFlow<Boolean> =
             bloqueo.observarActivo().stateIn(
