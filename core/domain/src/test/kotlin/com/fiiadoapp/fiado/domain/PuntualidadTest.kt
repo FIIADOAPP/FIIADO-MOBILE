@@ -176,4 +176,32 @@ class PuntualidadTest {
         assertEquals(dia(6), resultado.proximoVencimiento)
         assertEquals(1L, resultado.diasVencido)
     }
+
+    @Test
+    fun `sugiere el plazo que suele tardar solo con dos fiados pagados o mas`() {
+        val unPagado = calcular(fiado(1, 10), pago(4, 10))
+        val dosPagados = calcular(fiado(1, 10), pago(4, 10), fiado(5, 10), pago(10, 10))
+        val enElDia = calcular(fiado(1, 10), pago(1, 10), fiado(2, 10), pago(2, 10))
+
+        assertNull(unPagado.diasSugeridos)
+        assertEquals(4, dosPagados.diasSugeridos)
+        assertEquals(1, enElDia.diasSugeridos)
+    }
+
+    @Test
+    fun `el negocio cuenta clientes por nivel, promedia sus pagos y ordena a los de cuidado por lo vencido`() {
+        val puntual = calcular(fiado(1, 10, vence = 2), pago(2, 10), fiado(3, 10, vence = 4), pago(5, 10))
+        val debePoco = calcular(fiado(1, 10, vence = 2), hoy = 20)
+        val debeMucho = calcular(fiado(1, 50, vence = 2), hoy = 20)
+        val sinMovimientos = calcular(fiado(25, 10))
+        val ids = List(4) { Uuid.random() }
+
+        val negocio = PuntualidadDelNegocio.de(ids.zip(listOf(puntual, debePoco, debeMucho, sinMovimientos)).toMap())
+
+        assertEquals(1, negocio.clientesEn(NivelPuntualidad.PUNTUAL))
+        assertEquals(2, negocio.clientesEn(NivelPuntualidad.CUIDADO))
+        assertEquals(0, negocio.clientesEn(NivelPuntualidad.SE_DEMORA))
+        assertEquals(listOf(ids[2], ids[1]), negocio.enCuidado)
+        assertEquals(1.5, negocio.diasPromedioParaPagar)
+    }
 }

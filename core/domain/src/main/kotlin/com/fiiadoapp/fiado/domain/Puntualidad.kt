@@ -21,6 +21,9 @@ data class EstadoFiado(
 ) {
     val pagado: Boolean get() = pagadoEl != null
 
+    /** Días entre fiar y quedar pagado; `null` si sigue pendiente. */
+    val diasParaPagar: Long? get() = pagadoEl?.let { ChronoUnit.DAYS.between(fiado.fecha, it) }
+
     /** Días que lleva vencido sin pagarse; 0 si no está vencido. */
     fun vencidoHace(hoy: LocalDate): Long = if (pagado || plazo == null || !hoy.isAfter(plazo)) 0 else ChronoUnit.DAYS.between(plazo, hoy)
 }
@@ -41,6 +44,20 @@ data class Puntualidad(
     val fiados: List<EstadoFiado>,
 ) {
     fun estadoDe(fiadoId: Uuid): EstadoFiado? = fiados.firstOrNull { it.fiado.id == fiadoId }
+
+    /** Sus últimos [FIADOS_RECIENTES] fiados pagados, del más reciente al más antiguo: de ellos salen sus números. */
+    val pagadosRecientes: List<EstadoFiado>
+        get() = fiados.filter { it.pagado }.sortedByDescending { it.pagadoEl }.take(FIADOS_RECIENTES)
+
+    /**
+     * Plazo que suele necesitar, en días y al menos uno, para sugerirlo al fiarle; `null` con menos de
+     * [MINIMO_PARA_JUZGAR] fiados pagados.
+     */
+    val diasSugeridos: Int?
+        get() =
+            diasPromedioParaPagar
+                ?.takeIf { pagadosRecientes.size >= MINIMO_PARA_JUZGAR }
+                ?.let { maxOf(1, Math.round(it).toInt()) }
 
     companion object {
         /** Un día de atraso es normal; dos o más ya cuentan como demora. */
@@ -84,15 +101,7 @@ data class Puntualidad(
                 }
             return Puntualidad(
                 nivel = nivel,
-                diasPromedioParaPagar =
-                    recientes
-                        .takeIf { it.isNotEmpty() }
-                        ?.map {
-                            ChronoUnit.DAYS.between(
-                                it.fiado.fecha,
-                                it.pagadoEl,
-                            )
-                        }?.average(),
+                diasPromedioParaPagar = recientes.takeIf { it.isNotEmpty() }?.map { it.diasParaPagar!! }?.average(),
                 atrasoPromedio = atrasoPromedio,
                 porcentajeATiempo =
                     recientesConPlazo.takeIf { it.isNotEmpty() }?.let { lista ->
@@ -169,6 +178,34 @@ data class Puntualidad(
             }
             if (fin.isAfter(plazo)) total += ChronoUnit.DAYS.between(plazo, fin)
             return total
+        }
+    }
+}
+
+/** Cómo le pagan al negocio: cuántos clientes hay en cada nivel y cuánto tardan todos en pagar (ADR-0007). */
+data class PuntualidadDelNegocio(
+    val clientesPorNivel: Map<NivelPuntualidad, Int>,
+    /** Promedio de días para pagar de los últimos fiados pagados de cada cliente; `null` si nadie ha pagado. */
+    val diasPromedioParaPagar: Double?,
+    /** Clientes en Cuidado: primero el que más debe vencido y, a igual monto, el que más se atrasa. */
+    val enCuidado: List<Uuid>,
+) {
+    fun clientesEn(nivel: NivelPuntualidad): Int = clientesPorNivel[nivel] ?: 0
+
+    companion object {
+        fun de(porCliente: Map<Uuid, Puntualidad>): PuntualidadDelNegocio {
+            val dias = porCliente.values.flatMap { it.pagadosRecientes }.map { it.diasParaPagar!! }
+            return PuntualidadDelNegocio(
+                clientesPorNivel = porCliente.values.groupingBy { it.nivel }.eachCount(),
+                diasPromedioParaPagar = dias.takeIf { it.isNotEmpty() }?.average(),
+                enCuidado =
+                    porCliente.entries
+                        .filter { it.value.nivel == NivelPuntualidad.CUIDADO }
+                        .sortedWith(
+                            compareByDescending<Map.Entry<Uuid, Puntualidad>> { it.value.vencido }
+                                .thenByDescending { it.value.atrasoPromedio ?: 0.0 },
+                        ).map { it.key },
+            )
         }
     }
 }
