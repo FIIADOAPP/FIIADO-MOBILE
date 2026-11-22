@@ -6,6 +6,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+## [1.0.0] - 2026-11-22
+
+Primera versión para Google Play: la libreta se guarda solo en el teléfono y se respalda con la copia de seguridad de Android (ADR-0010).
+
 ### Agregado
 
 - ADR-0010: la versión de la Play Store guarda la libreta solo en el teléfono, sin cuenta ni envíos al servidor; Cuenta explica dónde está la libreta y conserva el bloqueo. La libreta y las preferencias se respaldan con la copia de seguridad de Android (Google Drive y traspaso a un teléfono nuevo), sin la sesión. El build `debug` sigue ofreciendo la cuenta, y `-Pfiado.cuentaRelease=true` la devuelve al release.
@@ -102,7 +106,8 @@ La cuenta requiere FIIADO-API `v0.2.0` o superior.
 - Formato con ktlint mediante Spotless y Android Lint con las advertencias tratadas como errores.
 - CI en GitHub Actions: commitlint, ktlint, Android Lint, pruebas y build en cada pull request.
 
-[Sin publicar]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.5.0...develop
+[Sin publicar]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v1.0.0...develop
+[1.0.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.5.0...v1.0.0
 [0.5.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/FIIADOAPP/FIIADO-MOBILE/compare/v0.2.0...v0.3.0
