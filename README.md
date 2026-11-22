@@ -41,7 +41,8 @@ Es una app Android nativa con los datos en el teléfono (Room como fuente de ver
 | Diseño oscuro con tarjetas y barra inferior flotante | Listo |
 | Plazo de pago al fiar | Listo |
 | Prórrogas: dar más plazo a un fiado | Listo |
-| Puntualidad de los clientes | Pendiente |
+| Puntualidad: semáforo, «Cómo paga» y lo que vence | Listo |
+| «Cómo te pagan» en el resumen y avisos al fiar | Pendiente |
 | Bloqueo opcional con la huella o el PIN del teléfono | Listo |
 
 ## Requisitos
