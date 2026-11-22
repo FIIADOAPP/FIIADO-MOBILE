@@ -8,6 +8,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ### Cambiado
 
+- Nuevo ícono con el logo de Fiadito: la libreta sobre fondo azul marino.
 - La app se llama **Fiadito**: el nombre bajo el ícono, el bloqueo y Cuenta. El identificador del paquete no cambia, así que se actualiza encima de las versiones anteriores sin perder datos.
 
 ### Corregido
