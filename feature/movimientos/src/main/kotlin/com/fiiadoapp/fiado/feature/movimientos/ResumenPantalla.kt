@@ -1,5 +1,6 @@
 package com.fiiadoapp.fiado.feature.movimientos
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,34 +20,47 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fiiadoapp.fiado.core.ui.AnilloDeProgreso
+import com.fiiadoapp.fiado.core.ui.Avatar
 import com.fiiadoapp.fiado.core.ui.BarraDeProgreso
 import com.fiiadoapp.fiado.core.ui.EncabezadoGrande
 import com.fiiadoapp.fiado.core.ui.LocalEspacioBarraInferior
 import com.fiiadoapp.fiado.core.ui.MargenPantalla
 import com.fiiadoapp.fiado.core.ui.Tarjeta
+import com.fiiadoapp.fiado.core.ui.colorDe
+import com.fiiadoapp.fiado.core.ui.textoDe
 import com.fiiadoapp.fiado.domain.Dinero
+import com.fiiadoapp.fiado.domain.NivelPuntualidad
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.roundToInt
+import kotlin.uuid.Uuid
 
 private val LOCALE_PERU = Locale.forLanguageTag("es-PE")
 private val FORMATO_MES = DateTimeFormatter.ofPattern("MMMM", LOCALE_PERU)
 private val FORMATO_DIA = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", LOCALE_PERU)
 
 @Composable
-internal fun ResumenPantalla(viewModel: ResumenViewModel = hiltViewModel()) {
+internal fun ResumenPantalla(
+    onCliente: (Uuid) -> Unit,
+    viewModel: ResumenViewModel = hiltViewModel(),
+) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
-    ResumenContenido(estado)
+    ResumenContenido(estado, onCliente)
 }
 
 @Composable
-internal fun ResumenContenido(estado: EstadoResumen?) {
+internal fun ResumenContenido(
+    estado: EstadoResumen?,
+    onCliente: (Uuid) -> Unit,
+) {
     Column(Modifier.fillMaxSize().statusBarsPadding()) {
         EncabezadoGrande(
             stringResource(R.string.resumen_titulo),
@@ -79,6 +93,7 @@ internal fun ResumenContenido(estado: EstadoResumen?) {
             if (estado.delDia.porMetodo.isNotEmpty()) {
                 TarjetaPorMetodo(stringResource(R.string.resumen_por_metodo_hoy), estado.delDia)
             }
+            estado.comoTePagan?.let { TarjetaComoTePagan(it, onCliente) }
             Spacer(Modifier.height(LocalEspacioBarraInferior.current))
         }
     }
@@ -189,3 +204,80 @@ private fun Monto(
 /** `null` si en el periodo no se fió nada: no hay de qué calcular un porcentaje. */
 private fun fraccionCobrada(periodo: Periodo): Float? =
     if (periodo.fiado.centimos <= 0) null else (periodo.cobrado.centimos.toFloat() / periodo.fiado.centimos).coerceAtMost(1f)
+
+/** Clientes por nivel, lo que tardan en pagar y quiénes están en Cuidado (ADR-0007). */
+@Composable
+private fun TarjetaComoTePagan(
+    comoTePagan: ComoTePagan,
+    onCliente: (Uuid) -> Unit,
+) {
+    val negocio = comoTePagan.negocio
+    Text(
+        stringResource(R.string.resumen_como_te_pagan),
+        style = MaterialTheme.typography.titleLarge,
+        modifier = Modifier.padding(top = 8.dp),
+    )
+    Tarjeta(Modifier.fillMaxWidth(), relleno = 20.dp) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(NivelPuntualidad.PUNTUAL, NivelPuntualidad.SE_DEMORA, NivelPuntualidad.CUIDADO).forEach { nivel ->
+                Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(negocio.clientesEn(nivel).toString(), style = MaterialTheme.typography.headlineMedium, color = colorDe(nivel))
+                    Text(textoDe(nivel), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
+        val sinHistorial = negocio.clientesEn(NivelPuntualidad.SIN_HISTORIAL)
+        if (sinHistorial > 0) {
+            Text(
+                pluralStringResource(R.plurals.resumen_sin_historial, sinHistorial, sinHistorial),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        negocio.diasPromedioParaPagar?.let {
+            val dias = it.roundToInt()
+            Text(pluralStringResource(R.plurals.resumen_tardan_en_pagar, dias, dias), style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+    if (comoTePagan.enCuidado.isNotEmpty()) {
+        Tarjeta(Modifier.fillMaxWidth(), relleno = 8.dp) {
+            Text(
+                stringResource(R.string.resumen_para_tener_cuidado),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(start = 12.dp, top = 8.dp),
+            )
+            comoTePagan.enCuidado.forEach { cliente -> FilaEnCuidado(cliente, onCliente) }
+        }
+    }
+}
+
+@Composable
+private fun FilaEnCuidado(
+    cliente: ClienteEnCuidado,
+    onCliente: (Uuid) -> Unit,
+) {
+    val puntualidad = cliente.puntualidad
+    val motivo =
+        if (puntualidad.vencido.esPositivo) {
+            val dias = puntualidad.diasVencido.toInt()
+            pluralStringResource(R.plurals.resumen_debe_vencido, dias, puntualidad.vencido.formatear(), dias)
+        } else {
+            val dias = (puntualidad.atrasoPromedio ?: 0.0).roundToInt()
+            pluralStringResource(R.plurals.resumen_suele_pagar_tarde, dias, dias)
+        }
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .clickable { onCliente(cliente.id) }
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Avatar(cliente.nombre)
+        Column(Modifier.weight(1f)) {
+            Text(cliente.nombre, style = MaterialTheme.typography.bodyLarge)
+            Text(motivo, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+        }
+    }
+}

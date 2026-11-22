@@ -238,6 +238,7 @@ private fun Navegacion(navController: NavHostController) {
             },
             onMetodosCobro = { navController.navigate(MetodosCobro) },
             onMensajeDeCobro = { navController.navigate(MensajeDeCobro) },
+            onHistorial = { navController.navigate(HistorialCliente(it.toString())) },
         )
         pantallasDeCuenta(navController)
     }

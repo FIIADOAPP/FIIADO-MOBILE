@@ -40,6 +40,7 @@ fun NavGraphBuilder.pantallasDeMovimientos(
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
     onMetodosCobro: () -> Unit,
     onMensajeDeCobro: () -> Unit,
+    onHistorial: (Uuid) -> Unit,
 ) {
     dialog<RegistrarMovimiento> {
         RegistrarMovimientoDialogo(onCerrar = onCerrar, onRegistrado = onRegistrado)
@@ -48,7 +49,7 @@ fun NavGraphBuilder.pantallasDeMovimientos(
         MetodosCobroPantalla(onVolver = onCerrar)
     }
     composable<ResumenGeneral> {
-        ResumenPantalla()
+        ResumenPantalla(onCliente = onHistorial)
     }
     composable<Cobros> {
         CobrosPantalla(onMetodosCobro = onMetodosCobro, onMensajeDeCobro = onMensajeDeCobro)
