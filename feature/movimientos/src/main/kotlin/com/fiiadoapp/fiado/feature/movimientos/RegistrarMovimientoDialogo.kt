@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.DateRange
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -55,8 +56,10 @@ import com.fiiadoapp.fiado.domain.AtajoDePlazo
 import com.fiiadoapp.fiado.domain.ErrorMovimiento
 import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
+import com.fiiadoapp.fiado.domain.Puntualidad
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import java.time.LocalDate
+import kotlin.math.roundToInt
 import kotlin.uuid.Uuid
 
 private const val MILISEGUNDOS_POR_DIA = 86_400_000L
@@ -77,6 +80,7 @@ internal fun RegistrarMovimientoDialogo(
         onMetodo = viewModel::elegirMetodo,
         onAtajo = viewModel::elegirAtajo,
         onOtraFecha = viewModel::elegirOtraFecha,
+        onPlazoSugerido = viewModel::usarPlazoSugerido,
         onGuardar = viewModel::guardar,
         onCancelar = onCerrar,
     )
@@ -91,6 +95,7 @@ internal fun RegistrarMovimientoContenido(
     onMetodo: (Uuid) -> Unit,
     onAtajo: (AtajoDePlazo?) -> Unit,
     onOtraFecha: (LocalDate) -> Unit,
+    onPlazoSugerido: () -> Unit,
     onGuardar: () -> Unit,
     onCancelar: () -> Unit,
 ) {
@@ -112,6 +117,9 @@ internal fun RegistrarMovimientoContenido(
                 style = MaterialTheme.typography.headlineSmall,
             )
             SaldoTexto(estado.saldo)
+            if (estado.avisarCuidado) {
+                estado.puntualidad?.let { AvisoDeCuidado(estado.nombreCliente, it) }
+            }
             OutlinedTextField(
                 shape = MaterialTheme.shapes.small,
                 value = estado.monto,
@@ -129,7 +137,7 @@ internal fun RegistrarMovimientoContenido(
             if (estado.tipo == TipoMovimiento.PAGO) {
                 SelectorDeMetodo(estado.metodos, estado.metodoElegido, onMetodo)
             } else {
-                SelectorDePlazo(estado, onAtajo, onOtraFecha)
+                SelectorDePlazo(estado, onAtajo, onOtraFecha, onPlazoSugerido)
             }
             val notaMuyLarga = estado.error == ErrorMovimiento.NotaMuyLarga
             val errorNota = pluralStringResource(R.plurals.registro_error_nota, Movimiento.LARGO_MAXIMO_NOTA, Movimiento.LARGO_MAXIMO_NOTA)
@@ -219,6 +227,7 @@ private fun SelectorDePlazo(
     estado: EstadoRegistro,
     onAtajo: (AtajoDePlazo?) -> Unit,
     onOtraFecha: (LocalDate) -> Unit,
+    onPlazoSugerido: () -> Unit,
 ) {
     var eligiendo by rememberSaveable { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -229,6 +238,17 @@ private fun SelectorDePlazo(
                 OpcionDePlazo(textoDeAtajo(atajo), estado.otraFecha == null && estado.atajo == atajo) { onAtajo(atajo) }
             }
             OpcionDePlazo(stringResource(R.string.registro_plazo_otra_fecha), estado.otraFecha != null) { eligiendo = true }
+        }
+        estado.diasSugeridos?.let { dias ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    pluralStringResource(R.plurals.registro_suele_pagar_en, dias, estado.nombreCliente, dias),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = onPlazoSugerido) { Text(stringResource(R.string.registro_usar_plazo_sugerido)) }
+            }
         }
         estado.vence?.let {
             Text(
@@ -309,5 +329,35 @@ internal fun SelectorDeFecha(
         dismissButton = { TextButton(onClick = onCancelar) { Text(stringResource(R.string.registro_cancelar)) } },
     ) {
         DatePicker(state = estado)
+    }
+}
+
+/** No impide fiar: solo explica con sus números por qué conviene cobrar antes (ADR-0007). */
+@Composable
+private fun AvisoDeCuidado(
+    nombre: String,
+    puntualidad: Puntualidad,
+) {
+    val partes =
+        buildList {
+            puntualidad.atrasoPromedio?.takeIf { it >= Puntualidad.DIAS_DEMORA }?.let {
+                val dias = it.roundToInt()
+                add(pluralStringResource(R.plurals.registro_aviso_atraso, dias, dias))
+            }
+            if (puntualidad.vencido.esPositivo) {
+                val dias = puntualidad.diasVencido.toInt()
+                add(pluralStringResource(R.plurals.registro_aviso_vencido, dias, puntualidad.vencido.formatear(), dias))
+            }
+        }
+    val texto = stringResource(R.string.registro_aviso_cuidado, nombre, partes.joinToString(stringResource(R.string.registro_aviso_y)))
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.error.copy(alpha = 0.14f),
+        contentColor = MaterialTheme.colorScheme.onSurface,
+    ) {
+        Row(Modifier.padding(12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Icon(Icons.Rounded.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+            Text(texto, style = MaterialTheme.typography.bodyMedium)
+        }
     }
 }

@@ -21,6 +21,9 @@
     <string name="registro_plazo_una_semana">1 semana</string>
     <string name="registro_plazo_fin_de_mes">Fin de mes</string>
     <string name="registro_plazo_otra_fecha">Otra fecha</string>
+    <string name="registro_usar_plazo_sugerido">Usar ese plazo</string>
+    <string name="registro_aviso_cuidado">%1$s %2$s. Considera cobrar lo pendiente antes de fiarle más.</string>
+    <string name="registro_aviso_y">" y "</string>
     <string name="plazo_hoy">Para hoy</string>
     <string name="plazo_manana">Para mañana</string>
     <string name="plazo_fecha">Para el %1$s</string>
@@ -142,5 +145,20 @@
         <item quantity="one">Suele pagar %1$d día tarde</item>
         <item quantity="many">Suele pagar %1$d días tarde</item>
         <item quantity="other">Suele pagar %1$d días tarde</item>
+    </plurals>
+    <plurals name="registro_suele_pagar_en">
+        <item quantity="one">%1$s suele pagar en %2$d día</item>
+        <item quantity="many">%1$s suele pagar en %2$d días</item>
+        <item quantity="other">%1$s suele pagar en %2$d días</item>
+    </plurals>
+    <plurals name="registro_aviso_atraso">
+        <item quantity="one">suele pagar %1$d día tarde</item>
+        <item quantity="many">suele pagar %1$d días tarde</item>
+        <item quantity="other">suele pagar %1$d días tarde</item>
+    </plurals>
+    <plurals name="registro_aviso_vencido">
+        <item quantity="one">tiene %1$s vencidos desde hace %2$d día</item>
+        <item quantity="many">tiene %1$s vencidos desde hace %2$d días</item>
+        <item quantity="other">tiene %1$s vencidos desde hace %2$d días</item>
     </plurals>
 </resources>
