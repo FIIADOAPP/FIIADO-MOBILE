@@ -6,6 +6,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+### Corregido
+
+- La tarjeta del anuncio aparece solo cuando AdMob entrega un anuncio. Sin anuncio (cuenta nueva o sin internet) no queda una tarjeta vacía, y se vuelve a pedir cada minuto. El anuncio ya no se vuelve a pedir al cambiar de pestaña.
+
 ## [1.1.0] - 2026-11-22
 
 ### Corregido
