@@ -30,3 +30,4 @@ Un ADR aceptado no se edita: si la decisión cambia, se escribe uno nuevo que lo
 | [0006](0006-bloqueo-de-la-app.md) | Bloqueo de la app con la huella o el PIN del teléfono | Aceptada |
 | [0007](0007-plazos-y-puntualidad.md) | Plazos de pago y puntualidad de los clientes | Aceptada |
 | [0008](0008-restaurar-sin-pisar-pendientes.md) | Restaurar sin pisar los cambios pendientes del teléfono | Aceptada |
+| [0009](0009-firma-y-publicacion.md) | Firma y publicación en Google Play | Aceptada |

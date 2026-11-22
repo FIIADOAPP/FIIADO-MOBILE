@@ -6,6 +6,14 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+### Agregado
+
+- ADR-0009 y release firmado: con la clave de subida en variables de entorno, `bundleRelease` genera el AAB para Google Play. El workflow `Release` adjunta el AAB y el APK firmados a cada release de GitHub, apuntando a la API pública de `API_URL_RELEASE`.
+
+### Cambiado
+
+- La app espera hasta 70 segundos la respuesta de la API, para cubrir el encendido del servidor gratuito.
+
 ## [0.5.0] - 2026-11-21
 
 El respaldo de plazos y prórrogas requiere FIIADO-API `v0.4.0` o superior.

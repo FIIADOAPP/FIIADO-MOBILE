@@ -35,7 +35,7 @@ android {
             buildConfigField("String", "API_URL", "\"${providers.gradleProperty("fiado.apiUrl").getOrElse("http://10.0.2.2:8000/")}\"")
         }
         release {
-            // La URL pública se define al desplegar la API (Fase 5).
+            // La URL pública llega desde la variable API_URL_RELEASE del workflow de release (ADR-0009).
             buildConfigField(
                 "String",
                 "API_URL",
