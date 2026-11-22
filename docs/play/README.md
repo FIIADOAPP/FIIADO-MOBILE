@@ -7,7 +7,7 @@ Todo lo que pide Play Console para publicar **Fiadito**, listo para copiar. Los 
 | Nombre de la app | Fiadito |
 | Paquete | `com.fiiadoapp.fiado` (no se puede cambiar después) |
 | Nombre del desarrollador | Fiado |
-| Correo de contacto | CORREO_DE_CONTACTO |
+| Correo de contacto | fiadito21@gmail.com |
 | Política de privacidad | https://github.com/FIIADOAPP/FIIADO-MOBILE/blob/main/docs/privacidad.md |
 | Categoría | Empresa |
 | Precio | Gratis, con anuncios y compras en la app |

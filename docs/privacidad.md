@@ -38,4 +38,4 @@ Como la libreta vive en tu teléfono, la borras desinstalando la app o desde **A
 
 ## Cambios y contacto
 
-Si esta política cambia, publicaremos la nueva versión en esta misma página con su fecha. Para cualquier consulta escríbenos a **CORREO_DE_CONTACTO**.
+Si esta política cambia, publicaremos la nueva versión en esta misma página con su fecha. Para cualquier consulta escríbenos a **fiadito21@gmail.com**.
