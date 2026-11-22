@@ -1,7 +1,6 @@
 package com.fiiadoapp.fiado.core.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,13 +64,16 @@ fun BarraInferiorFlotante(
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
             shadowElevation = 6.dp,
         ) {
+            // Los destinos y el botón central ocupan el mismo ancho: quedan igual de espaciados y el botón,
+            // en el centro exacto de la barra.
             Row(
                 Modifier.padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 destinos.forEachIndexed { indice, destino ->
-                    if (indice == mitad) BotonCentral(descripcionCentral, onCentral)
+                    if (indice == mitad) {
+                        Box(Modifier.weight(1f), contentAlignment = Alignment.Center) { BotonCentral(descripcionCentral, onCentral) }
+                    }
                     ElementoBarra(destino, indice == seleccionado, Modifier.weight(1f)) { onDestino(indice) }
                 }
             }
@@ -104,27 +106,34 @@ private fun ElementoBarra(
     onClick: () -> Unit,
 ) {
     val color = if (activo) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
-    Column(
+    Box(
         modifier
             .height(64.dp)
             .selectable(selected = activo, onClick = onClick, role = Role.Tab),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        contentAlignment = Alignment.Center,
     ) {
-        Icon(destino.icono, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
-        Text(
-            destino.etiqueta,
-            color = color,
-            fontSize = 11.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.labelSmall,
-        )
-        Box(
-            Modifier
-                .padding(top = 3.dp)
-                .size(4.dp)
-                .background(if (activo) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHigh, CircleShape),
-        )
+        // El ícono y el texto quedan centrados en la barra, a la altura del botón central.
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(destino.icono, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
+            Text(
+                destino.etiqueta,
+                color = color,
+                fontSize = 11.sp,
+                lineHeight = 14.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.labelSmall,
+            )
+        }
+        // El punto del destino activo va sobre el borde inferior, sin mover el ícono ni el texto.
+        if (activo) {
+            Box(
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 2.dp)
+                    .size(4.dp)
+                    .background(MaterialTheme.colorScheme.primary, CircleShape),
+            )
+        }
     }
 }
