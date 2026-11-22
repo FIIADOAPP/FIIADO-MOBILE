@@ -1,0 +1,64 @@
+name: Release
+
+# Al publicar un release en GitHub, compila el AAB para Google Play y el APK firmados y los adjunta (ADR-0009).
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  firmar:
+    name: AAB y APK firmados
+    runs-on: ubuntu-latest
+    env:
+      API_URL_RELEASE: ${{ vars.API_URL_RELEASE }}
+      FIRMA_KEYSTORE_BASE64: ${{ secrets.FIRMA_KEYSTORE_BASE64 }}
+      FIRMA_CLAVE: ${{ secrets.FIRMA_CLAVE }}
+      FIRMA_ALIAS: ${{ secrets.FIRMA_ALIAS }}
+      FIRMA_CLAVE_ALIAS: ${{ secrets.FIRMA_CLAVE_ALIAS }}
+    steps:
+      - name: Comprobar la configuración
+        run: |
+          faltan=""
+          for nombre in FIRMA_KEYSTORE_BASE64 FIRMA_CLAVE FIRMA_ALIAS FIRMA_CLAVE_ALIAS; do
+            [ -n "${!nombre}" ] || faltan="$faltan $nombre"
+          done
+          if [ -n "$faltan" ]; then
+            echo "::error::Faltan variables o secretos del repositorio:$faltan"
+            exit 1
+          fi
+          # Sin API_URL_RELEASE, la app sale sin cuenta y guarda la libreta solo en el teléfono (ADR-0010).
+          case "$API_URL_RELEASE" in
+            "" | https://*/) ;;
+            *) echo "::error::API_URL_RELEASE debe empezar con https:// y terminar en /"; exit 1 ;;
+          esac
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Recuperar la clave de subida
+        run: |
+          echo "$FIRMA_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/subida.jks"
+          echo "FIRMA_ARCHIVO=$RUNNER_TEMP/subida.jks" >> "$GITHUB_ENV"
+      - name: Compilar
+        run: |
+          cuenta=()
+          if [ -n "$API_URL_RELEASE" ]; then
+            cuenta=(-Pfiado.cuentaRelease=true -Pfiado.apiUrlRelease="$API_URL_RELEASE")
+          fi
+          ./gradlew bundleRelease assembleRelease "${cuenta[@]}" --console=plain
+      - name: Adjuntar al release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          cp app/build/outputs/bundle/release/app-release.aab "fiado-$TAG.aab"
+          cp app/build/outputs/apk/release/app-release.apk "fiado-$TAG.apk"
+          gh release upload "$TAG" "fiado-$TAG.aab" "fiado-$TAG.apk" --clobber
+      - name: Borrar la clave de subida
+        if: always()
+        run: rm -f "$RUNNER_TEMP/subida.jks"

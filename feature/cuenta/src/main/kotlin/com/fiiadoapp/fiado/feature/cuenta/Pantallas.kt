@@ -50,6 +50,17 @@ internal fun CuentaPantalla(
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             }
 
+            EstadoCuenta.SinCuenta if !viewModel.cuentaDisponible -> {
+                Tarjeta(Modifier.fillMaxWidth(), relleno = 20.dp) {
+                    Text(stringResource(R.string.cuenta_solo_telefono_titulo), style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        stringResource(R.string.cuenta_solo_telefono_explicacion),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
             EstadoCuenta.SinCuenta -> {
                 Text(stringResource(R.string.cuenta_sin_cuenta_explicacion), style = MaterialTheme.typography.bodyLarge)
                 BotonPrincipal(stringResource(R.string.cuenta_crear), enviando = false, onClick = onCrearCuenta)

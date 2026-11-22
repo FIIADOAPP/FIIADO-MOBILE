@@ -33,14 +33,17 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "API_URL", "\"${providers.gradleProperty("fiado.apiUrl").getOrElse("http://10.0.2.2:8000/")}\"")
+            buildConfigField("boolean", "CUENTA_DISPONIBLE", providers.gradleProperty("fiado.cuenta").getOrElse("true"))
         }
         release {
-            // La URL pública se define al desplegar la API (Fase 5).
+            // La URL pública llega desde la variable API_URL_RELEASE del workflow de release (ADR-0009).
             buildConfigField(
                 "String",
                 "API_URL",
                 "\"${providers.gradleProperty("fiado.apiUrlRelease").getOrElse("https://api.fiado.invalid/")}\"",
             )
+            // La versión 1.0 guarda la libreta solo en el teléfono (ADR-0010).
+            buildConfigField("boolean", "CUENTA_DISPONIBLE", providers.gradleProperty("fiado.cuentaRelease").getOrElse("false"))
         }
     }
 

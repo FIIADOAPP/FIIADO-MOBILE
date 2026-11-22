@@ -105,12 +105,15 @@ Cada entrega indica su repositorio: **M** (mobile) o **A** (API).
 | Rama | Repo | Entrega |
 |---|---|---|
 | `chore/firma-release` | M | APK firmado generado en CI con el keystore de GitHub Secrets. |
+| `feat/version-solo-local` | M | ADR-0010: el release sale sin cuenta, la libreta vive en el teléfono y se respalda con la copia de seguridad de Android. |
 | `docs/aceptacion` | M | Lista de verificación de la prueba de aceptación, ejecutada, con capturas y README final. |
 | `chore/despliegue-api` | A | Opcional: despliegue público de la API para el portafolio. |
 
 ## Criterio de terminado
 
-1. Instalo el APK en un teléfono y registro clientes, fiados y pagos en modo avión.
-2. Quito el modo avión y todo llega al servidor.
-3. Inicio sesión con la misma cuenta en otro dispositivo (puede ser un emulador) y aparece todo, sin datos perdidos ni duplicados; el primer teléfono queda con la sesión cerrada.
-4. Ambos repositorios tienen `v1.0.0` publicada con el CI en verde.
+La versión 1.0 guarda la libreta solo en el teléfono ([ADR-0010](adr/0010-version-1-solo-en-el-telefono.md)). La sincronización con el servidor ya está hecha y probada, pero queda para una versión posterior.
+
+1. Instalo el APK release firmado en un teléfono y registro clientes, fiados y pagos en modo avión.
+2. Cierro y vuelvo a abrir la app, y todo sigue ahí.
+3. Hago una copia de seguridad de Android, desinstalo, reinstalo y la libreta vuelve sin datos perdidos ni duplicados.
+4. La app tiene `v1.0.0` publicada, con el AAB y el APK firmados y el CI en verde.

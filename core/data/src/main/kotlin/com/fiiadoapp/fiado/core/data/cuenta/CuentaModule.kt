@@ -80,4 +80,5 @@ private fun retrofit(
         .addConverterFactory(Json { ignoreUnknownKeys = true }.asConverterFactory("application/json".toMediaType()))
         .build()
 
-private const val TIEMPO_ESPERA_S = 15L
+/** Cubre el encendido de la API en el plan gratuito, que tarda hasta un minuto (ADR-0009). */
+private const val TIEMPO_ESPERA_S = 70L

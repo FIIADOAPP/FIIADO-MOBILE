@@ -8,6 +8,7 @@ import com.fiiadoapp.fiado.core.testing.RespaldoFalso
 import com.fiiadoapp.fiado.domain.CuentaAbierta
 import com.fiiadoapp.fiado.domain.ErrorCuenta
 import com.fiiadoapp.fiado.domain.EstadoRespaldo
+import com.fiiadoapp.fiado.domain.Funciones
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.plus
@@ -38,7 +39,7 @@ class CuentaViewModelsTest {
     @Test
     fun `sin cuenta la pantalla ofrece crearla o iniciar sesion`() =
         runTest {
-            val viewModel = CuentaViewModel(cuenta, respaldo, bloqueo)
+            val viewModel = CuentaViewModel(cuenta, respaldo, bloqueo, Funciones(cuentaDisponible = true))
             viewModel.estado.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
 
             assertEquals(EstadoCuenta.SinCuenta, viewModel.estado.value)
@@ -49,7 +50,7 @@ class CuentaViewModelsTest {
     fun `con cuenta la muestra y comprueba con la api que la sesion siga abierta`() =
         runTest {
             cuenta.cuenta.value = rosa
-            val viewModel = CuentaViewModel(cuenta, respaldo, bloqueo)
+            val viewModel = CuentaViewModel(cuenta, respaldo, bloqueo, Funciones(cuentaDisponible = true))
             viewModel.estado.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
 
             assertEquals(EstadoCuenta.Abierta(rosa, alDia), viewModel.estado.value)
@@ -60,7 +61,7 @@ class CuentaViewModelsTest {
     fun `con cuenta muestra los cambios por respaldar y si el envio se detuvo`() =
         runTest {
             cuenta.cuenta.value = rosa
-            val viewModel = CuentaViewModel(cuenta, respaldo, bloqueo)
+            val viewModel = CuentaViewModel(cuenta, respaldo, bloqueo, Funciones(cuentaDisponible = true))
             viewModel.estado.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
 
             respaldo.estado.value = EstadoRespaldo(pendientes = 3, detenido = false)
@@ -73,7 +74,7 @@ class CuentaViewModelsTest {
     @Test
     fun `muestra si el bloqueo esta activo y lo cambia, con o sin cuenta`() =
         runTest {
-            val viewModel = CuentaViewModel(cuenta, respaldo, bloqueo)
+            val viewModel = CuentaViewModel(cuenta, respaldo, bloqueo, Funciones(cuentaDisponible = true))
             viewModel.bloqueoActivo.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
             assertFalse(viewModel.bloqueoActivo.value)
 
@@ -87,7 +88,7 @@ class CuentaViewModelsTest {
     fun `cerrar sesion vuelve al modo sin cuenta`() =
         runTest {
             cuenta.cuenta.value = rosa
-            val viewModel = CuentaViewModel(cuenta, respaldo, bloqueo)
+            val viewModel = CuentaViewModel(cuenta, respaldo, bloqueo, Funciones(cuentaDisponible = true))
             viewModel.estado.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
 
             viewModel.cerrarSesion()
