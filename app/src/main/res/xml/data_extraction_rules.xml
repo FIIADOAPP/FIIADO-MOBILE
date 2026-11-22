@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12 o superior. La libreta y las preferencias viajan a Google y a un teléfono nuevo; la sesión no (ADR-0010). -->
 <data-extraction-rules>
     <cloud-backup>
-        <exclude domain="root" />
-        <exclude domain="file" />
-        <exclude domain="database" />
-        <exclude domain="sharedpref" />
-        <exclude domain="external" />
+        <include domain="database" path="fiado.db" />
+        <include domain="file" path="datastore/preferencias.preferences_pb" />
     </cloud-backup>
     <device-transfer>
-        <exclude domain="root" />
-        <exclude domain="file" />
-        <exclude domain="database" />
-        <exclude domain="sharedpref" />
-        <exclude domain="external" />
+        <include domain="database" path="fiado.db" />
+        <include domain="file" path="datastore/preferencias.preferences_pb" />
     </device-transfer>
 </data-extraction-rules>
