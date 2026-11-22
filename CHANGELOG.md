@@ -15,10 +15,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - ADR-0007 y plazo de pago al fiar: «¿Para cuándo?» con los atajos Mañana, 3 días, 1 semana, Fin de mes u Otra fecha. El historial muestra el plazo de cada fiado y el plazo se respalda con FIIADO-API `v0.4.0` o superior. La base de datos pasa a la versión 5.
 - «Dar más plazo» al tocar un fiado con plazo en el historial: solo permite una fecha posterior al plazo vigente y queda como una prórroga aparte, sin cambiar el fiado. El historial marca los plazos prorrogados. Las prórrogas se respaldan y se restauran; la base de datos pasa a la versión 6.
 - Puntualidad de cada cliente (ADR-0007): los pagos cubren primero los fiados más antiguos, y de ahí salen los días que tarda en pagar, su porcentaje de pagos a tiempo, su atraso y lo vencido. El semáforo (Puntual, Se demora, Cuidado o Sin historial) aparece en la lista junto a «Vence mañana» o «Vencido hace 3 días», y el historial suma la tarjeta «Cómo paga» y el estado de cada fiado con plazo.
-
-### Cambiado
-
-- «Dar más plazo» solo se ofrece en los fiados con plazo que todavía no se pagan.
+- «Cómo te pagan» en el resumen (ADR-0007): cuántos clientes hay en cada nivel, cuánto tardan en pagar en promedio y quiénes están en Cuidado, con lo que deben vencido; al tocar uno se abre su historial. Al fiar a un cliente en Cuidado aparece un aviso con sus números que no impide fiar, y con dos o más fiados pagados se sugiere el plazo que suele tardar.
 - Recordatorio de cobro por WhatsApp desde el historial de un cliente que debe: abre WhatsApp con el mensaje escrito. Si el cliente no tiene celular, ofrece agregarlo.
 - Mensaje de cobro editable desde el menú, con `{cliente}`, `{saldo}` y `{negocio}`, vista previa y opción de restablecer. Por defecto saluda con el nombre del negocio; sin cuenta, esa frase se omite. Se guarda solo en el teléfono.
 - ADR-0006 y bloqueo opcional con la huella o el PIN del teléfono, desde Cuenta: se pide al abrir la app y al volver tras un minuto o más en segundo plano. Activarlo o apagarlo pide confirmar con la huella. Mientras está activo, la vista de apps recientes no muestra saldos. Si el teléfono quita su bloqueo de pantalla, el de la app se apaga solo y avisa.
@@ -27,6 +24,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ### Cambiado
 
+- «Dar más plazo» solo se ofrece en los fiados con plazo que todavía no se pagan.
 - Nuevo diseño oscuro: fondo gris carbón, tarjetas redondeadas, acento lila, verde para lo cobrado y lo que está al día y coral para lo que se debe. La app ya no cambia de tema según el teléfono.
 - El menú de la lista de clientes y su botón «Nuevo cliente» dan paso a la barra inferior.
 
