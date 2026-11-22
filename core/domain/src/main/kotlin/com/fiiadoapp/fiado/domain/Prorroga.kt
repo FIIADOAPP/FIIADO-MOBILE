@@ -56,5 +56,7 @@ fun plazoVigente(
 interface RepositorioProrrogas {
     fun observarDeCliente(clienteId: Uuid): Flow<List<Prorroga>>
 
+    fun observarTodas(): Flow<List<Prorroga>>
+
     suspend fun guardar(prorroga: Prorroga)
 }

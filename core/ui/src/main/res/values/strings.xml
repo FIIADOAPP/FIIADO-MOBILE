@@ -3,4 +3,21 @@
     <string name="saldo_a_favor">A favor %1$s</string>
     <string name="saldo_al_dia">Al día</string>
     <string name="volver">Volver</string>
+    <string name="puntualidad_puntual">Puntual</string>
+    <string name="puntualidad_se_demora">Se demora</string>
+    <string name="puntualidad_cuidado">Cuidado</string>
+    <string name="puntualidad_sin_historial">Sin historial</string>
+    <string name="vence_hoy">Vence hoy</string>
+    <string name="vence_manana">Vence mañana</string>
+
+    <plurals name="vence_en">
+        <item quantity="one">Vence en %1$d día</item>
+        <item quantity="many">Vence en %1$d días</item>
+        <item quantity="other">Vence en %1$d días</item>
+    </plurals>
+    <plurals name="vencido_hace">
+        <item quantity="one">Vencido hace %1$d día</item>
+        <item quantity="many">Vencido hace %1$d días</item>
+        <item quantity="other">Vencido hace %1$d días</item>
+    </plurals>
 </resources>

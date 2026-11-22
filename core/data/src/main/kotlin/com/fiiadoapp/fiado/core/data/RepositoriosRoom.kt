@@ -91,6 +91,8 @@ class RepositorioProrrogasRoom(
     override fun observarDeCliente(clienteId: Uuid): Flow<List<Prorroga>> =
         dao.observarDeCliente(clienteId.toString()).map { filas -> filas.map { it.aDominio() } }
 
+    override fun observarTodas(): Flow<List<Prorroga>> = dao.observarTodas().map { filas -> filas.map { it.aDominio() } }
+
     override suspend fun guardar(prorroga: Prorroga) {
         val fila = prorroga.aEntidad()
         db.guardarConOperacion(ids, programador, TipoDeRegistro.PRORROGA, fila.foto()) { dao.guardar(fila) }

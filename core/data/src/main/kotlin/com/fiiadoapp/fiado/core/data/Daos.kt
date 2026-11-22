@@ -81,6 +81,9 @@ interface ProrrogaDao {
     @Query("SELECT p.* FROM prorrogas p JOIN movimientos m ON m.id = p.movimientoId WHERE m.clienteId = :clienteId")
     fun observarDeCliente(clienteId: String): Flow<List<ProrrogaEntity>>
 
+    @Query("SELECT * FROM prorrogas")
+    fun observarTodas(): Flow<List<ProrrogaEntity>>
+
     /** Una prórroga no cambia: guardarla otra vez no hace nada. */
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun guardar(prorroga: ProrrogaEntity)
