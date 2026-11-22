@@ -53,4 +53,12 @@
     </plurals>
     <string name="cuenta_solo_telefono_titulo">Tu libreta está en este teléfono</string>
     <string name="cuenta_solo_telefono_explicacion">Todo se guarda aquí y funciona sin internet. Si activas la copia de seguridad de Google en los ajustes del teléfono, tu libreta vuelve sola al reinstalar Fiado o al pasarte a un teléfono nuevo.</string>
+    <string name="cuenta_anuncios_titulo">Anuncios</string>
+    <string name="cuenta_anuncios_explicacion">Fiado es gratis gracias a un anuncio pequeño en Clientes y Resumen. Con un pago único lo quitas para siempre, también si cambias de teléfono con la misma cuenta de Google.</string>
+    <string name="cuenta_anuncios_quitar">Quitar anuncios · %1$s</string>
+    <string name="cuenta_anuncios_comprado">Gracias por tu compra: no verás más anuncios.</string>
+    <string name="cuenta_anuncios_pendiente">Tu pago está pendiente. Los anuncios se quitan solos cuando Google Play lo confirme.</string>
+    <string name="cuenta_anuncios_no_disponible">La compra no está disponible ahora. Revisa que tengas internet y una cuenta de Google en el teléfono, y vuelve a intentarlo.</string>
+    <string name="cuenta_anuncios_restaurar">Restaurar compra</string>
+    <string name="cuenta_anuncios_privacidad">Privacidad de anuncios</string>
 </resources>

@@ -15,6 +15,15 @@ android {
         targetSdk = 37
         versionCode = 7
         versionName = "1.0.1"
+
+        // AdMob (ADR-0011): sin los ids reales se usan los de prueba de Google, que nunca cobran clics.
+        manifestPlaceholders["admobAppId"] =
+            providers.gradleProperty("fiado.admobAppId").getOrElse("ca-app-pub-3940256099942544~3347511713")
+        buildConfigField(
+            "String",
+            "ADMOB_BANNER",
+            "\"${providers.gradleProperty("fiado.admobBanner").getOrElse("ca-app-pub-3940256099942544/9214589741")}\"",
+        )
     }
 
     // Clave de subida a Google Play (ADR-0009): solo desde variables de entorno, nunca desde el repositorio.
@@ -42,6 +51,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     lint {
@@ -77,6 +87,9 @@ dependencies {
 
     implementation(libs.androidx.work.runtime)
     implementation(libs.androidx.biometric)
+    implementation(libs.play.services.ads)
+    implementation(libs.ump)
+    implementation(libs.billing.ktx)
     implementation(libs.androidx.fragment)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.work)

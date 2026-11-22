@@ -6,6 +6,13 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+### Agregado
+
+- ADR-0011 y publicidad:
+  - Banner adaptativo de AdMob encima de la barra inferior, solo en Clientes y Resumen, después del formulario de consentimiento de Google donde la ley lo exige.
+  - Compra única «Quitar anuncios» con Google Play Billing desde Cuenta, con «Restaurar compra» y acceso a la privacidad de anuncios. Sin internet, quien ya compró sigue sin anuncios.
+  - Los ids de AdMob llegan desde las variables `ADMOB_APP_ID` y `ADMOB_BANNER`; sin ellas se usan los anuncios de prueba de Google.
+
 ## [1.0.1] - 2026-11-22
 
 ### Corregido
