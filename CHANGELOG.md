@@ -8,6 +8,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ### Agregado
 
+- ADR-0010: la versión de la Play Store guarda la libreta solo en el teléfono, sin cuenta ni envíos al servidor; Cuenta explica dónde está la libreta y conserva el bloqueo. La libreta y las preferencias se respaldan con la copia de seguridad de Android (Google Drive y traspaso a un teléfono nuevo), sin la sesión. El build `debug` sigue ofreciendo la cuenta, y `-Pfiado.cuentaRelease=true` la devuelve al release.
 - ADR-0009 y release firmado: con la clave de subida en variables de entorno, `bundleRelease` genera el AAB para Google Play. El workflow `Release` adjunta el AAB y el APK firmados a cada release de GitHub, apuntando a la API pública de `API_URL_RELEASE`.
 
 ### Cambiado
