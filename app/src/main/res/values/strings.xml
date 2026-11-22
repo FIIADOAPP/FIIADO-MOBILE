@@ -1,16 +1,16 @@
 <resources>
-    <string name="app_name">Fiado</string>
+    <string name="app_name">Fiadito</string>
     <string name="barra_clientes">Clientes</string>
     <string name="barra_resumen">Resumen</string>
     <string name="barra_cobros">Cobros</string>
     <string name="barra_cuenta">Cuenta</string>
     <string name="barra_nuevo_cliente">Nuevo cliente</string>
     <string name="anuncio_etiqueta">Anuncio</string>
-    <string name="bloqueo_titulo">Fiado está bloqueada</string>
+    <string name="bloqueo_titulo">Fiadito está bloqueada</string>
     <string name="bloqueo_explicacion">Usa tu huella o el PIN del teléfono para ver tu libreta.</string>
     <string name="bloqueo_desbloquear">Desbloquear</string>
-    <string name="bloqueo_pedido">Desbloquear Fiado</string>
+    <string name="bloqueo_pedido">Desbloquear Fiadito</string>
     <string name="bloqueo_desactivado_titulo">Se desactivó el bloqueo</string>
-    <string name="bloqueo_desactivado_explicacion">Tu teléfono ya no tiene bloqueo de pantalla, así que Fiado tampoco puede pedirlo. Configúralo en los ajustes de Android y vuelve a activarlo desde Cuenta.</string>
+    <string name="bloqueo_desactivado_explicacion">Tu teléfono ya no tiene bloqueo de pantalla, así que Fiadito tampoco puede pedirlo. Configúralo en los ajustes de Android y vuelve a activarlo desde Cuenta.</string>
     <string name="bloqueo_entendido">Entendido</string>
 </resources>
