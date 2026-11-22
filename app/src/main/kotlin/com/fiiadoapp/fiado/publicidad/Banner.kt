@@ -1,5 +1,6 @@
 package com.fiiadoapp.fiado.publicidad
 
+import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,6 +12,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,9 +29,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.fiiadoapp.fiado.BuildConfig
 import com.fiiadoapp.fiado.R
 import com.fiiadoapp.fiado.core.ui.MargenPantalla
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
 
 /** Margen entre el borde de la tarjeta y el anuncio: el anuncio nunca se recorta (política de AdMob). */
 private val RellenoTarjeta = 6.dp
@@ -55,25 +61,61 @@ fun tamanoDeBanner(): AdSize {
 /** Alto de la tarjeta con su etiqueta, para que las pantallas dejen ese espacio libre al final. */
 fun AdSize.alto(): Dp = AltoEtiqueta + EspacioEtiqueta + RellenoTarjeta * 2 + height.dp + SeparacionBarra
 
+/** Un banner que se pide una sola vez y sigue vivo al cambiar de pestaña; [cargado] dice si hay anuncio para mostrar. */
+class AnuncioBanner(
+    val vista: AdView,
+    val tamano: AdSize,
+    cargado: State<Boolean>,
+) {
+    val cargado: Boolean by cargado
+}
+
 /**
- * Banner de AdMob dentro de una tarjeta con los márgenes de la app y la etiqueta «Anuncio», para que se
- * distinga del contenido. En `debug`, o sin los ids reales, usa el bloque de prueba de Google.
+ * Pide el banner de AdMob. Una cuenta o app nueva puede quedarse sin anuncios: en ese caso no se muestra
+ * nada y se vuelve a intentar cada minuto. En `debug`, o sin los ids reales, usa el bloque de prueba de Google.
  */
 @Composable
-fun BannerAnuncio(
-    tamano: AdSize,
-    modifier: Modifier = Modifier,
-) {
+fun rememberAnuncioBanner(tamano: AdSize): AnuncioBanner {
     val contexto = LocalContext.current
+    val cargado = remember(tamano) { mutableStateOf(false) }
     val vista =
         remember(tamano) {
             AdView(contexto).apply {
                 adUnitId = BuildConfig.ADMOB_BANNER
                 setAdSize(tamano)
+                adListener =
+                    object : AdListener() {
+                        override fun onAdLoaded() {
+                            cargado.value = true
+                        }
+
+                        override fun onAdFailedToLoad(error: LoadAdError) {
+                            cargado.value = false
+                            postDelayed({ loadAd(AdRequest.Builder().build()) }, REINTENTO_MS)
+                        }
+                    }
                 loadAd(AdRequest.Builder().build())
             }
         }
-    DisposableEffect(vista) { onDispose { vista.destroy() } }
+    DisposableEffect(vista) {
+        onDispose {
+            vista.handler?.removeCallbacksAndMessages(null)
+            vista.destroy()
+        }
+    }
+    return remember(vista) { AnuncioBanner(vista, tamano, cargado) }
+}
+
+private const val REINTENTO_MS = 60_000L
+
+/** El anuncio en una tarjeta con los márgenes de la app y la etiqueta «Anuncio», para que se distinga del contenido. */
+@Composable
+fun BannerAnuncio(
+    anuncio: AnuncioBanner,
+    modifier: Modifier = Modifier,
+) {
+    val vista = anuncio.vista
+    val tamano = anuncio.tamano
     // La etiqueta va dentro de la tarjeta, con fondo, para que no flote sobre la lista.
     Surface(
         modifier = modifier.fillMaxWidth().padding(start = MargenPantalla, end = MargenPantalla, bottom = SeparacionBarra),
@@ -90,7 +132,11 @@ fun BannerAnuncio(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             AndroidView(
-                factory = { vista },
+                // La vista sobrevive al cambiar de pestaña: se suelta de su padre anterior antes de volver a usarla.
+                factory = {
+                    (vista.parent as? ViewGroup)?.removeView(vista)
+                    vista
+                },
                 modifier = Modifier.padding(top = EspacioEtiqueta).size(tamano.width.dp, tamano.height.dp),
             )
         }

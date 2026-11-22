@@ -68,6 +68,7 @@ import com.fiiadoapp.fiado.feature.movimientos.pantallasDeMovimientos
 import com.fiiadoapp.fiado.publicidad.BannerAnuncio
 import com.fiiadoapp.fiado.publicidad.Publicidad
 import com.fiiadoapp.fiado.publicidad.alto
+import com.fiiadoapp.fiado.publicidad.rememberAnuncioBanner
 import com.fiiadoapp.fiado.publicidad.tamanoDeBanner
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -206,8 +207,10 @@ private fun Aplicacion(publicidad: Publicidad) {
     val principal = PRINCIPALES.indexOfFirst { (_, ruta) -> entrada?.destination?.hasRoute(ruta) == true }.takeIf { it >= 0 }
     val mostrarAnuncios by publicidad.mostrarAnuncios.collectAsStateWithLifecycle()
     // El banner solo va en Clientes y Resumen, nunca mientras se fía, se cobra o se edita (ADR-0011).
-    val conBanner = mostrarAnuncios && principal != null && principal in CON_BANNER
     val tamano = tamanoDeBanner()
+    // Se pide apenas se puede mostrar anuncios; la tarjeta aparece solo cuando llegó uno.
+    val anuncio = if (mostrarAnuncios) rememberAnuncioBanner(tamano) else null
+    val conBanner = anuncio?.cargado == true && principal != null && principal in CON_BANNER
     // Surface da el fondo y el color de texto del tema también a las pantallas sin Scaffold.
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Box(Modifier.fillMaxSize()) {
@@ -217,7 +220,7 @@ private fun Aplicacion(publicidad: Publicidad) {
             }
             if (principal != null) {
                 Column(Modifier.align(Alignment.BottomCenter)) {
-                    if (conBanner) BannerAnuncio(tamano)
+                    if (conBanner && anuncio != null) BannerAnuncio(anuncio)
                     BarraInferiorFlotante(
                         destinos = destinos(),
                         seleccionado = principal,
