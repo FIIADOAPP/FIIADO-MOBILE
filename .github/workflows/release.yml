@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       API_URL_RELEASE: ${{ vars.API_URL_RELEASE }}
+      ADMOB_APP_ID: ${{ vars.ADMOB_APP_ID }}
+      ADMOB_BANNER: ${{ vars.ADMOB_BANNER }}
       FIRMA_KEYSTORE_BASE64: ${{ secrets.FIRMA_KEYSTORE_BASE64 }}
       FIRMA_CLAVE: ${{ secrets.FIRMA_CLAVE }}
       FIRMA_ALIAS: ${{ secrets.FIRMA_ALIAS }}
@@ -50,7 +52,14 @@ jobs:
           if [ -n "$API_URL_RELEASE" ]; then
             cuenta=(-Pfiado.cuentaRelease=true -Pfiado.apiUrlRelease="$API_URL_RELEASE")
           fi
-          ./gradlew bundleRelease assembleRelease "${cuenta[@]}" --console=plain
+          # Sin los ids de AdMob, el release usa los anuncios de prueba de Google (ADR-0011).
+          anuncios=()
+          if [ -n "$ADMOB_APP_ID" ] && [ -n "$ADMOB_BANNER" ]; then
+            anuncios=(-Pfiado.admobAppId="$ADMOB_APP_ID" -Pfiado.admobBanner="$ADMOB_BANNER")
+          else
+            echo "::warning::Sin ADMOB_APP_ID y ADMOB_BANNER: el release lleva los anuncios de prueba de Google."
+          fi
+          ./gradlew bundleRelease assembleRelease "${cuenta[@]}" "${anuncios[@]}" --console=plain
       - name: Adjuntar al release
         env:
           GH_TOKEN: ${{ github.token }}
