@@ -69,6 +69,27 @@ internal val MIGRACION_3_4 =
         }
     }
 
+/** Versión 5 (ADR-0007): plazo de pago de los fiados. Lo registrado antes queda sin plazo. */
+internal val MIGRACION_4_5 =
+    object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `movimientos` ADD COLUMN `vence` INTEGER")
+        }
+    }
+
+/** Versión 6 (ADR-0007): prórrogas de los fiados. */
+internal val MIGRACION_5_6 =
+    object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `prorrogas` (`id` TEXT NOT NULL, `movimientoId` TEXT NOT NULL, `vence` INTEGER NOT NULL, " +
+                    "`registradaEn` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`movimientoId`) REFERENCES `movimientos`(`id`) " +
+                    "ON UPDATE NO ACTION ON DELETE NO ACTION )",
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_prorrogas_movimientoId` ON `prorrogas` (`movimientoId`)")
+        }
+    }
+
 /** Idempotente: los iniciales tienen identificadores fijos. */
 internal fun insertarMetodosIniciales(db: SupportSQLiteDatabase) {
     MetodoCobro.INICIALES.forEach {

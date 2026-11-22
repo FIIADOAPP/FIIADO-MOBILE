@@ -13,10 +13,25 @@
     <string name="registro_error_archivado">Este cliente está archivado.</string>
     <string name="registro_metodo">Cobrado con</string>
     <string name="registro_error_metodo">Elige con qué te pagó.</string>
+    <string name="registro_error_plazo">El plazo no puede ser antes del día del fiado.</string>
+    <string name="registro_plazo">¿Para cuándo?</string>
+    <string name="registro_plazo_ninguno">Sin plazo</string>
+    <string name="registro_plazo_manana">Mañana</string>
+    <string name="registro_plazo_tres_dias">3 días</string>
+    <string name="registro_plazo_una_semana">1 semana</string>
+    <string name="registro_plazo_fin_de_mes">Fin de mes</string>
+    <string name="registro_plazo_otra_fecha">Otra fecha</string>
+    <string name="registro_usar_plazo_sugerido">Usar ese plazo</string>
+    <string name="registro_aviso_cuidado">%1$s %2$s. Considera cobrar lo pendiente antes de fiarle más.</string>
+    <string name="registro_aviso_y">" y "</string>
+    <string name="plazo_hoy">Para hoy</string>
+    <string name="plazo_manana">Para mañana</string>
+    <string name="plazo_fecha">Para el %1$s</string>
 
     <string name="historial_editar_cliente">Editar cliente</string>
     <string name="historial_fiar">Fiar</string>
     <string name="historial_cobrar">Cobrar</string>
+    <string name="historial_movimientos">Movimientos</string>
     <string name="historial_vacio">Aún no hay movimientos con este cliente.</string>
     <string name="historial_ayuda">Toca un movimiento si necesitas anularlo.</string>
     <string name="historial_fiado">Fiado</string>
@@ -27,14 +42,42 @@
     <string name="historial_anular_titulo">¿Anular %1$s de %2$s?</string>
     <string name="historial_anular_explicacion">Seguirá en el historial, tachado, y dejará de contar en el saldo. No se puede deshacer.</string>
     <string name="historial_anular">Anular</string>
+    <string name="historial_opciones_titulo">Fiado de %1$s</string>
+    <string name="historial_dar_mas_plazo">Dar más plazo</string>
+    <string name="historial_como_paga">Cómo paga</string>
+    <string name="historial_sin_historial">Aún no hay suficientes fiados con plazo pagados para saber cómo paga.</string>
+    <string name="historial_a_tiempo">Paga a tiempo el %1$d %% de sus fiados con plazo</string>
+    <string name="historial_pagado_a_tiempo">Pagado a tiempo</string>
+    <string name="historial_con_mas_plazo">(con más plazo)</string>
+    <string name="historial_recordar">Recordar por WhatsApp</string>
+    <string name="historial_recordar_sin_celular">Agrega su celular para recordarle por WhatsApp</string>
+    <string name="historial_sin_whatsapp">No se encontró una app para abrir WhatsApp.</string>
+
+    <string name="cobros_titulo">Cobros</string>
+    <string name="cobros_subtitulo">Cómo te pagan y cómo les recuerdas</string>
+    <string name="cobros_metodos_ayuda">Efectivo, Yape, Plin y los que agregues</string>
+    <string name="cobros_mensaje_ayuda">El texto del recordatorio por WhatsApp</string>
+    <string name="mensaje_titulo">Mensaje de cobro</string>
+    <string name="mensaje_ayuda">Este texto se usa en cada recordatorio por WhatsApp. %1$s se cambia por el nombre del cliente, %2$s por lo que debe y %3$s por el nombre de tu negocio. Sin cuenta, la frase con el negocio se omite.</string>
+    <string name="mensaje_campo">Mensaje</string>
+    <string name="mensaje_vista_previa">Así se verá</string>
+    <string name="mensaje_restablecer">Restablecer</string>
+    <string name="mensaje_guardar">Guardar</string>
+    <string name="mensaje_error_vacio">Escribe el mensaje.</string>
+    <string name="mensaje_error_sin_saldo">Incluye %1$s para que el cliente sepa cuánto debe.</string>
 
     <string name="resumen_titulo">Resumen</string>
+    <string name="resumen_cobrado_de_lo_fiado">cobrado de lo fiado</string>
+    <string name="resumen_por_metodo">Cobrado por método</string>
+    <string name="resumen_por_metodo_hoy">Cobrado hoy por método</string>
     <string name="resumen_por_cobrar">Por cobrar</string>
     <string name="resumen_por_cobrar_ayuda">Lo que te deben todos tus clientes. El saldo a favor de uno no descuenta lo que deben los demás.</string>
     <string name="resumen_hoy">Hoy</string>
     <string name="resumen_mes">Este mes (%1$s)</string>
     <string name="resumen_fiado">Fiado</string>
     <string name="resumen_cobrado">Cobrado</string>
+    <string name="resumen_como_te_pagan">Cómo te pagan</string>
+    <string name="resumen_para_tener_cuidado">Para tener cuidado</string>
 
     <string name="metodos_titulo">Métodos de cobro</string>
     <string name="metodos_ayuda">Al cobrar eliges uno de estos métodos. Toca uno para renombrarlo o archivarlo.</string>
@@ -57,5 +100,65 @@
         <item quantity="one">Máximo %1$d carácter.</item>
         <item quantity="many">Máximo %1$d caracteres.</item>
         <item quantity="other">Máximo %1$d caracteres.</item>
+    </plurals>
+    <plurals name="mensaje_error_largo">
+        <item quantity="one">El mensaje admite hasta %1$d carácter.</item>
+        <item quantity="many">El mensaje admite hasta %1$d caracteres.</item>
+        <item quantity="other">El mensaje admite hasta %1$d caracteres.</item>
+    </plurals>
+    <plurals name="historial_tarda_en_pagar">
+        <item quantity="one">Tarda %1$d día en pagar, en promedio</item>
+        <item quantity="many">Tarda %1$d días en pagar, en promedio</item>
+        <item quantity="other">Tarda %1$d días en pagar, en promedio</item>
+    </plurals>
+    <plurals name="historial_vencido_total">
+        <item quantity="one">Debe %1$s vencidos desde hace %2$d día</item>
+        <item quantity="many">Debe %1$s vencidos desde hace %2$d días</item>
+        <item quantity="other">Debe %1$s vencidos desde hace %2$d días</item>
+    </plurals>
+    <plurals name="historial_vencido_hace">
+        <item quantity="one">Vencido hace %1$d día</item>
+        <item quantity="many">Vencido hace %1$d días</item>
+        <item quantity="other">Vencido hace %1$d días</item>
+    </plurals>
+    <plurals name="historial_pagado_tarde">
+        <item quantity="one">Pagado %1$d día tarde</item>
+        <item quantity="many">Pagado %1$d días tarde</item>
+        <item quantity="other">Pagado %1$d días tarde</item>
+    </plurals>
+    <plurals name="resumen_sin_historial">
+        <item quantity="one">%1$d cliente aún sin historial</item>
+        <item quantity="many">%1$d clientes aún sin historial</item>
+        <item quantity="other">%1$d clientes aún sin historial</item>
+    </plurals>
+    <plurals name="resumen_tardan_en_pagar">
+        <item quantity="one">Tus clientes tardan %1$d día en pagar, en promedio</item>
+        <item quantity="many">Tus clientes tardan %1$d días en pagar, en promedio</item>
+        <item quantity="other">Tus clientes tardan %1$d días en pagar, en promedio</item>
+    </plurals>
+    <plurals name="resumen_debe_vencido">
+        <item quantity="one">Debe %1$s vencidos desde hace %2$d día</item>
+        <item quantity="many">Debe %1$s vencidos desde hace %2$d días</item>
+        <item quantity="other">Debe %1$s vencidos desde hace %2$d días</item>
+    </plurals>
+    <plurals name="resumen_suele_pagar_tarde">
+        <item quantity="one">Suele pagar %1$d día tarde</item>
+        <item quantity="many">Suele pagar %1$d días tarde</item>
+        <item quantity="other">Suele pagar %1$d días tarde</item>
+    </plurals>
+    <plurals name="registro_suele_pagar_en">
+        <item quantity="one">%1$s suele pagar en %2$d día</item>
+        <item quantity="many">%1$s suele pagar en %2$d días</item>
+        <item quantity="other">%1$s suele pagar en %2$d días</item>
+    </plurals>
+    <plurals name="registro_aviso_atraso">
+        <item quantity="one">suele pagar %1$d día tarde</item>
+        <item quantity="many">suele pagar %1$d días tarde</item>
+        <item quantity="other">suele pagar %1$d días tarde</item>
+    </plurals>
+    <plurals name="registro_aviso_vencido">
+        <item quantity="one">tiene %1$s vencidos desde hace %2$d día</item>
+        <item quantity="many">tiene %1$s vencidos desde hace %2$d días</item>
+        <item quantity="other">tiene %1$s vencidos desde hace %2$d días</item>
     </plurals>
 </resources>

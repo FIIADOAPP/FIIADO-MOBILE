@@ -2,13 +2,16 @@ package com.fiiadoapp.fiado.feature.movimientos
 
 import com.fiiadoapp.fiado.core.testing.LibretaFalsa
 import com.fiiadoapp.fiado.core.testing.ReglaDispatcherPrincipal
+import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
+import com.fiiadoapp.fiado.domain.NivelPuntualidad
 import com.fiiadoapp.fiado.domain.TipoMovimiento.FIADO
 import com.fiiadoapp.fiado.domain.TipoMovimiento.PAGO
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.plus
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -18,6 +21,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.uuid.Uuid
 
 class ResumenViewModelTest {
@@ -37,6 +41,15 @@ class ResumenViewModelTest {
         metodo: MetodoCobro? = null,
     ) = Movimiento(Uuid.random(), rosa, tipo, Dinero(centimos), null, fecha, ahora, null, metodo?.id)
 
+    private fun TestScope.viewModelObservado() =
+        ResumenViewModel(
+            libreta.repositorioMovimientos,
+            libreta.repositorioMetodosCobro,
+            libreta.repositorioClientes,
+            libreta.repositorioProrrogas,
+            Clock.fixed(ahora, ZoneId.of("America/Lima")),
+        ).also { it.estado.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler)) }
+
     @Test
     fun `resume lo de hoy y del mes en hora de Lima, con lo cobrado por metodo`() =
         runTest {
@@ -48,13 +61,7 @@ class ResumenViewModelTest {
                     movimiento(PAGO, 1500, metodo = MetodoCobro.YAPE),
                     movimiento(PAGO, 2000, fecha = LocalDate.of(2026, 11, 3), metodo = MetodoCobro.PLIN),
                 ).associateBy { it.id }
-            val viewModel =
-                ResumenViewModel(
-                    libreta.repositorioMovimientos,
-                    libreta.repositorioMetodosCobro,
-                    Clock.fixed(ahora, ZoneId.of("America/Lima")),
-                )
-            viewModel.estado.launchIn(backgroundScope + UnconfinedTestDispatcher(testScheduler))
+            val viewModel = viewModelObservado()
 
             val estado = viewModel.estado.value
 
@@ -76,5 +83,37 @@ class ResumenViewModelTest {
                 ),
                 estado?.delMes?.porMetodo,
             )
+        }
+
+    @Test
+    fun `resume como te pagan con los clientes activos y nombra a los de cuidado`() =
+        runTest {
+            val juan = Cliente(Uuid.random(), "Juan", null, ahora, ahora, null)
+            val archivado = Cliente(Uuid.random(), "Pedro", null, ahora, ahora, ahora)
+            val sinFiados = Cliente(Uuid.random(), "Ana", null, ahora, ahora, null)
+            libreta.clientes.value = listOf(juan, archivado, sinFiados).associateBy { it.id }
+            val vencidoDeJuan =
+                Movimiento(Uuid.random(), juan.id, FIADO, Dinero(4000), null, hoy.minusDays(12), ahora, null, vence = hoy.minusDays(9))
+            val dePedro = Movimiento(Uuid.random(), archivado.id, FIADO, Dinero(1000), null, hoy.minusDays(30), ahora, null)
+            libreta.movimientos.value = listOf(vencidoDeJuan, dePedro).associateBy { it.id }
+
+            val comoTePagan = viewModelObservado().estado.value?.comoTePagan
+
+            assertEquals(mapOf(NivelPuntualidad.CUIDADO to 1), comoTePagan?.negocio?.clientesPorNivel)
+            assertEquals(listOf("Juan"), comoTePagan?.enCuidado?.map { it.nombre })
+            assertEquals(
+                Dinero(4000),
+                comoTePagan
+                    ?.enCuidado
+                    ?.single()
+                    ?.puntualidad
+                    ?.vencido,
+            )
+        }
+
+    @Test
+    fun `sin clientes con fiados no muestra como te pagan`() =
+        runTest {
+            assertNull(viewModelObservado().estado.value?.comoTePagan)
         }
 }

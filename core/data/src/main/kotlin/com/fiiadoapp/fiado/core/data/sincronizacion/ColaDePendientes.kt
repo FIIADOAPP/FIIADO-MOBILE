@@ -34,6 +34,9 @@ interface ColaDao {
     @Query("DELETE FROM operaciones_pendientes WHERE id IN (:ids)")
     suspend fun quitar(ids: List<String>)
 
+    @Query("SELECT * FROM operaciones_pendientes ORDER BY orden")
+    suspend fun todas(): List<OperacionPendienteEntity>
+
     @Query("SELECT COUNT(*) FROM operaciones_pendientes")
     fun observarCantidad(): Flow<Int>
 }

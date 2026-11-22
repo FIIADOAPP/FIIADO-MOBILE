@@ -83,6 +83,35 @@ class MigracionesTest {
         db.close()
     }
 
+    @Test
+    fun `la version 5 agrega el plazo y deja sin plazo lo registrado antes`() {
+        ayudante.createDatabase(base, 4).use { db ->
+            db.execSQL("INSERT INTO clientes VALUES ('c1', 'Rosa', 'rosa', NULL, 0, 0, NULL)")
+            db.execSQL("INSERT INTO movimientos VALUES ('m1', 'c1', 'FIADO', 1250, NULL, 20407, 0, NULL, NULL)")
+        }
+
+        val db = ayudante.runMigrationsAndValidate(base, 5, true, MIGRACION_4_5)
+
+        db.query("SELECT vence FROM movimientos WHERE id = 'm1'").use { c ->
+            c.moveToFirst()
+            assertEquals(true, c.isNull(0))
+        }
+        db.close()
+    }
+
+    @Test
+    fun `la version 6 agrega las prorrogas`() {
+        ayudante.createDatabase(base, 5).close()
+
+        val db = ayudante.runMigrationsAndValidate(base, 6, true, MIGRACION_5_6)
+
+        db.query("SELECT COUNT(*) FROM prorrogas").use { c ->
+            c.moveToFirst()
+            assertEquals(0, c.getInt(0))
+        }
+        db.close()
+    }
+
     /** Ruta absoluta: con un nombre relativo, el ayudante abre y valida rutas distintas. */
     private val base =
         InstrumentationRegistry

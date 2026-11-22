@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.DateRange
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,11 +52,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fiiadoapp.fiado.core.ui.SaldoTexto
+import com.fiiadoapp.fiado.domain.AtajoDePlazo
 import com.fiiadoapp.fiado.domain.ErrorMovimiento
 import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
+import com.fiiadoapp.fiado.domain.Puntualidad
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import java.time.LocalDate
+import kotlin.math.roundToInt
 import kotlin.uuid.Uuid
 
 private const val MILISEGUNDOS_POR_DIA = 86_400_000L
@@ -71,6 +78,9 @@ internal fun RegistrarMovimientoDialogo(
         onNota = viewModel::cambiarNota,
         onFecha = viewModel::cambiarFecha,
         onMetodo = viewModel::elegirMetodo,
+        onAtajo = viewModel::elegirAtajo,
+        onOtraFecha = viewModel::elegirOtraFecha,
+        onPlazoSugerido = viewModel::usarPlazoSugerido,
         onGuardar = viewModel::guardar,
         onCancelar = onCerrar,
     )
@@ -83,10 +93,13 @@ internal fun RegistrarMovimientoContenido(
     onNota: (String) -> Unit,
     onFecha: (LocalDate) -> Unit,
     onMetodo: (Uuid) -> Unit,
+    onAtajo: (AtajoDePlazo?) -> Unit,
+    onOtraFecha: (LocalDate) -> Unit,
+    onPlazoSugerido: () -> Unit,
     onGuardar: () -> Unit,
     onCancelar: () -> Unit,
 ) {
-    Surface(shape = MaterialTheme.shapes.extraLarge, tonalElevation = 6.dp) {
+    Surface(shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
         if (estado.cargando) {
             Box(Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             return@Surface
@@ -104,7 +117,11 @@ internal fun RegistrarMovimientoContenido(
                 style = MaterialTheme.typography.headlineSmall,
             )
             SaldoTexto(estado.saldo)
+            if (estado.avisarCuidado) {
+                estado.puntualidad?.let { AvisoDeCuidado(estado.nombreCliente, it) }
+            }
             OutlinedTextField(
+                shape = MaterialTheme.shapes.small,
                 value = estado.monto,
                 onValueChange = onMonto,
                 modifier = Modifier.fillMaxWidth().focusRequester(foco),
@@ -119,10 +136,13 @@ internal fun RegistrarMovimientoContenido(
             )
             if (estado.tipo == TipoMovimiento.PAGO) {
                 SelectorDeMetodo(estado.metodos, estado.metodoElegido, onMetodo)
+            } else {
+                SelectorDePlazo(estado, onAtajo, onOtraFecha, onPlazoSugerido)
             }
             val notaMuyLarga = estado.error == ErrorMovimiento.NotaMuyLarga
             val errorNota = pluralStringResource(R.plurals.registro_error_nota, Movimiento.LARGO_MAXIMO_NOTA, Movimiento.LARGO_MAXIMO_NOTA)
             OutlinedTextField(
+                shape = MaterialTheme.shapes.small,
                 value = estado.nota,
                 onValueChange = onNota,
                 modifier = Modifier.fillMaxWidth(),
@@ -134,13 +154,15 @@ internal fun RegistrarMovimientoContenido(
             AssistChip(
                 onClick = { eligiendoFecha = true },
                 label = { Text(textoDeFecha(estado.fecha, estado.hoy)) },
-                leadingIcon = { Icon(Icons.Filled.DateRange, contentDescription = null) },
+                leadingIcon = { Icon(Icons.Rounded.DateRange, contentDescription = null) },
+                shape = CircleShape,
             )
             val errorGeneral =
                 when (estado.error) {
                     ErrorMovimiento.FechaFutura -> R.string.registro_error_fecha
                     ErrorMovimiento.ClienteArchivado -> R.string.registro_error_archivado
                     ErrorMovimiento.SinMetodoCobro, ErrorMovimiento.MetodoCobroArchivado -> R.string.registro_error_metodo
+                    ErrorMovimiento.PlazoAntesDeLaFecha -> R.string.registro_error_plazo
                     else -> null
                 }
             if (errorGeneral != null) {
@@ -152,13 +174,16 @@ internal fun RegistrarMovimientoContenido(
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 TextButton(onClick = onCancelar) { Text(stringResource(R.string.registro_cancelar)) }
-                Button(onClick = onGuardar, enabled = !estado.guardando) { Text(stringResource(R.string.registro_guardar)) }
+                Button(onClick = onGuardar, enabled = !estado.guardando, modifier = Modifier.padding(start = 8.dp)) {
+                    Text(stringResource(R.string.registro_guardar))
+                }
             }
         }
         if (eligiendoFecha) {
             SelectorDeFecha(
                 fecha = estado.fecha,
-                hoy = estado.hoy,
+                anios = (estado.hoy.year - 1)..estado.hoy.year,
+                seleccionable = { !it.isAfter(estado.hoy) },
                 onElegir = {
                     onFecha(it)
                     eligiendoFecha = false
@@ -187,29 +212,111 @@ private fun SelectorDeMetodo(
                     onClick = { onMetodo(metodo.id) },
                     label = { Text(metodo.nombre) },
                     // El check distingue el elegido sin depender solo del color.
-                    leadingIcon = if (seleccionado) ({ Icon(Icons.Filled.Check, contentDescription = null) }) else null,
+                    leadingIcon = if (seleccionado) ({ Icon(Icons.Rounded.Check, contentDescription = null) }) else null,
+                    shape = CircleShape,
                 )
             }
         }
     }
 }
 
+/** Sin plazo por defecto; los atajos se cuentan desde el día del fiado (ADR-0007). */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SelectorDePlazo(
+    estado: EstadoRegistro,
+    onAtajo: (AtajoDePlazo?) -> Unit,
+    onOtraFecha: (LocalDate) -> Unit,
+    onPlazoSugerido: () -> Unit,
+) {
+    var eligiendo by rememberSaveable { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(stringResource(R.string.registro_plazo), style = MaterialTheme.typography.labelLarge)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OpcionDePlazo(stringResource(R.string.registro_plazo_ninguno), estado.vence == null) { onAtajo(null) }
+            AtajoDePlazo.entries.forEach { atajo ->
+                OpcionDePlazo(textoDeAtajo(atajo), estado.otraFecha == null && estado.atajo == atajo) { onAtajo(atajo) }
+            }
+            OpcionDePlazo(stringResource(R.string.registro_plazo_otra_fecha), estado.otraFecha != null) { eligiendo = true }
+        }
+        estado.diasSugeridos?.let { dias ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    pluralStringResource(R.plurals.registro_suele_pagar_en, dias, estado.nombreCliente, dias),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = onPlazoSugerido) { Text(stringResource(R.string.registro_usar_plazo_sugerido)) }
+            }
+        }
+        estado.vence?.let {
+            Text(
+                textoDePlazo(it, estado.hoy),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+    if (eligiendo) {
+        SelectorDeFecha(
+            fecha = estado.vence ?: AtajoDePlazo.UNA_SEMANA.desde(estado.fecha),
+            anios = estado.fecha.year..(estado.fecha.year + 1),
+            seleccionable = { !it.isBefore(estado.fecha) },
+            onElegir = {
+                onOtraFecha(it)
+                eligiendo = false
+            },
+            onCancelar = { eligiendo = false },
+        )
+    }
+}
+
+@Composable
+private fun OpcionDePlazo(
+    texto: String,
+    elegida: Boolean,
+    onClick: () -> Unit,
+) {
+    FilterChip(
+        selected = elegida,
+        onClick = onClick,
+        label = { Text(texto) },
+        leadingIcon = if (elegida) ({ Icon(Icons.Rounded.Check, contentDescription = null) }) else null,
+        shape = CircleShape,
+    )
+}
+
+@Composable
+private fun textoDeAtajo(atajo: AtajoDePlazo): String =
+    stringResource(
+        when (atajo) {
+            AtajoDePlazo.MANANA -> R.string.registro_plazo_manana
+            AtajoDePlazo.TRES_DIAS -> R.string.registro_plazo_tres_dias
+            AtajoDePlazo.UNA_SEMANA -> R.string.registro_plazo_una_semana
+            AtajoDePlazo.FIN_DE_MES -> R.string.registro_plazo_fin_de_mes
+        },
+    )
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SelectorDeFecha(
+internal fun SelectorDeFecha(
     fecha: LocalDate,
-    hoy: LocalDate,
+    anios: IntRange,
+    seleccionable: (LocalDate) -> Boolean,
     onElegir: (LocalDate) -> Unit,
     onCancelar: () -> Unit,
 ) {
-    val ultimoDia = hoy.toEpochDay() * MILISEGUNDOS_POR_DIA
     val estado =
         rememberDatePickerState(
             initialSelectedDateMillis = fecha.toEpochDay() * MILISEGUNDOS_POR_DIA,
-            yearRange = (hoy.year - 1)..hoy.year,
+            yearRange = anios,
             selectableDates =
                 object : SelectableDates {
-                    override fun isSelectableDate(utcTimeMillis: Long) = utcTimeMillis <= ultimoDia
+                    override fun isSelectableDate(utcTimeMillis: Long) =
+                        seleccionable(
+                            LocalDate.ofEpochDay(utcTimeMillis / MILISEGUNDOS_POR_DIA),
+                        )
                 },
         )
     DatePickerDialog(
@@ -222,5 +329,35 @@ private fun SelectorDeFecha(
         dismissButton = { TextButton(onClick = onCancelar) { Text(stringResource(R.string.registro_cancelar)) } },
     ) {
         DatePicker(state = estado)
+    }
+}
+
+/** No impide fiar: solo explica con sus números por qué conviene cobrar antes (ADR-0007). */
+@Composable
+private fun AvisoDeCuidado(
+    nombre: String,
+    puntualidad: Puntualidad,
+) {
+    val partes =
+        buildList {
+            puntualidad.atrasoPromedio?.takeIf { it >= Puntualidad.DIAS_DEMORA }?.let {
+                val dias = it.roundToInt()
+                add(pluralStringResource(R.plurals.registro_aviso_atraso, dias, dias))
+            }
+            if (puntualidad.vencido.esPositivo) {
+                val dias = puntualidad.diasVencido.toInt()
+                add(pluralStringResource(R.plurals.registro_aviso_vencido, dias, puntualidad.vencido.formatear(), dias))
+            }
+        }
+    val texto = stringResource(R.string.registro_aviso_cuidado, nombre, partes.joinToString(stringResource(R.string.registro_aviso_y)))
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.error.copy(alpha = 0.14f),
+        contentColor = MaterialTheme.colorScheme.onSurface,
+    ) {
+        Row(Modifier.padding(12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Icon(Icons.Rounded.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+            Text(texto, style = MaterialTheme.typography.bodyMedium)
+        }
     }
 }

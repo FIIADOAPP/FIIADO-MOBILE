@@ -34,7 +34,6 @@ fun NavGraphBuilder.pantallasDeCuenta(navController: NavController) {
 
     composable<Cuenta> {
         CuentaPantalla(
-            onVolver = { navController.popBackStack() },
             onCrearCuenta = { navController.navigate(CrearCuenta) },
             onIniciarSesion = { navController.navigate(IniciarSesion()) },
         )

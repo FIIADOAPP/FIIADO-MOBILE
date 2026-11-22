@@ -19,8 +19,9 @@ import com.fiiadoapp.fiado.core.data.sincronizacion.VinculoEntity
         OperacionPendienteEntity::class,
         VinculoEntity::class,
         IdRestauradoEntity::class,
+        ProrrogaEntity::class,
     ],
-    version = 4,
+    version = 6,
 )
 abstract class FiadoDatabase : RoomDatabase() {
     abstract fun clienteDao(): ClienteDao
@@ -33,6 +34,8 @@ abstract class FiadoDatabase : RoomDatabase() {
 
     abstract fun restauracionDao(): RestauracionDao
 
+    abstract fun prorrogaDao(): ProrrogaDao
+
     companion object {
         /** Journal clásico en lugar de WAL, para que una escritura confirmada sobreviva a un apagado (ADR-0003). */
         fun construir(
@@ -42,7 +45,7 @@ abstract class FiadoDatabase : RoomDatabase() {
             Room
                 .databaseBuilder(contexto, FiadoDatabase::class.java, nombre)
                 .setJournalMode(JournalMode.TRUNCATE)
-                .addMigrations(MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4)
+                .addMigrations(MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4, MIGRACION_4_5, MIGRACION_5_6)
                 .addCallback(SembrarMetodosIniciales)
                 .build()
     }

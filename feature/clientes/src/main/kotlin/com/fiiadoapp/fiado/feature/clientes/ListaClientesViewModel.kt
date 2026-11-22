@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiiadoapp.fiado.domain.ClienteConSaldo
 import com.fiiadoapp.fiado.domain.Dinero
+import com.fiiadoapp.fiado.domain.Puntualidad
 import com.fiiadoapp.fiado.domain.RepositorioClientes
 import com.fiiadoapp.fiado.domain.RepositorioMovimientos
+import com.fiiadoapp.fiado.domain.RepositorioProrrogas
 import com.fiiadoapp.fiado.domain.Resumen
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -39,6 +42,7 @@ class ListaClientesViewModel
     constructor(
         private val clientes: RepositorioClientes,
         private val movimientos: RepositorioMovimientos,
+        prorrogas: RepositorioProrrogas,
         private val reloj: Clock,
     ) : ViewModel() {
         private val _busqueda = MutableStateFlow("")
@@ -57,6 +61,17 @@ class ListaClientesViewModel
                 .observarTodos()
                 .map { Resumen.calcular(it, LocalDate.now(reloj)).porCobrar }
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+        /** Puntualidad de cada cliente con movimientos (ADR-0007). */
+        val puntualidades: StateFlow<Map<Uuid, Puntualidad>> =
+            combine(movimientos.observarTodos(), prorrogas.observarTodas()) { todos, todasLasProrrogas ->
+                val hoy = LocalDate.now(reloj)
+                todos.groupBy { it.clienteId }.mapValues { (_, deCliente) ->
+                    Puntualidad.calcular(deCliente, todasLasProrrogas, hoy, reloj.zone)
+                }
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
+
+        val hoy: LocalDate get() = LocalDate.now(reloj)
 
         private val _aviso = MutableStateFlow<AvisoRegistro?>(null)
         val aviso: StateFlow<AvisoRegistro?> = _aviso.asStateFlow()

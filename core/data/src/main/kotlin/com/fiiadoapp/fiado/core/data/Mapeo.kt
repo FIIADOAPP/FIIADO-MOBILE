@@ -4,6 +4,7 @@ import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
 import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
+import com.fiiadoapp.fiado.domain.Prorroga
 import com.fiiadoapp.fiado.domain.Telefono
 import com.fiiadoapp.fiado.domain.TipoMovimiento
 import java.text.Normalizer
@@ -57,6 +58,7 @@ internal fun Movimiento.aEntidad() =
         registradoEn = registradoEn.toEpochMilli(),
         anuladoEn = anuladoEn?.toEpochMilli(),
         metodoCobroId = metodoCobroId?.toString(),
+        vence = vence?.toEpochDay(),
     )
 
 internal fun MovimientoEntity.aDominio() =
@@ -70,6 +72,23 @@ internal fun MovimientoEntity.aDominio() =
         registradoEn = Instant.ofEpochMilli(registradoEn),
         anuladoEn = anuladoEn?.let(Instant::ofEpochMilli),
         metodoCobroId = metodoCobroId?.let(Uuid::parse),
+        vence = vence?.let(LocalDate::ofEpochDay),
+    )
+
+internal fun Prorroga.aEntidad() =
+    ProrrogaEntity(
+        id = id.toString(),
+        movimientoId = movimientoId.toString(),
+        vence = vence.toEpochDay(),
+        registradaEn = registradaEn.toEpochMilli(),
+    )
+
+internal fun ProrrogaEntity.aDominio() =
+    Prorroga(
+        id = Uuid.parse(id),
+        movimientoId = Uuid.parse(movimientoId),
+        vence = LocalDate.ofEpochDay(vence),
+        registradaEn = Instant.ofEpochMilli(registradaEn),
     )
 
 internal fun MetodoCobro.aEntidad() =

@@ -2,6 +2,7 @@ package com.fiiadoapp.fiado.core.data
 
 import com.fiiadoapp.fiado.core.data.sincronizacion.OperacionPendienteEntity
 import com.fiiadoapp.fiado.domain.MetodoCobro
+import com.fiiadoapp.fiado.domain.Prorroga
 import com.fiiadoapp.fiado.domain.TipoMovimiento.FIADO
 import com.fiiadoapp.fiado.domain.TipoMovimiento.PAGO
 import kotlinx.coroutines.flow.first
@@ -16,6 +17,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.uuid.Uuid
 
 @RunWith(RobolectricTestRunner::class)
 class ColaDePendientesTest : BaseDeDatosDePrueba() {
@@ -62,7 +64,7 @@ class ColaDePendientesTest : BaseDeDatosDePrueba() {
                 Json.parseToJsonElement(
                     """{"id":"${pago.id}","cliente_id":"${rosa.id}","tipo":"pago","monto":500,"nota":null,
                     "fecha":"2026-11-15","registrado_en":"2026-11-15T15:30:00.123Z","anulado_en":null,
-                    "metodo_cobro_id":"${MetodoCobro.EFECTIVO.id}"}""",
+                    "metodo_cobro_id":"${MetodoCobro.EFECTIVO.id}","vence":null}""",
                 ),
                 fotoPago,
             )
@@ -99,5 +101,41 @@ class ColaDePendientesTest : BaseDeDatosDePrueba() {
         runTest {
             assertEquals(MetodoCobro.INICIALES.size, metodos.observarTodos().first().size)
             assertEquals(emptyList(), cola())
+        }
+
+    @Test
+    fun `un fiado con plazo lo lleva en la foto`() =
+        runTest {
+            val rosa = cliente("Doña Rosa")
+            clientes.guardar(rosa)
+            val conPlazo = movimiento(rosa, FIADO, 1250).copy(vence = hoy.plusDays(3))
+
+            movimientos.guardar(conPlazo)
+
+            assertEquals("\"2026-11-18\"", datos(cola().last())["vence"].toString())
+            assertEquals(conPlazo, movimientos.obtener(conPlazo.id))
+        }
+
+    @Test
+    fun `una prorroga se guarda una sola vez y deja su foto en la cola`() =
+        runTest {
+            val rosa = cliente("Doña Rosa")
+            clientes.guardar(rosa)
+            val fiado = movimiento(rosa, FIADO, 1250).copy(vence = hoy.plusDays(1))
+            movimientos.guardar(fiado)
+            val prorroga = Prorroga(Uuid.random(), fiado.id, hoy.plusDays(5), ahora)
+
+            prorrogas.guardar(prorroga)
+            prorrogas.guardar(prorroga)
+
+            assertEquals(listOf(prorroga), prorrogas.observarDeCliente(rosa.id).first())
+            val foto = cola().last()
+            assertEquals("prorroga", foto.entidad)
+            assertEquals(
+                Json.parseToJsonElement(
+                    """{"id":"${prorroga.id}","movimiento_id":"${fiado.id}","vence":"2026-11-20","registrada_en":"2026-11-15T15:30:00.123Z"}""",
+                ),
+                datos(foto),
+            )
         }
 }

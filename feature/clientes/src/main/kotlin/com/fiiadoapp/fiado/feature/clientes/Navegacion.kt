@@ -26,8 +26,6 @@ fun NavGraphBuilder.pantallasDeClientes(
     navController: NavController,
     onCliente: (Uuid) -> Unit,
     onRegistrar: (Uuid, TipoMovimiento) -> Unit,
-    onMetodosCobro: () -> Unit,
-    onCuenta: () -> Unit,
     onResumen: () -> Unit,
 ) {
     composable<ListaClientes> { entrada ->
@@ -37,11 +35,8 @@ fun NavGraphBuilder.pantallasDeClientes(
         ListaClientesPantalla(
             movimientoRegistrado = registrado?.let(Uuid::parse),
             onAvisoConsumido = { entrada.savedStateHandle[ListaClientes.MOVIMIENTO_REGISTRADO] = null },
-            onNuevo = { navController.navigate(FormularioCliente()) },
             onCliente = onCliente,
             onRegistrar = onRegistrar,
-            onMetodosCobro = onMetodosCobro,
-            onCuenta = onCuenta,
             onResumen = onResumen,
         )
     }

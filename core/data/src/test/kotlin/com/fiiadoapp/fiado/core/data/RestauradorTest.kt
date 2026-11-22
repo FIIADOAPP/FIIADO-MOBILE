@@ -11,6 +11,7 @@ import com.fiiadoapp.fiado.core.data.sincronizacion.Sincronizador
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.MetodoCobro
 import com.fiiadoapp.fiado.domain.Movimiento
+import com.fiiadoapp.fiado.domain.Prorroga
 import com.fiiadoapp.fiado.domain.Telefono
 import com.fiiadoapp.fiado.domain.TipoMovimiento.FIADO
 import com.fiiadoapp.fiado.domain.TipoMovimiento.PAGO
@@ -33,9 +34,11 @@ import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.time.Instant
+import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.uuid.Uuid
 
 /** La restauración real (Retrofit y Room) contra un servidor simulado que responde como FIIADO-API. */
 @RunWith(RobolectricTestRunner::class)
@@ -102,12 +105,13 @@ class RestauradorTest : BaseDeDatosDePrueba() {
     private fun movimientoJson(
         movimiento: Movimiento,
         anuladoEn: String? = null,
+        vence: String? = null,
     ) = """{"entidad":"movimiento","datos":{"id":"${movimiento.id}","cliente_id":"${movimiento.clienteId}",
         "tipo":"${movimiento.tipo.name.lowercase()}","monto":${movimiento.monto.centimos},"nota":${movimiento.nota?.let {
         "\"$it\""
     } ?: "null"},
         "fecha":"${movimiento.fecha}","registrado_en":"${movimiento.registradoEn}","anulado_en":${anuladoEn?.let { "\"$it\"" } ?: "null"},
-        "metodo_cobro_id":${movimiento.metodoCobroId?.let { "\"$it\"" } ?: "null"}}}"""
+        "metodo_cobro_id":${movimiento.metodoCobroId?.let { "\"$it\"" } ?: "null"}${vence?.let { ",\"vence\":\"$it\"" } ?: ""}}}"""
 
     private suspend fun cola() = db.colaDao().primeras(1_000)
 
@@ -283,6 +287,93 @@ class RestauradorTest : BaseDeDatosDePrueba() {
             val vinculo = db.restauracionDao().vinculo()!!
             assertEquals(false, vinculo.restaurada)
             assertTrue(vinculo.primera)
+        }
+
+    @Test
+    fun `trae el plazo de los fiados y acepta una API que aun no lo envia`() =
+        runBlocking {
+            val juana = cliente("Juana")
+            val conPlazo = movimiento(juana, FIADO, 1000)
+            val sinCampo = movimiento(juana, FIADO, 500)
+            pagina(
+                null,
+                metodoJson(MetodoCobro.EFECTIVO),
+                clienteJson(juana),
+                movimientoJson(conPlazo, vence = "2026-11-20"),
+                movimientoJson(sinCampo),
+            )
+
+            assertNull(restaurador.restaurarSiFalta(CORREO))
+
+            assertEquals(LocalDate.of(2026, 11, 20), movimientos.obtener(conPlazo.id)?.vence)
+            assertNull(movimientos.obtener(sinCampo.id)?.vence)
+        }
+
+    @Test
+    fun `un cambio local pendiente no se pisa con la version del servidor y luego se sube`() =
+        runBlocking {
+            val juana = cliente("Juana")
+            restaurador.prepararRestauracion(CORREO)
+            pagina(null, metodoJson(MetodoCobro.EFECTIVO), metodoJson(MetodoCobro.YAPE), metodoJson(MetodoCobro.PLIN), clienteJson(juana))
+            restaurador.restaurarSiFalta(CORREO)
+            // Sin sesión, el dueño le agrega el celular; el cambio queda en la cola.
+            val conCelular = clientes.observar(juana.id).first()!!.copy(telefono = Telefono.desdeTexto("912345678"))
+            clientes.guardar(conCelular)
+            restaurador.prepararRestauracion(CORREO)
+            pagina(null, metodoJson(MetodoCobro.EFECTIVO), metodoJson(MetodoCobro.YAPE), metodoJson(MetodoCobro.PLIN), clienteJson(juana))
+
+            assertNull(restaurador.restaurarSiFalta(CORREO))
+
+            assertEquals(conCelular.telefono, clientes.observar(juana.id).first()?.telefono)
+            val subida = cola().last { it.entidad == "cliente" }
+            assertTrue(subida.datos.contains("+51912345678"))
+        }
+
+    @Test
+    fun `la primera vez tambien conserva y vuelve a encolar lo cambiado en el telefono`() =
+        runBlocking {
+            metodos.guardar(MetodoCobro.YAPE.copy(nombre = "Yape negocio"))
+            pagina(null, metodoJson(MetodoCobro.EFECTIVO), metodoJson(MetodoCobro.YAPE), metodoJson(MetodoCobro.PLIN))
+
+            assertNull(restaurador.restaurarSiFalta(CORREO))
+
+            assertEquals(
+                "Yape negocio",
+                metodos
+                    .observarTodos()
+                    .first()
+                    .first { it.id == MetodoCobro.YAPE.id }
+                    .nombre,
+            )
+            assertEquals(listOf("metodo_cobro" to MetodoCobro.YAPE.id.toString()), entidadesEnCola())
+            assertTrue(cola().single().datos.contains("Yape negocio"))
+        }
+
+    @Test
+    fun `trae las prorrogas y sube las que solo existen en el telefono`() =
+        runBlocking {
+            val juana = cliente("Juana")
+            val fiado = movimiento(juana, FIADO, 1000).copy(vence = LocalDate.of(2026, 11, 16))
+            val delServidor = Prorroga(Uuid.random(), fiado.id, LocalDate.of(2026, 11, 20), Instant.parse("2026-11-16T10:00:00Z"))
+            val prorrogaJson =
+                """{"entidad":"prorroga","datos":{"id":"${delServidor.id}","movimiento_id":"${fiado.id}",
+                "vence":"2026-11-20","registrada_en":"2026-11-16T10:00:00Z"}}"""
+            pagina(
+                null,
+                metodoJson(MetodoCobro.EFECTIVO),
+                metodoJson(MetodoCobro.YAPE),
+                metodoJson(MetodoCobro.PLIN),
+                clienteJson(juana),
+                movimientoJson(fiado, vence = "2026-11-16"),
+                prorrogaJson,
+            )
+
+            assertNull(restaurador.restaurarSiFalta(CORREO))
+            val local = Prorroga(Uuid.random(), fiado.id, LocalDate.of(2026, 11, 25), ahora)
+            prorrogas.guardar(local)
+
+            assertEquals(setOf(delServidor, local), prorrogas.observarDeCliente(juana.id).first().toSet())
+            assertEquals(listOf("prorroga" to local.id.toString()), entidadesEnCola())
         }
 
     private companion object {

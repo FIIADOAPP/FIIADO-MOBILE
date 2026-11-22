@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.fiiadoapp.fiado.domain.CuentaAbierta
 import com.fiiadoapp.fiado.domain.ErrorCuenta
 import com.fiiadoapp.fiado.domain.EstadoRespaldo
+import com.fiiadoapp.fiado.domain.RepositorioBloqueo
 import com.fiiadoapp.fiado.domain.RepositorioCuenta
 import com.fiiadoapp.fiado.domain.RepositorioRespaldo
 import com.fiiadoapp.fiado.domain.Resultado
@@ -43,7 +44,21 @@ class CuentaViewModel
     constructor(
         private val repositorio: RepositorioCuenta,
         respaldo: RepositorioRespaldo,
+        private val bloqueo: RepositorioBloqueo,
     ) : ViewModel() {
+        /** Si la app pide la huella o el PIN del teléfono (ADR-0006); no depende de tener cuenta. */
+        val bloqueoActivo: StateFlow<Boolean> =
+            bloqueo.observarActivo().stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                false,
+            )
+
+        /** Se llama después de que el dueño confirmó con la huella o el PIN. */
+        fun cambiarBloqueo(activo: Boolean) {
+            viewModelScope.launch { bloqueo.cambiar(activo) }
+        }
+
         val estado: StateFlow<EstadoCuenta> =
             combine(repositorio.observar(), respaldo.observar()) { cuenta, estadoRespaldo ->
                 if (cuenta == null) EstadoCuenta.SinCuenta else EstadoCuenta.Abierta(cuenta, estadoRespaldo)

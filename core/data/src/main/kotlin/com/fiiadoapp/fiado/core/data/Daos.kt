@@ -1,6 +1,8 @@
 package com.fiiadoapp.fiado.core.data
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
@@ -30,6 +32,9 @@ interface ClienteDao {
 
     @Query("SELECT * FROM clientes WHERE id = :id")
     fun observar(id: String): Flow<ClienteEntity?>
+
+    @Query("SELECT * FROM clientes WHERE id = :id")
+    suspend fun obtener(id: String): ClienteEntity?
 
     @Upsert
     suspend fun guardar(cliente: ClienteEntity)
@@ -64,6 +69,25 @@ interface MetodoCobroDao {
     @Query("SELECT * FROM metodos_cobro ORDER BY creadoEn, id")
     fun observarTodos(): Flow<List<MetodoCobroEntity>>
 
+    @Query("SELECT * FROM metodos_cobro WHERE id = :id")
+    suspend fun obtener(id: String): MetodoCobroEntity?
+
     @Upsert
     suspend fun guardar(metodo: MetodoCobroEntity)
+}
+
+@Dao
+interface ProrrogaDao {
+    @Query("SELECT p.* FROM prorrogas p JOIN movimientos m ON m.id = p.movimientoId WHERE m.clienteId = :clienteId")
+    fun observarDeCliente(clienteId: String): Flow<List<ProrrogaEntity>>
+
+    @Query("SELECT * FROM prorrogas")
+    fun observarTodas(): Flow<List<ProrrogaEntity>>
+
+    /** Una prórroga no cambia: guardarla otra vez no hace nada. */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun guardar(prorroga: ProrrogaEntity)
+
+    @Query("SELECT * FROM prorrogas WHERE id = :id")
+    suspend fun obtener(id: String): ProrrogaEntity?
 }

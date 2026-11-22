@@ -36,6 +36,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fiiadoapp.fiado.core.ui.BarraSecundaria
+import com.fiiadoapp.fiado.core.ui.MargenPantalla
 import com.fiiadoapp.fiado.core.ui.textoDeSaldo
 import com.fiiadoapp.fiado.domain.Cliente
 import com.fiiadoapp.fiado.domain.Dinero
@@ -70,15 +72,9 @@ internal fun FormularioClienteContenido(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(stringResource(if (estado.esEdicion) R.string.cliente_editar_titulo else R.string.cliente_nuevo_titulo))
-                },
-                navigationIcon = {
-                    IconButton(onClick = onVolver) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.volver))
-                    }
-                },
+            BarraSecundaria(
+                stringResource(if (estado.esEdicion) R.string.cliente_editar_titulo else R.string.cliente_nuevo_titulo),
+                onVolver,
             )
         },
     ) { relleno ->
@@ -92,7 +88,7 @@ internal fun FormularioClienteContenido(
                     .padding(relleno)
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
+                    .padding(horizontal = MargenPantalla, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             val errorNombre =
@@ -114,6 +110,7 @@ internal fun FormularioClienteContenido(
                     }
                 }
             OutlinedTextField(
+                shape = MaterialTheme.shapes.small,
                 value = estado.nombre,
                 onValueChange = onNombre,
                 modifier = Modifier.fillMaxWidth(),
@@ -124,6 +121,7 @@ internal fun FormularioClienteContenido(
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
             )
             OutlinedTextField(
+                shape = MaterialTheme.shapes.small,
                 value = estado.telefono,
                 onValueChange = onTelefono,
                 modifier = Modifier.fillMaxWidth(),

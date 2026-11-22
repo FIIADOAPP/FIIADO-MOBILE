@@ -86,12 +86,19 @@ Cada entrega indica su repositorio: **M** (mobile) o **A** (API).
 | `test/sincronizacion-casos-dificiles` | M, A | Sin conexión, corte a la mitad (enviado pero sin confirmación), reenvío duplicado, restauración interrumpida y sesión reemplazada. |
 | `feat/estado-de-sincronizacion` | M | Indicador de pendientes y aviso al cerrar sesión o al ceder el dispositivo con cambios sin enviar, que se conservan en el teléfono. |
 
-### Fase 4: Cobro y seguridad → app `v0.5.0`
+### Fase 4: Cobro, seguridad y puntualidad → API `v0.4.0`, app `v0.5.0`
 
 | Rama | Repo | Entrega |
 |---|---|---|
 | `feat/recordatorio-whatsapp` | M | Mensaje de cobro con el monto ya escrito. |
+| `feat/rediseno-oscuro` | M | Diseño oscuro con tarjetas, gráficos en el resumen y barra inferior flotante, sin cambiar la lógica. |
 | `feat/bloqueo-biometrico` | M | Bloqueo al abrir y al volver de segundo plano. |
+| `docs/adr-plazos` | M | ADR-0007: plazo al fiar, prórrogas, a qué fiado paga cada pago, cómo se mide la puntualidad y el semáforo. |
+| `feat/plazos` | A | `vence` en los movimientos y la entidad `prorroga`, con migración y pruebas (API `v0.4.0`). |
+| `feat/plazo-al-fiar` | M | "¿Para cuándo?" con atajos al fiar, plazo visible en el historial y migración a la versión 5. |
+| `feat/prorrogas` | M | "Dar más plazo" a un fiado pendiente, solo hacia adelante. |
+| `feat/puntualidad` | M | Cálculo en el dominio (pagos del más antiguo al más reciente, atraso, semáforo), tarjeta "Cómo paga" y etiquetas de vencimiento en la lista. |
+| `feat/como-te-pagan` | M | Sección "Cómo te pagan" en el resumen, aviso al fiar a un cliente en Cuidado y plazo sugerido. |
 
 ### Fase 5: Publicación → `v1.0.0` en ambos
 

@@ -3,6 +3,7 @@ package com.fiiadoapp.fiado.core.data.sincronizacion
 import com.fiiadoapp.fiado.core.data.ClienteEntity
 import com.fiiadoapp.fiado.core.data.MetodoCobroEntity
 import com.fiiadoapp.fiado.core.data.MovimientoEntity
+import com.fiiadoapp.fiado.core.data.ProrrogaEntity
 import com.fiiadoapp.fiado.core.data.normalizarParaBusqueda
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -46,6 +47,16 @@ internal data class MovimientoFoto(
     @SerialName("registrado_en") val registradoEn: String,
     @SerialName("anulado_en") val anuladoEn: String?,
     @SerialName("metodo_cobro_id") val metodoCobroId: String?,
+    /** Una API anterior a la v0.4.0 no lo envía al restaurar. */
+    val vence: String? = null,
+)
+
+@Serializable
+internal data class ProrrogaFoto(
+    val id: String,
+    @SerialName("movimiento_id") val movimientoId: String,
+    val vence: String,
+    @SerialName("registrada_en") val registradaEn: String,
 )
 
 /** Valor del campo `entidad` de una operación. */
@@ -55,12 +66,15 @@ internal enum class TipoDeRegistro(
     METODO_COBRO("metodo_cobro"),
     CLIENTE("cliente"),
     MOVIMIENTO("movimiento"),
+    PRORROGA("prorroga"),
 }
 
 /** Los `null` también se escriben: la API exige la foto completa. Lo desconocido se ignora al leer. */
 internal val jsonDeSincronizacion =
     Json {
         explicitNulls = true
+        // La foto es completa: también se escriben los campos con valor por defecto, como `vence`.
+        encodeDefaults = true
         ignoreUnknownKeys = true
     }
 
@@ -92,8 +106,15 @@ internal fun MovimientoEntity.foto(): String =
                 registradoEn = instante(registradoEn),
                 anuladoEn = anuladoEn?.let(::instante),
                 metodoCobroId = metodoCobroId,
+                vence = vence?.let { LocalDate.ofEpochDay(it).toString() },
             ),
         )
+
+internal fun ProrrogaEntity.foto(): String =
+    jsonDeSincronizacion.encodeToString(
+        ProrrogaFoto.serializer(),
+        ProrrogaFoto(id, movimientoId, LocalDate.ofEpochDay(vence).toString(), instante(registradaEn)),
+    )
 
 /** Desde la fila guardada, no desde el dominio: así la foto tiene la misma precisión (milisegundos) cada vez. */
 private fun instante(milisegundos: Long): String = Instant.ofEpochMilli(milisegundos).toString()
@@ -121,6 +142,13 @@ internal sealed interface Restaurado {
         val fila: MovimientoEntity,
     ) : Restaurado {
         override val tipo = TipoDeRegistro.MOVIMIENTO
+        override val id = fila.id
+    }
+
+    data class Prorroga(
+        val fila: ProrrogaEntity,
+    ) : Restaurado {
+        override val tipo = TipoDeRegistro.PRORROGA
         override val id = fila.id
     }
 }
@@ -171,7 +199,15 @@ internal fun decodificar(registro: RegistroDto): Restaurado {
                         registradoEn = milis(foto.registradoEn),
                         anuladoEn = foto.anuladoEn?.let(::milis),
                         metodoCobroId = foto.metodoCobroId,
+                        vence = foto.vence?.let { LocalDate.parse(it).toEpochDay() },
                     ),
+                )
+            }
+
+            TipoDeRegistro.PRORROGA.valor -> {
+                val foto = jsonDeSincronizacion.decodeFromJsonElement(ProrrogaFoto.serializer(), datos)
+                Restaurado.Prorroga(
+                    ProrrogaEntity(foto.id, foto.movimientoId, LocalDate.parse(foto.vence).toEpochDay(), milis(foto.registradaEn)),
                 )
             }
 

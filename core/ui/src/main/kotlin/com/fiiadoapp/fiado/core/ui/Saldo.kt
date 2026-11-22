@@ -5,10 +5,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.fiiadoapp.fiado.domain.Dinero
 
-/** "Debe S/ 12.50", "A favor S/ 3.00" o "Al día". */
+/** "Debe S/ 12.50", "A favor S/ 3.00" o "Al día". Lo que se debe va en coral; lo demás, en verde. */
 @Composable
 fun textoDeSaldo(saldo: Dinero): String =
     when {
@@ -21,17 +22,17 @@ fun textoDeSaldo(saldo: Dinero): String =
 fun SaldoTexto(
     saldo: Dinero,
     modifier: Modifier = Modifier,
+    estilo: TextStyle = MaterialTheme.typography.titleMedium,
 ) {
     Text(
         text = textoDeSaldo(saldo),
         modifier = modifier,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = if (saldo.esPositivo) FontWeight.Bold else FontWeight.Normal,
+        style = estilo,
+        fontWeight = if (saldo.esPositivo) FontWeight.SemiBold else FontWeight.Medium,
         color =
             when {
                 saldo.esPositivo -> MaterialTheme.colorScheme.error
-                saldo.esNegativo -> MaterialTheme.colorScheme.primary
-                else -> MaterialTheme.colorScheme.onSurfaceVariant
+                else -> MaterialTheme.colorScheme.tertiary
             },
     )
 }

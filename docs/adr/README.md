@@ -27,3 +27,6 @@ Un ADR aceptado no se edita: si la decisión cambia, se escribe uno nuevo que lo
 | [0003](0003-durabilidad-de-escrituras.md) | Durabilidad de las escrituras locales | Aceptada |
 | [0004](0004-metodos-de-cobro.md) | Métodos de cobro | Aceptada |
 | [0005](0005-sesion-en-la-app.md) | Cuenta y sesión en la app | Aceptada |
+| [0006](0006-bloqueo-de-la-app.md) | Bloqueo de la app con la huella o el PIN del teléfono | Aceptada |
+| [0007](0007-plazos-y-puntualidad.md) | Plazos de pago y puntualidad de los clientes | Aceptada |
+| [0008](0008-restaurar-sin-pisar-pendientes.md) | Restaurar sin pisar los cambios pendientes del teléfono | Aceptada |
