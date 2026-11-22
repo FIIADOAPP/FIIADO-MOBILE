@@ -22,15 +22,16 @@ jobs:
       - name: Comprobar la configuración
         run: |
           faltan=""
-          for nombre in API_URL_RELEASE FIRMA_KEYSTORE_BASE64 FIRMA_CLAVE FIRMA_ALIAS FIRMA_CLAVE_ALIAS; do
+          for nombre in FIRMA_KEYSTORE_BASE64 FIRMA_CLAVE FIRMA_ALIAS FIRMA_CLAVE_ALIAS; do
             [ -n "${!nombre}" ] || faltan="$faltan $nombre"
           done
           if [ -n "$faltan" ]; then
             echo "::error::Faltan variables o secretos del repositorio:$faltan"
             exit 1
           fi
+          # Sin API_URL_RELEASE, la app sale sin cuenta y guarda la libreta solo en el teléfono (ADR-0010).
           case "$API_URL_RELEASE" in
-            https://*/) ;;
+            "" | https://*/) ;;
             *) echo "::error::API_URL_RELEASE debe empezar con https:// y terminar en /"; exit 1 ;;
           esac
       - uses: actions/checkout@v7
@@ -44,7 +45,12 @@ jobs:
           echo "$FIRMA_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/subida.jks"
           echo "FIRMA_ARCHIVO=$RUNNER_TEMP/subida.jks" >> "$GITHUB_ENV"
       - name: Compilar
-        run: ./gradlew bundleRelease assembleRelease -Pfiado.apiUrlRelease="$API_URL_RELEASE" --console=plain
+        run: |
+          cuenta=()
+          if [ -n "$API_URL_RELEASE" ]; then
+            cuenta=(-Pfiado.cuentaRelease=true -Pfiado.apiUrlRelease="$API_URL_RELEASE")
+          fi
+          ./gradlew bundleRelease assembleRelease "${cuenta[@]}" --console=plain
       - name: Adjuntar al release
         env:
           GH_TOKEN: ${{ github.token }}
