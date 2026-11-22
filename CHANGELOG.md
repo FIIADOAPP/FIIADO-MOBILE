@@ -8,6 +8,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ### Corregido
 
+- Con la letra del teléfono muy grande, la barra inferior muestra solo los íconos (con su nombre para el lector de pantalla) en vez de pisar las etiquetas; las iniciales de los clientes ya no se salen de su círculo y la etiqueta «Anuncio» ya no se monta sobre el anuncio.
+
+### Corregido
+
 - La tarjeta del anuncio aparece solo cuando AdMob entrega un anuncio. Sin anuncio (cuenta nueva o sin internet) no queda una tarjeta vacía, y se vuelve a pedir cada minuto. El anuncio ya no se vuelve a pedir al cambiar de pestaña.
 
 ## [1.1.0] - 2026-11-22
