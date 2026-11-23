@@ -120,10 +120,13 @@ class MainActivity : FragmentActivity() {
                                 val titulo = stringResource(R.string.bloqueo_pedido)
                                 PantallaBloqueada(
                                     onDesbloquear = {
-                                        if (autenticador.disponible()) {
-                                            autenticador.autenticar(titulo) { bloqueo.desbloquear() }
-                                        } else {
-                                            bloqueo.desactivarPorElTelefono()
+                                        when {
+                                            autenticador.disponible() -> autenticador.autenticar(titulo) { bloqueo.desbloquear() }
+
+                                            autenticador.sinBloqueoDePantalla() -> bloqueo.desactivarPorElTelefono()
+
+                                            // Un fallo pasajero del sensor: la libreta sigue bloqueada y se puede reintentar.
+                                            else -> Unit
                                         }
                                     },
                                 )
