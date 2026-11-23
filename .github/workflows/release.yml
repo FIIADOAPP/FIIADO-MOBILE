@@ -12,16 +12,18 @@ jobs:
   firmar:
     name: AAB y APK firmados
     runs-on: ubuntu-latest
+    # Solo variables públicas a nivel del job; cada secreto se entrega únicamente al paso que lo usa.
     env:
       API_URL_RELEASE: ${{ vars.API_URL_RELEASE }}
       ADMOB_APP_ID: ${{ vars.ADMOB_APP_ID }}
       ADMOB_BANNER: ${{ vars.ADMOB_BANNER }}
-      FIRMA_KEYSTORE_BASE64: ${{ secrets.FIRMA_KEYSTORE_BASE64 }}
-      FIRMA_CLAVE: ${{ secrets.FIRMA_CLAVE }}
-      FIRMA_ALIAS: ${{ secrets.FIRMA_ALIAS }}
-      FIRMA_CLAVE_ALIAS: ${{ secrets.FIRMA_CLAVE_ALIAS }}
     steps:
       - name: Comprobar la configuración
+        env:
+          FIRMA_KEYSTORE_BASE64: ${{ secrets.FIRMA_KEYSTORE_BASE64 }}
+          FIRMA_CLAVE: ${{ secrets.FIRMA_CLAVE }}
+          FIRMA_ALIAS: ${{ secrets.FIRMA_ALIAS }}
+          FIRMA_CLAVE_ALIAS: ${{ secrets.FIRMA_CLAVE_ALIAS }}
         run: |
           faltan=""
           for nombre in FIRMA_KEYSTORE_BASE64 FIRMA_CLAVE FIRMA_ALIAS FIRMA_CLAVE_ALIAS; do
@@ -43,10 +45,16 @@ jobs:
           java-version: 21
       - uses: gradle/actions/setup-gradle@v6
       - name: Recuperar la clave de subida
+        env:
+          FIRMA_KEYSTORE_BASE64: ${{ secrets.FIRMA_KEYSTORE_BASE64 }}
         run: |
           echo "$FIRMA_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/subida.jks"
           echo "FIRMA_ARCHIVO=$RUNNER_TEMP/subida.jks" >> "$GITHUB_ENV"
       - name: Compilar
+        env:
+          FIRMA_CLAVE: ${{ secrets.FIRMA_CLAVE }}
+          FIRMA_ALIAS: ${{ secrets.FIRMA_ALIAS }}
+          FIRMA_CLAVE_ALIAS: ${{ secrets.FIRMA_CLAVE_ALIAS }}
         run: |
           cuenta=()
           if [ -n "$API_URL_RELEASE" ]; then
