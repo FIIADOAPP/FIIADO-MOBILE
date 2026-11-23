@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Android 12 o superior. La libreta y las preferencias viajan a Google y a un teléfono nuevo; la sesión no (ADR-0010). -->
 <data-extraction-rules>
-    <cloud-backup>
+    <!-- Solo si la copia va cifrada de extremo a extremo (teléfono con bloqueo de pantalla), como dice la política de privacidad. -->
+    <cloud-backup disableIfNoEncryptionCapabilities="true">
         <include domain="database" path="fiado.db" />
         <include domain="file" path="datastore/preferencias.preferences_pb" />
     </cloud-backup>

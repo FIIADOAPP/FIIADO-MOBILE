@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Android 11 o anterior. La libreta y las preferencias se respaldan en Google; la sesión no (ADR-0010). -->
+<!-- Android 11 o anterior; solo con la copia cifrada en el teléfono. La libreta y las preferencias se respaldan en Google; la sesión no (ADR-0010). -->
 <full-backup-content>
-    <include domain="database" path="fiado.db" />
-    <include domain="file" path="datastore/preferencias.preferences_pb" />
+    <include domain="database" path="fiado.db" requireFlags="clientSideEncryption" />
+    <include domain="file" path="datastore/preferencias.preferences_pb" requireFlags="clientSideEncryption" />
 </full-backup-content>
