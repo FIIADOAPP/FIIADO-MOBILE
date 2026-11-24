@@ -54,13 +54,15 @@ class BloqueoViewModel
             if (_estado.value == EstadoBloqueo.ABIERTA) salioEn = ahora
         }
 
+        /**
+         * Se decide en el acto, con lo que ya está en memoria: si esperara una corrutina, la libreta alcanzaría
+         * a dibujarse un instante antes de bloquearse.
+         */
         fun alVolver(ahora: Long) {
             val salida = salioEn
             salioEn = null
-            viewModelScope.launch {
-                if (bloqueo.observarActivo().first() && ReglaDeBloqueo.pedirAlVolver(salida, ahora)) {
-                    _estado.value = EstadoBloqueo.BLOQUEADA
-                }
+            if (activo.value && ReglaDeBloqueo.pedirAlVolver(salida, ahora)) {
+                _estado.value = EstadoBloqueo.BLOQUEADA
             }
         }
 

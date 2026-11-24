@@ -6,6 +6,12 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+### Seguridad
+
+- La copia de seguridad de Google solo incluye la libreta cuando va cifrada de extremo a extremo, como dice la política de privacidad.
+- Al volver a la app con el bloqueo activo, se bloquea en el acto, sin mostrar la libreta un instante. Un fallo pasajero del sensor ya no apaga el bloqueo: solo se apaga si el teléfono no tiene bloqueo de pantalla.
+- El workflow de release entrega los secretos de firma solo a los pasos que los usan.
+
 ### Cambiado
 
 - Nuevo ícono con el logo de Fiadito: la libreta sobre fondo azul marino.

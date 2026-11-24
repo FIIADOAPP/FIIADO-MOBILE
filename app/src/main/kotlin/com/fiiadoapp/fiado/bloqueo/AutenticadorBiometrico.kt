@@ -15,7 +15,11 @@ import com.fiiadoapp.fiado.core.ui.Autenticador
 class AutenticadorBiometrico(
     private val actividad: FragmentActivity,
 ) : Autenticador {
-    override fun disponible(): Boolean = BiometricManager.from(actividad).canAuthenticate(PERMITIDOS) == BiometricManager.BIOMETRIC_SUCCESS
+    override fun disponible(): Boolean = estado() == BiometricManager.BIOMETRIC_SUCCESS
+
+    override fun sinBloqueoDePantalla(): Boolean = estado() == BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
+
+    private fun estado(): Int = BiometricManager.from(actividad).canAuthenticate(PERMITIDOS)
 
     override fun autenticar(
         titulo: String,
